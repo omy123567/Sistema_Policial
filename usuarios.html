@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Usuarios - Sistema de Gestión Policial</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+        .permisos-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-top: 0.5rem; }
+        .modulo-permiso { margin-bottom: 1rem; padding: 0.5rem; border-bottom: 1px solid var(--border); }
+        .modulo-permiso h4 { margin-bottom: 0.5rem; color: var(--accent-primary); }
+        .permiso-checkbox { display: inline-flex; align-items: center; margin-right: 1rem; }
+        .permiso-checkbox input { margin-right: 0.25rem; }
+        @media (max-width: 768px) { .permiso-checkbox { display: block; margin-bottom: 0.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <nav class="navbar">
+            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="personal.html" class="nav-link"><i class="fas fa-users"></i> Personal</a></li>
+                <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
+                <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
+                <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
+                <li><a href="usuarios.html" class="nav-link active"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+            </ul>
+            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <div class="card-header">
+            <h1><i class="fas fa-user-cog"></i> Gestión de Usuarios</h1>
+            <button id="btnNuevoUsuario" class="btn btn-primary" onclick="openUsuarioModal()"><i class="fas fa-plus"></i> Nuevo Usuario</button>
+        </div>
+        
+        <div class="table-container">
+            <table id="usuariosTable">
+                <thead><tr><th>Nombre</th><th>Usuario</th><th>Email</th><th>Rol</th><th>Dependencia</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="usuariosTableBody"><tr><td colspan="7" class="text-center">Cargando...<\/td></tr></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="usuarioModal" class="modal"><div class="modal-content" style="max-width:600px;max-height:90vh;overflow-y:auto;">
+        <div class="modal-header"><h3 id="modalTitle">Nuevo Usuario</h3><span class="close-modal">&times;</span></div>
+        <div class="modal-body">
+            <form id="usuarioForm">
+                <input type="hidden" id="usuarioId">
+                <div><label>Nombre Completo *</label><input type="text" id="usuario_nombre" class="form-control" required></div>
+                <div><label>Usuario *</label><input type="text" id="usuario_username" class="form-control" required></div>
+                <div><label>Email *</label><input type="email" id="usuario_email" class="form-control" required></div>
+                <div><label>Contraseña</label><div style="display:flex;gap:0.5rem;"><input type="password" id="usuario_password" class="form-control" placeholder="Dejar en blanco para no cambiar"><button type="button" class="btn-sm btn-secondary" onclick="togglePasswordVisibility('usuario_password')"><i class="fas fa-eye"></i></button></div></div>
+                <div><label>Rol *</label><select id="usuario_rol" class="form-control" required><option value="">Seleccionar</option><option value="1">Administrador Central</option><option value="2">Supervisor Delegación</option><option value="3">Jefe Sección</option><option value="4">Operador</option></select></div>
+                <div><label>Dependencia</label><select id="usuario_dependencia" class="form-control" data-dependencia><option value="">Seleccionar</option></select></div>
+                <div><label>Nivel Acceso</label><select id="usuario_nivel_acceso" class="form-control"><option value="solo_propio">Solo su dependencia</option><option value="delegacion">Toda la delegación</option><option value="todas">Todas las dependencias</option></select></div>
+                <div><label>Estado</label><select id="usuario_estado" class="form-control"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select></div>
+                <div><label>Permisos</label><div id="permisosContainer" class="permisos-container"></div></div>
+            </form>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveUsuario()">Guardar</button></div>
+    </div></div>
+    
+    <div id="toast-container" class="toast-container"></div>
+    
+    <script>
+        const API_URL = 'backend/api.php';
+        let permisosData = {};
+        
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<div>${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        
+        async function apiRequest(endpoint, method = 'GET', data = null) {
+            const token = getToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
+            let url = `${API_URL}?endpoint=${endpoint}`;
+            const options = { method, headers };
+            if (data && (method === 'POST' || method === 'PUT')) options.body = JSON.stringify(data);
+            
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                if (response.status === 401) { window.location.href = 'index.html'; throw new Error('Sesión expirada'); }
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast('Error de conexión', 'error');
+                return [];
+            }
+        }
+        
+        function renderUsuariosTable(d) {
+            const tbody = document.getElementById('usuariosTableBody');
+            if (!tbody) return;
+            if (!d || d.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay registros<\/td></td>';
+                return;
+            }
+            tbody.innerHTML = d.map(i => `<tr>
+                <td>${escapeHtml(i.nombre_completo)}</td>
+                <td>${escapeHtml(i.username)}</td>
+                <td>${escapeHtml(i.email)}</td>
+                <td>${escapeHtml(i.rol_nombre||'-')}</td>
+                <td>${escapeHtml(i.dependencia_nombre||'-')}</td>
+                <td>${i.estado === 'Activo' ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>'}</td>
+                <td>
+                    <button class="btn-sm btn-primary" onclick="editUsuario(${i.id})"><i class="fas fa-edit"></i></button>
+                    <button class="btn-sm btn-danger" onclick="deleteUsuario(${i.id})"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`).join('');
+        }
+        
+        function cargarPermisos(rolId) {
+            const c = document.getElementById('permisosContainer');
+            if (!c) return;
+            const modulos = ['dashboard','personal','recargos','expedientes','licencias','usuarios','configuracion'];
+            const acciones = ['ver','crear','editar','eliminar'];
+            c.innerHTML = modulos.map(m => `<div class="modulo-permiso"><h4><i class="fas fa-${m==='dashboard'?'tachometer-alt':m==='personal'?'users':m==='recargos'?'exclamation-triangle':m==='expedientes'?'folder-open':m==='licencias'?'calendar-alt':m==='usuarios'?'user-cog':'cog'}"></i> ${m.charAt(0).toUpperCase()+m.slice(1)}</h4><div>${acciones.map(a => `<label class="permiso-checkbox"><input type="checkbox" class="permiso-${m}" data-modulo="${m}" data-accion="${a}" ${permisosData[m]?.includes(a)?'checked':''}> ${a.charAt(0).toUpperCase()+a.slice(1)}</label>`).join('')}</div></div>`).join('');
+            if (rolId == 1) document.querySelectorAll('.permiso-checkbox input').forEach(cb => cb.checked = true);
+        }
+        
+        function recopilarPermisos() {
+            const p = {};
+            const modulos = ['dashboard','personal','recargos','expedientes','licencias','usuarios','configuracion'];
+            modulos.forEach(m => {
+                const a = [];
+                document.querySelectorAll(`.permiso-${m}`).forEach(cb => { if (cb.checked) a.push(cb.dataset.accion); });
+                if (a.length > 0) p[m] = a;
+            });
+            return p;
+        }
+        
+        async function cargarDependenciasSelect() {
+            try {
+                const d = await apiRequest('dependencias');
+                const sel = document.getElementById('usuario_dependencia');
+                if (sel) sel.innerHTML = '<option value="">Seleccionar...</option>' + d.map(dep => `<option value="${dep.id}">${escapeHtml(dep.nombre)}</option>`).join('');
+            } catch(e) { console.error(e); }
+        }
+        
+        function openUsuarioModal(data = null) {
+            const modal = document.getElementById('usuarioModal');
+            if (!modal) return;
+            if (data) {
+                document.getElementById('usuarioId').value = data.id;
+                document.getElementById('usuario_nombre').value = data.nombre_completo;
+                document.getElementById('usuario_username').value = data.username;
+                document.getElementById('usuario_email').value = data.email;
+                document.getElementById('usuario_rol').value = data.rol_id;
+                document.getElementById('usuario_dependencia').value = data.dependencia_id || '';
+                document.getElementById('usuario_nivel_acceso').value = data.nivel_acceso || 'solo_propio';
+                document.getElementById('usuario_estado').value = data.estado;
+                permisosData = data.permisos || {};
+                document.getElementById('modalTitle').textContent = 'Editar Usuario';
+            } else {
+                document.getElementById('usuarioForm').reset();
+                document.getElementById('usuarioId').value = '';
+                permisosData = {};
+                document.getElementById('modalTitle').textContent = 'Nuevo Usuario';
+            }
+            cargarPermisos(document.getElementById('usuario_rol').value);
+            modal.style.display = 'flex';
+        }
+        
+        async function saveUsuario() {
+            const id = document.getElementById('usuarioId')?.value;
+            const data = {
+                nombre_completo: document.getElementById('usuario_nombre')?.value,
+                username: document.getElementById('usuario_username')?.value,
+                email: document.getElementById('usuario_email')?.value,
+                password: document.getElementById('usuario_password')?.value,
+                rol_id: document.getElementById('usuario_rol')?.value,
+                dependencia_id: document.getElementById('usuario_dependencia')?.value,
+                nivel_acceso: document.getElementById('usuario_nivel_acceso')?.value,
+                estado: document.getElementById('usuario_estado')?.value,
+                permisos: recopilarPermisos()
+            };
+            if (!data.nombre_completo || !data.username || !data.email) { showToast('Complete campos requeridos', 'warning'); return; }
+            try {
+                let result;
+                if (id) result = await apiRequest(`usuarios&id=${id}`, 'PUT', data);
+                else {
+                    if (!data.password) { showToast('Contraseña requerida', 'error'); return; }
+                    result = await apiRequest('usuarios', 'POST', data);
+                }
+                if (result && result.success) {
+                    showToast(`Usuario ${id ? 'actualizado' : 'creado'} correctamente`, 'success');
+                    closeModal();
+                    await loadUsuarios();
+                } else showToast('Error al guardar', 'error');
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        async function loadUsuarios() {
+            try {
+                const data = await apiRequest('usuarios');
+                renderUsuariosTable(data);
+                await cargarDependenciasSelect();
+                showToast('Usuarios cargados', 'success');
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        async function editUsuario(id) {
+            try {
+                const data = await apiRequest(`usuarios&id=${id}`);
+                if (data) openUsuarioModal(data);
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        async function deleteUsuario(id) {
+            if (confirm('¿Eliminar este usuario?')) {
+                try {
+                    const result = await apiRequest(`usuarios&id=${id}`, 'DELETE');
+                    if (result && result.success) {
+                        showToast('Usuario eliminado', 'success');
+                        await loadUsuarios();
+                    }
+                } catch(e) { showToast('Error', 'error'); }
+            }
+        }
+        
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        
+        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsuarios();
+            document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
+            document.getElementById('usuario_rol')?.addEventListener('change', function() { cargarPermisos(this.value); });
+        });
+        
+        window.openUsuarioModal = openUsuarioModal;
+        window.saveUsuario = saveUsuario;
+        window.editUsuario = editUsuario;
+        window.deleteUsuario = deleteUsuario;
+        window.togglePasswordVisibility = togglePasswordVisibility;
+        window.closeModal = closeModal;
+    </script>
+</body>
+</html>

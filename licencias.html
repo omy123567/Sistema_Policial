@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Licencias - Sistema de Gestión Policial</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+        input[list], select { width: 100%; padding: 0.5rem 0.75rem; background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); }
+        .filtros-container { background-color: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+        .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .badge-estado { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 8px; font-size: 0.7rem; font-weight: bold; }
+        .badge-aprobada { background-color: rgba(22,163,74,0.2); color:#16a34a; }
+        .badge-pendiente { background-color: rgba(217,119,6,0.2); color:#d97706; }
+        .badge-rechazada { background-color: rgba(220,38,38,0.2); color:#dc2626; }
+        .badge-finalizada { background-color: rgba(107,114,128,0.2); color:#9ca3af; }
+        .btn-accion { padding: 0.25rem 0.5rem; margin:0 0.25rem; border-radius:6px; font-size:0.7rem; cursor:pointer; }
+        .btn-ver { background-color: rgba(29,78,216,0.2); color:#1d4ed8; border:none; }
+        .btn-ver:hover { background-color:#1d4ed8; color:white; }
+        .btn-eliminar { background-color: rgba(220,38,38,0.2); color:#dc2626; border:none; }
+        .btn-eliminar:hover { background-color:#dc2626; color:white; }
+        @media (max-width:768px){ .filtros-grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <nav class="navbar">
+            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="personal.html" class="nav-link"><i class="fas fa-users"></i> Personal</a></li>
+                <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
+                <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
+                <li><a href="licencias.html" class="nav-link active"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
+                <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+            </ul>
+            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <div class="card-header">
+            <h1><i class="fas fa-calendar-alt"></i> Gestión de Licencias</h1>
+            <div>
+                <button id="btnNuevaLicencia" class="btn btn-primary" onclick="openLicenciaModal()"><i class="fas fa-plus"></i> Nueva Licencia</button>
+                <button id="btnReportePDF" class="btn btn-secondary" onclick="generarPDFLicencias()"><i class="fas fa-file-pdf"></i> Reporte PDF</button>
+            </div>
+        </div>
+        
+        <div class="filtros-container">
+            <h3><i class="fas fa-filter"></i> Filtros</h3>
+            <div class="filtros-grid">
+                <div><label>Fecha Desde</label><input type="date" id="filtro_fecha_desde" class="form-control"></div>
+                <div><label>Fecha Hasta</label><input type="date" id="filtro_fecha_hasta" class="form-control"></div>
+                <div><label>Tipo</label><select id="filtro_tipo" class="form-control"><option value="">Todos</option></select></div>
+                <div><label>Estado</label><select id="filtro_estado" class="form-control"><option value="">Todos</option><option>Pendiente</option><option>Aprobada</option><option>Rechazada</option><option>Finalizada</option></select></div>
+                <div><label>Agente</label><input type="text" id="filtro_agente" class="form-control" placeholder="Nombre"></div>
+                <div id="filtroDependenciaContainer" style="display:none;"><label>Dependencia</label><select id="filtro_dependencia" class="form-control" data-dependencia><option value="">Todas</option></select></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+                <button class="btn btn-primary" onclick="aplicarFiltros()"><i class="fas fa-search"></i> Buscar</button>
+                <button class="btn btn-secondary" onclick="limpiarFiltros()"><i class="fas fa-eraser"></i> Limpiar</button>
+                <button class="btn btn-secondary" onclick="exportarFiltradosCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table id="licenciasTable">
+                <thead><tr><th>Legajo</th><th>Agente</th><th>Tipo</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Días</th><th>Acciones</th></tr></thead>
+                <tbody id="licenciasTableBody"><tr><td colspan="8" class="text-center">Cargando...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="licenciaModal" class="modal"><div class="modal-content" style="max-width:600px;">
+        <div class="modal-header"><h3 id="modalTitle">Nueva Licencia</h3><span class="close-modal">&times;</span></div>
+        <div class="modal-body">
+            <form id="licenciaForm">
+                <input type="hidden" id="licenciaId">
+                <input type="hidden" id="licencia_agente">
+                <input type="hidden" id="licencia_tipo">
+                <input type="hidden" id="licencia_dependencia_id">
+                
+                <div><label>Agente *</label><input type="text" id="licencia_agente_input" class="form-control" list="personalList" placeholder="Buscar..." autocomplete="off" required><datalist id="personalList"></datalist></div>
+                <div><label>Tipo *</label><input type="text" id="licencia_tipo_input" class="form-control" list="tiposLicenciaList" placeholder="Buscar..." autocomplete="off" required><datalist id="tiposLicenciaList"></datalist></div>
+                <div><label>Dependencia</label><select id="licencia_dependencia_select" class="form-control" data-dependencia><option value="">Seleccionar</option></select></div>
+                <div><label>Estado</label><select id="licencia_estado" class="form-control"><option>Pendiente</option><option>Aprobada</option><option>Rechazada</option><option>Finalizada</option></select></div>
+                <div class="form-row"><div><label>Fecha Inicio *</label><input type="date" id="licencia_fecha_inicio" class="form-control" required></div><div><label>Días Hábiles</label><input type="number" id="licencia_dias_habiles" class="form-control" value="0" min="0"></div></div>
+                <div class="form-row"><div><label>Días Viaje</label><input type="number" id="licencia_dias_viaje" class="form-control" value="0" min="0"></div><div><label><input type="checkbox" id="licencia_contar_fines_semana"> Contar fines semana</label></div></div>
+                <div><label>Fecha Fin</label><input type="date" id="licencia_fecha_fin" class="form-control" readonly style="background-color:var(--bg-surface);"></div>
+                <div><label>Observaciones</label><textarea id="licencia_observaciones" class="form-control" rows="3"></textarea></div>
+            </form>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveLicencia()">Guardar</button></div>
+    </div></div>
+    
+    <div id="toast-container" class="toast-container"></div>
+    
+    <datalist id="tiposLicenciaList"></datalist>
+    <datalist id="personalList"></datalist>
+    
+    <script>
+        const API_URL = 'backend/api.php';
+        let datosOriginales = [];
+        let datosFiltrados = [];
+        
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<div>${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        
+        async function apiRequest(endpoint, method = 'GET', data = null) {
+            const token = getToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
+            let url = `${API_URL}?endpoint=${endpoint}`;
+            const options = { method, headers };
+            if (data && (method === 'POST' || method === 'PUT')) options.body = JSON.stringify(data);
+            
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                if (response.status === 401) { window.location.href = 'index.html'; throw new Error('Sesión expirada'); }
+                return result;
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast('Error de conexión', 'error');
+                return [];
+            }
+        }
+        
+        function getEstadoBadge(e) {
+            const c = {'Aprobada':'badge-aprobada','Pendiente':'badge-pendiente','Rechazada':'badge-rechazada','Finalizada':'badge-finalizada'};
+            const i = {'Aprobada':'fa-check-circle','Pendiente':'fa-hourglass-half','Rechazada':'fa-times-circle','Finalizada':'fa-flag-checkered'};
+            return `<span class="badge-estado ${c[e]||'badge-pendiente'}"><i class="fas ${i[e]||'fa-hourglass-half'}"></i> ${e||'Pendiente'}</span>`;
+        }
+        
+        function renderLicenciasTable(d) {
+            const tbody = document.getElementById('licenciasTableBody');
+            if (!tbody) return;
+            if (!d || d.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay registros</td></tr>';
+                return;
+            }
+            const puedeEditar = true;
+            const puedeEliminar = true;
+            tbody.innerHTML = d.map(i => `<tr>
+                <td>${escapeHtml(i.legajo || '-')}</td>
+                <td>${escapeHtml(i.apellido ? `${i.apellido}, ${i.nombre}` : '-')}</td>
+                <td>${escapeHtml(i.tipo_licencia || '-')}</td>
+                <td>${getEstadoBadge(i.estado)}</td>
+                <td>${escapeHtml(i.fecha_inicio)}</td>
+                <td>${escapeHtml(i.fecha_fin || '-')}</td>
+                <td>${escapeHtml(i.dias_habiles || '-')}</td>
+                <td>
+                    ${puedeEditar ? `<button class="btn-accion btn-ver" onclick="editLicencia(${i.id})"><i class="fas fa-edit"></i> Editar</button>` : ''}
+                    ${puedeEliminar ? `<button class="btn-accion btn-eliminar" onclick="deleteLicencia(${i.id})"><i class="fas fa-trash"></i> Eliminar</button>` : ''}
+                </td>
+            </tr>`).join('');
+        }
+        
+        async function cargarTiposSelect() {
+            try {
+                const t = await apiRequest('catalogos&tipo=tipos_licencia');
+                const s = document.getElementById('filtro_tipo');
+                if (s && t) s.innerHTML = '<option value="">Todos</option>' + t.map(t => `<option value="${t.valor}">${t.valor}</option>`).join('');
+            } catch(e) { console.error(e); }
+        }
+        
+        function aplicarFiltros() {
+            let f = [...datosOriginales];
+            const fd = document.getElementById('filtro_fecha_desde')?.value;
+            if (fd) f = f.filter(l => l.fecha_inicio >= fd);
+            const fh = document.getElementById('filtro_fecha_hasta')?.value;
+            if (fh) f = f.filter(l => l.fecha_inicio <= fh);
+            const t = document.getElementById('filtro_tipo')?.value;
+            if (t && t !== '') f = f.filter(l => l.tipo_licencia === t);
+            const e = document.getElementById('filtro_estado')?.value;
+            if (e && e !== '') f = f.filter(l => l.estado === e);
+            const a = document.getElementById('filtro_agente')?.value.trim().toLowerCase();
+            if (a) f = f.filter(l => (l.apellido || '').toLowerCase().includes(a) || (l.nombre || '').toLowerCase().includes(a));
+            const d = document.getElementById('filtro_dependencia')?.value;
+            if (d) f = f.filter(l => l.dependencia_id == d);
+            datosFiltrados = f;
+            renderLicenciasTable(f);
+            showToast(`Encontradas ${f.length} licencias`, f.length > 0 ? 'success' : 'warning');
+        }
+        
+        function limpiarFiltros() {
+            ['filtro_fecha_desde','filtro_fecha_hasta','filtro_tipo','filtro_estado','filtro_agente','filtro_dependencia'].forEach(id => {
+                const e = document.getElementById(id);
+                if (e) e.value = '';
+            });
+            renderLicenciasTable(datosOriginales);
+            datosFiltrados = [...datosOriginales];
+            showToast('Filtros limpiados', 'info');
+        }
+        
+        function exportarFiltradosCSV() {
+            const d = datosFiltrados.length > 0 ? datosFiltrados : datosOriginales;
+            if (!d || d.length === 0) { showToast('No hay datos', 'warning'); return; }
+            const headers = ['Legajo','Agente','Tipo','Estado','Inicio','Fin','Días','Observaciones'];
+            const csv = [headers.join(',')];
+            d.forEach(i => {
+                csv.push([`"${i.legajo||''}"`,`"${i.apellido?`${i.apellido}, ${i.nombre}`:''}"`,`"${i.tipo_licencia||''}"`,`"${i.estado||''}"`,`"${i.fecha_inicio||''}"`,`"${i.fecha_fin||''}"`,`"${i.dias_habiles||''}"`,`"${(i.observaciones||'').substring(0,100)}"`].join(','));
+            });
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `licencias_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            showToast('Exportación completada', 'success');
+        }
+        
+        async function generarPDFLicencias() {
+            const t = document.getElementById('licenciasTable');
+            if (!t) { showToast('No hay datos', 'warning'); return; }
+            showToast('Generando PDF...', 'info');
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('landscape', 'mm', 'a4');
+                pdf.setFontSize(18);
+                pdf.text('Reporte de Licencias', 14, 20);
+                pdf.setFontSize(10);
+                pdf.text(`Fecha: ${new Date().toLocaleString()}`, 14, 30);
+                const canvas = await html2canvas(t, { scale: 2, backgroundColor: '#1c2128' });
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 10, 40, pdfWidth, pdfHeight);
+                pdf.save(`reporte_licencias_${new Date().toISOString().split('T')[0]}.pdf`);
+                showToast('PDF generado', 'success');
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        function calcularFechaFin() {
+            const fi = document.getElementById('licencia_fecha_inicio')?.value;
+            const dh = parseInt(document.getElementById('licencia_dias_habiles')?.value) || 0;
+            const dv = parseInt(document.getElementById('licencia_dias_viaje')?.value) || 0;
+            const cf = document.getElementById('licencia_contar_fines_semana')?.checked;
+            if (!fi) return;
+            let fecha = new Date(fi);
+            let total = dh + dv;
+            if (!cf) {
+                let agregados = 0;
+                while (agregados < total) {
+                    fecha.setDate(fecha.getDate() + 1);
+                    const dia = fecha.getDay();
+                    if (dia !== 0 && dia !== 6) agregados++;
+                }
+            } else {
+                fecha.setDate(fecha.getDate() + total);
+            }
+            const ff = document.getElementById('licencia_fecha_fin');
+            if (ff) ff.value = fecha.toISOString().split('T')[0];
+        }
+        
+        async function loadLicencias() {
+            try {
+                const data = await apiRequest('licencias');
+                datosOriginales = data;
+                datosFiltrados = [...data];
+                renderLicenciasTable(data);
+                await cargarTiposSelect();
+                showToast('Licencias cargadas', 'success');
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        function openLicenciaModal(data = null) {
+            const modal = document.getElementById('licenciaModal');
+            if (!modal) return;
+            if (data) {
+                document.getElementById('licenciaId').value = data.id;
+                document.getElementById('licencia_agente_input').value = data.agente_id ? `${data.agente_id}|${data.legajo} - ${data.apellido}, ${data.nombre}` : '';
+                document.getElementById('licencia_agente').value = data.agente_id || '';
+                document.getElementById('licencia_tipo_input').value = data.tipo_licencia || '';
+                document.getElementById('licencia_tipo').value = data.tipo_licencia || '';
+                document.getElementById('licencia_estado').value = data.estado || 'Pendiente';
+                document.getElementById('licencia_fecha_inicio').value = data.fecha_inicio;
+                document.getElementById('licencia_dias_habiles').value = data.dias_habiles;
+                document.getElementById('licencia_dias_viaje').value = data.dias_viaje;
+                document.getElementById('licencia_contar_fines_semana').checked = data.contar_fines_semana == 1;
+                document.getElementById('licencia_fecha_fin').value = data.fecha_fin;
+                document.getElementById('licencia_observaciones').value = data.observaciones || '';
+                document.getElementById('modalTitle').textContent = 'Editar Licencia';
+            } else {
+                document.getElementById('licenciaForm').reset();
+                document.getElementById('licenciaId').value = '';
+                document.getElementById('licencia_fecha_inicio').value = new Date().toISOString().split('T')[0];
+                document.getElementById('licencia_estado').value = 'Pendiente';
+                document.getElementById('modalTitle').textContent = 'Nueva Licencia';
+                calcularFechaFin();
+            }
+            modal.style.display = 'flex';
+        }
+        
+        async function saveLicencia() {
+            const id = document.getElementById('licenciaId')?.value;
+            const data = {
+                agente_id: document.getElementById('licencia_agente')?.value,
+                tipo_licencia: document.getElementById('licencia_tipo')?.value,
+                estado: document.getElementById('licencia_estado')?.value,
+                fecha_inicio: document.getElementById('licencia_fecha_inicio')?.value,
+                dias_habiles: parseInt(document.getElementById('licencia_dias_habiles')?.value) || 0,
+                dias_viaje: parseInt(document.getElementById('licencia_dias_viaje')?.value) || 0,
+                contar_fines_semana: document.getElementById('licencia_contar_fines_semana')?.checked ? 1 : 0,
+                fecha_fin: document.getElementById('licencia_fecha_fin')?.value,
+                observaciones: document.getElementById('licencia_observaciones')?.value,
+                dependencia_id: document.getElementById('licencia_dependencia_select')?.value
+            };
+            if (!data.agente_id || !data.tipo_licencia || !data.fecha_inicio) { showToast('Complete campos requeridos', 'warning'); return; }
+            try {
+                let result;
+                if (id) result = await apiRequest(`licencias&id=${id}`, 'PUT', data);
+                else result = await apiRequest('licencias', 'POST', data);
+                if (result && result.success) {
+                    showToast(`Licencia ${id ? 'actualizada' : 'creada'} correctamente`, 'success');
+                    closeModal();
+                    await loadLicencias();
+                } else showToast('Error al guardar', 'error');
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        async function editLicencia(id) {
+            try {
+                const data = await apiRequest(`licencias&id=${id}`);
+                if (data) openLicenciaModal(data);
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        async function deleteLicencia(id) {
+            if (confirm('¿Eliminar esta licencia?')) {
+                try {
+                    const result = await apiRequest(`licencias&id=${id}`, 'DELETE');
+                    if (result && result.success) {
+                        showToast('Licencia eliminada', 'success');
+                        await loadLicencias();
+                    }
+                } catch(e) { showToast('Error', 'error'); }
+            }
+        }
+        
+        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLicencias();
+            document.getElementById('licencia_fecha_inicio')?.addEventListener('change', calcularFechaFin);
+            document.getElementById('licencia_dias_habiles')?.addEventListener('input', calcularFechaFin);
+            document.getElementById('licencia_dias_viaje')?.addEventListener('input', calcularFechaFin);
+            document.getElementById('licencia_contar_fines_semana')?.addEventListener('change', calcularFechaFin);
+            document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
+        });
+        
+        window.aplicarFiltros = aplicarFiltros;
+        window.limpiarFiltros = limpiarFiltros;
+        window.exportarFiltradosCSV = exportarFiltradosCSV;
+        window.generarPDFLicencias = generarPDFLicencias;
+        window.editLicencia = editLicencia;
+        window.deleteLicencia = deleteLicencia;
+        window.openLicenciaModal = openLicenciaModal;
+        window.saveLicencia = saveLicencia;
+        window.closeModal = closeModal;
+    </script>
+</body>
+</html>

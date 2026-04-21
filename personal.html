@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Personal - Sistema de Gestión Policial</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+        input[list], select { width: 100%; padding: 0.5rem 0.75rem; background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); }
+        .documentos-container { max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; background-color: var(--bg-surface); }
+        .documento-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid var(--border); }
+        .filtros-container { background-color: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+        .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .btn-accion { padding: 0.25rem 0.5rem; margin: 0 0.25rem; border-radius: 6px; font-size: 0.7rem; cursor: pointer; }
+        .btn-ver { background-color: rgba(29, 78, 216, 0.2); color: #1d4ed8; border: none; }
+        .btn-ver:hover { background-color: #1d4ed8; color: white; }
+        .btn-eliminar { background-color: rgba(220, 38, 38, 0.2); color: #dc2626; border: none; }
+        .btn-eliminar:hover { background-color: #dc2626; color: white; }
+        .btn-editar { background-color: rgba(217, 119, 6, 0.2); color: #d97706; border: none; }
+        .btn-editar:hover { background-color: #d97706; color: white; }
+        @media (max-width: 768px) { .filtros-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <nav class="navbar">
+            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="personal.html" class="nav-link active"><i class="fas fa-users"></i> Personal</a></li>
+                <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
+                <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
+                <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
+                <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+            </ul>
+            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <div class="card-header">
+            <h1><i class="fas fa-users"></i> Gestión de Personal</h1>
+            <div>
+                <button id="btnNuevoPersonal" class="btn btn-primary" onclick="openPersonalModal()"><i class="fas fa-plus"></i> Nuevo Personal</button>
+                <button id="btnImportar" class="btn btn-secondary" onclick="openImportModal()"><i class="fas fa-upload"></i> Importar CSV</button>
+                <button id="btnReportePDF" class="btn btn-secondary" onclick="generarPDFPersonal()"><i class="fas fa-file-pdf"></i> Reporte PDF</button>
+            </div>
+        </div>
+        
+        <div class="filtros-container">
+            <h3><i class="fas fa-filter"></i> Filtros</h3>
+            <div class="filtros-grid">
+                <div><label>Legajo</label><input type="text" id="filtro_legajo" class="form-control"></div>
+                <div><label>Apellido</label><input type="text" id="filtro_apellido" class="form-control"></div>
+                <div><label>Nombre</label><input type="text" id="filtro_nombre" class="form-control"></div>
+                <div><label>DNI</label><input type="text" id="filtro_dni" class="form-control"></div>
+                <div><label>Jerarquía</label><select id="filtro_jerarquia" class="form-control"><option value="">Todas</option></select></div>
+                <div id="filtroDependenciaContainer" style="display:none;"><label>Dependencia</label><select id="filtro_dependencia" class="form-control" data-dependencia><option value="">Todas</option></select></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+                <button class="btn btn-primary" onclick="aplicarFiltros()"><i class="fas fa-search"></i> Buscar</button>
+                <button class="btn btn-secondary" onclick="limpiarFiltros()"><i class="fas fa-eraser"></i> Limpiar</button>
+                <button class="btn btn-secondary" onclick="exportarFiltradosCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table id="personalTable">
+                <thead><tr><th>Legajo</th><th>Jerarquía</th><th>Apellido/Nombre</th><th>DNI</th><th>Oficina</th><th>Edad</th><th>Dependencia</th><th>Acciones</th></tr></thead>
+                <tbody id="personalTableBody"><tr><td colspan="8" class="text-center">Cargando...<\/td></tr></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="personalModal" class="modal"><div class="modal-content" style="max-width:900px;max-height:90vh;overflow-y:auto;">
+        <div class="modal-header"><h3 id="modalTitle">Nuevo Personal</h3><span class="close-modal">&times;</span></div>
+        <div class="modal-body">
+            <form id="personalForm">
+                <input type="hidden" id="personalId"><input type="hidden" id="jerarquia"><input type="hidden" id="oficina"><input type="hidden" id="obra_social"><input type="hidden" id="dependencia_id">
+                <div class="form-row"><div><label>Legajo *</label><input type="text" id="legajo" class="form-control" required></div><div><label>Jerarquía *</label><input type="text" id="jerarquia_input" class="form-control" list="jerarquiasList" placeholder="Buscar..." autocomplete="off" required><datalist id="jerarquiasList"></datalist></div></div>
+                <div class="form-row"><div><label>Apellido *</label><input type="text" id="apellido" class="form-control" required></div><div><label>Nombre *</label><input type="text" id="nombre" class="form-control" required></div></div>
+                <div class="form-row"><div><label>DNI *</label><input type="text" id="dni" class="form-control" required></div><div><label>Sexo</label><select id="sexo" class="form-control"><option value="">Seleccionar</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div></div>
+                <div class="form-row"><div><label>Oficina</label><input type="text" id="oficina_input" class="form-control" list="oficinasList" placeholder="Buscar..."><datalist id="oficinasList"></datalist></div><div><label>Fecha Nac.</label><input type="date" id="fecha_nacimiento" class="form-control"></div></div>
+                <div class="form-row"><div><label>Teléfono</label><input type="text" id="telefono" class="form-control"></div><div><label>Email</label><input type="email" id="email" class="form-control"></div></div>
+                <div><label>Dependencia</label><select id="dependencia_select" class="form-control" data-dependencia><option value="">Seleccionar</option></select></div>
+                <div><label><input type="checkbox" id="tiene_arma"> Tiene arma</label></div>
+                <div id="armamentoFields" style="display:none;"><div class="form-row"><div><label>Marca</label><input type="text" id="arma_marca" class="form-control"></div><div><label>Modelo</label><input type="text" id="arma_modelo" class="form-control"></div><div><label>Serie</label><input type="text" id="arma_serie" class="form-control"></div></div></div>
+                <div id="sinArmaFields" style="display:block;"><div><label>Justificación</label><textarea id="sin_arma_justificacion" class="form-control" rows="2"></textarea></div></div>
+                <div class="form-row"><div><label>N° Credencial</label><input type="text" id="nro_credencial" class="form-control"></div><div><label>N° Licencia</label><input type="text" id="nro_licencia_conducir" class="form-control"></div></div>
+                <div class="form-row"><div><label>Vencimiento Licencia</label><input type="date" id="fecha_vencimiento_licencia" class="form-control"></div><div><label>Obra Social</label><input type="text" id="obra_social_input" class="form-control" list="obrasSocialesList" placeholder="Buscar..."><datalist id="obrasSocialesList"></datalist></div></div>
+                <div class="form-row"><div><label>N° Afiliado</label><input type="text" id="nro_afiliado" class="form-control"></div></div>
+                <div><label>Documentos</label><div id="documentosList" class="documentos-container"><p class="text-center">No hay documentos</p></div><button type="button" class="btn-sm btn-secondary mt-1" onclick="abrirModalDocumento()"><i class="fas fa-upload"></i> Agregar</button></div>
+            </form>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="savePersonal()">Guardar</button></div>
+    </div></div>
+    
+    <div id="documentoModal" class="modal"><div class="modal-content" style="max-width:400px;"><div class="modal-header"><h3>Agregar Documento</h3><span class="close-modal" onclick="cerrarModalDocumento()">&times;</span></div><div class="modal-body"><div><label>Título</label><input type="text" id="doc_titulo" class="form-control"></div><div><label>Descripción</label><textarea id="doc_descripcion" class="form-control" rows="2"></textarea></div><div><label>Archivo</label><input type="file" id="doc_archivo" class="form-control" accept=".pdf,.jpg,.png,.doc"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModalDocumento()">Cancelar</button><button class="btn btn-primary" onclick="guardarDocumento()">Subir</button></div></div></div>
+    
+    <div id="importModal" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>Importar CSV</h3><span class="close-modal">&times;</span></div><div class="modal-body"><div id="dropZone" class="import-area" style="border:2px dashed var(--border);padding:2rem;text-align:center;cursor:pointer;"><i class="fas fa-cloud-upload-alt fa-2x"></i><p>Arrastre CSV</p><input type="file" id="fileInput" accept=".csv" style="display:none;"></div><div id="importPreview"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="procesarImportacion()">Importar</button></div></div></div>
+    
+    <div id="toast-container" class="toast-container"></div>
+    <datalist id="jerarquiasList"></datalist><datalist id="oficinasList"></datalist><datalist id="obrasSocialesList"></datalist>
+    <script src="main.js"></script>
+    <script>
+        let datosOriginales=[],datosFiltrados=[],personalIdActual=null,importData=[];
+        function calcularEdad(f){if(!f)return'-';const hoy=new Date(),nac=new Date(f);let e=hoy.getFullYear()-nac.getFullYear();const m=hoy.getMonth()-nac.getMonth();if(m<0||(m===0&&hoy.getDate()<nac.getDate()))e--;return e;}
+        function renderPersonalTable(d){const t=document.getElementById('personalTableBody');if(!t)return;if(!d||d.length===0){t.innerHTML='<tr><td colspan="8" class="text-center">No hay registros</td></tr>';return;}const puedeEditar=window.canEdit&&window.canEdit('personal'),puedeEliminar=window.canDelete&&window.canDelete('personal');t.innerHTML=d.map(i=>`<tr><td>${escapeHtml(i.legajo)}</td><td>${escapeHtml(i.jerarquia||'-')}</td><td>${escapeHtml(i.apellido)}, ${escapeHtml(i.nombre)}</td><td>${escapeHtml(i.dni)}</td><td>${escapeHtml(i.oficina||'-')}</td><td>${calcularEdad(i.fecha_nacimiento)} años</td><td>${escapeHtml(i.dependencia_nombre||'-')}</td><td>${puedeEditar?`<button class="btn-accion btn-editar" onclick="editPersonal(${i.id})"><i class="fas fa-edit"></i></button>`:''}${puedeEliminar?`<button class="btn-accion btn-eliminar" onclick="deletePersonal(${i.id})"><i class="fas fa-trash"></i></button>`:''}</td></tr>`).join('');}
+        async function aplicarFiltros(){let f=[...datosOriginales];const l=document.getElementById('filtro_legajo')?.value.toLowerCase();if(l)f=f.filter(p=>(p.legajo||'').toLowerCase().includes(l));const a=document.getElementById('filtro_apellido')?.value.toLowerCase();if(a)f=f.filter(p=>(p.apellido||'').toLowerCase().includes(a));const n=document.getElementById('filtro_nombre')?.value.toLowerCase();if(n)f=f.filter(p=>(p.nombre||'').toLowerCase().includes(n));const d=document.getElementById('filtro_dni')?.value.toLowerCase();if(d)f=f.filter(p=>(p.dni||'').includes(d));const j=document.getElementById('filtro_jerarquia')?.value;if(j)f=f.filter(p=>p.jerarquia===j);const dep=document.getElementById('filtro_dependencia')?.value;if(dep)f=f.filter(p=>p.dependencia_id==dep);datosFiltrados=f;renderPersonalTable(f);showToast(`Encontrados ${f.length} agentes`,f.length>0?'success':'warning');}
+        function limpiarFiltros(){['filtro_legajo','filtro_apellido','filtro_nombre','filtro_dni','filtro_jerarquia','filtro_dependencia'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderPersonalTable(datosOriginales);datosFiltrados=[...datosOriginales];showToast('Filtros limpiados','info');}
+        function exportarFiltradosCSV(){const d=datosFiltrados.length>0?datosFiltrados:datosOriginales;if(!d||d.length===0){showToast('No hay datos','warning');return;}const headers=['Legajo','Jerarquía','Apellido','Nombre','DNI','Oficina','Teléfono','Email'];const csv=[headers.join(',')];d.forEach(p=>{csv.push([`"${p.legajo||''}"`,`"${p.jerarquia||''}"`,`"${p.apellido||''}"`,`"${p.nombre||''}"`,`"${p.dni||''}"`,`"${p.oficina||''}"`,`"${p.telefono||''}"`,`"${p.email||''}"`].join(','));});const blob=new Blob([csv.join('\n')],{type:'text/csv'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`personal_${new Date().toISOString().split('T')[0]}.csv`;link.click();URL.revokeObjectURL(link.href);showToast('Exportación completada','success');}
+        async function generarPDFPersonal(){const t=document.getElementById('personalTable');if(!t){showToast('No hay datos','warning');return;}showToast('Generando PDF...','info');try{const{jsPDF}=window.jspdf;const pdf=new jsPDF('landscape','mm','a4');pdf.setFontSize(18);pdf.text('Reporte de Personal',14,20);pdf.setFontSize(10);pdf.text(`Fecha: ${new Date().toLocaleString()}`,14,30);const canvas=await html2canvas(t,{scale:2,backgroundColor:'#1c2128'});const imgData=canvas.toDataURL('image/png');const pdfWidth=pdf.internal.pageSize.getWidth()-20;const pdfHeight=(canvas.height*pdfWidth)/canvas.width;pdf.addImage(imgData,'PNG',10,40,pdfWidth,pdfHeight);pdf.save(`reporte_personal_${new Date().toISOString().split('T')[0]}.pdf`);showToast('PDF generado','success');}catch(e){showToast('Error','error');}}
+        function openImportModal(){document.getElementById('importModal').style.display='flex';}
+        function cerrarModalDocumento(){document.getElementById('documentoModal').style.display='none';document.getElementById('doc_titulo').value='';document.getElementById('doc_descripcion').value='';document.getElementById('doc_archivo').value='';}
+        function abrirModalDocumento(){document.getElementById('documentoModal').style.display='flex';}
+        async function guardarDocumento(){const titulo=document.getElementById('doc_titulo').value,desc=document.getElementById('doc_descripcion').value,archivo=document.getElementById('doc_archivo').files[0];if(!titulo||!archivo){showToast('Complete campos','warning');return;}const fd=new FormData();fd.append('personal_id',document.getElementById('personalId').value||'');fd.append('titulo',titulo);fd.append('descripcion',desc);fd.append('archivo',archivo);try{const res=await fetch(`${API_URL}?endpoint=upload_documento`,{method:'POST',headers:{'Authorization':`Bearer ${localStorage.getItem('jwt_token')}`},body:fd});const d=await res.json();if(d.success){showToast('Documento subido','success');cerrarModalDocumento();if(document.getElementById('personalId').value)await cargarDocumentos(document.getElementById('personalId').value);}else showToast('Error','error');}catch(e){showToast('Error','error');}}
+        function setupDragAndDrop(){const dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput');if(dz){dz.addEventListener('click',()=>fi.click());dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));dz.addEventListener('drop',handleDrop);fi.addEventListener('change',handleFileSelect);}}
+        function handleDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('drag-over');const file=e.dataTransfer.files[0];if(file&&file.type==='text/csv')leerCSV(file);else showToast('Seleccione CSV','error');}
+        function handleFileSelect(e){const file=e.target.files[0];if(file)leerCSV(file);}
+        function leerCSV(file){const r=new FileReader();r.onload=function(e){const lines=e.target.result.split('\n');const headers=lines[0].split(',');importData=[];for(let i=1;i<lines.length;i++){if(lines[i].trim()){const values=lines[i].split(',');const reg={};headers.forEach((h,idx)=>reg[h.trim()]=values[idx]?.trim());importData.push(reg);}}const preview=document.getElementById('importPreview');if(preview)preview.innerHTML=`<p class="success">✅ ${importData.length} registros listos</p>`;};r.readAsText(file);}
+        async function procesarImportacion(){if(importData.length===0){showToast('No hay datos','warning');return;}try{const result=await apiRequest('importar_datos','POST',{tabla:'personal',datos:importData});if(result&&result.success){showToast(`${result.importados} registros importados`,'success');closeModal();loadPersonal();}else showToast('Error','error');}catch(e){showToast('Error','error');}}
+        async function cargarDependenciasSelect(){try{const res=await fetch(`${API_URL}?endpoint=dependencias`,{headers:{'Authorization':`Bearer ${localStorage.getItem('jwt_token')}`}});const d=await res.json();document.querySelectorAll('select[data-dependencia]').forEach(s=>{s.innerHTML='<option value="">Seleccionar...</option>'+d.map(dep=>`<option value="${dep.id}">${escapeHtml(dep.nombre)}</option>`).join('');});}catch(e){console.error(e);}}
+        const originalLoadPersonal=window.loadPersonal;window.loadPersonal=async function(){try{const data=await apiRequest('personal');datosOriginales=data;datosFiltrados=[...data];renderPersonalTable(data);const jerarquias=[...new Set(data.map(p=>p.jerarquia).filter(j=>j))];document.getElementById('filtro_jerarquia').innerHTML='<option value="">Todas</option>'+jerarquias.map(j=>`<option value="${j}">${j}</option>`).join('');showToast('Personal cargado','success');}catch(e){showToast('Error','error');}};
+        window.editPersonal=async function(id){try{const data=await apiRequest(`personal&id=${id}`);if(data)openPersonalModal(data);}catch(e){showToast('Error','error');}};
+        window.deletePersonal=async function(id){if(confirm('¿Eliminar?')){try{const result=await apiRequest(`personal&id=${id}`,'DELETE');if(result&&result.success){showToast('Eliminado','success');await loadPersonal();}}catch(e){showToast('Error','error');}}};
+        document.addEventListener('DOMContentLoaded',()=>{setupDragAndDrop();cargarDependenciasSelect();});
+        window.openImportModal=openImportModal;window.cerrarModalDocumento=cerrarModalDocumento;window.abrirModalDocumento=abrirModalDocumento;window.guardarDocumento=guardarDocumento;window.aplicarFiltros=aplicarFiltros;window.limpiarFiltros=limpiarFiltros;window.exportarFiltradosCSV=exportarFiltradosCSV;window.generarPDFPersonal=generarPDFPersonal;
+    </script>
+</body>
+</html>
