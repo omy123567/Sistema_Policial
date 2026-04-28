@@ -19,18 +19,232 @@
         .tab-buttons { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .btn-active { background-color: var(--accent-primary); color: white; }
         .btn-inactive { background-color: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-accion { padding: 0.25rem 0.5rem; margin: 0 0.25rem; border-radius: 6px; font-size: 0.7rem; cursor: pointer; border: none; }
+        .btn-editar { background-color: rgba(29, 78, 216, 0.2); color: #1d4ed8; }
+        .btn-editar:hover { background-color: #1d4ed8; color: white; }
+        .btn-eliminar { background-color: rgba(220, 38, 38, 0.2); color: #dc2626; }
+        .btn-eliminar:hover { background-color: #dc2626; color: white; }
+        
+        /* Tema claro */
+        .theme-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .theme-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .theme-option:hover {
+            transform: translateY(-2px);
+        }
+        .theme-option.dark {
+            background: #1a1a2e;
+            color: white;
+        }
+        .theme-option.light {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .theme-option.selected {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.3);
+        }
+        .theme-option i {
+            font-size: 1.5rem;
+        }
+        
+        /* Logo preview */
+        .logo-preview-box {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .logo-preview-box img {
+            max-height: 60px;
+            border-radius: 8px;
+        }
+        .logo-editor-controls {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-surface);
+            border-radius: 8px;
+        }
+        .slider-group {
+            margin-bottom: 0.75rem;
+        }
+        .slider-group label {
+            display: inline-block;
+            width: 80px;
+        }
+        input[type="range"] {
+            width: calc(100% - 130px);
+            vertical-align: middle;
+        }
+        .slider-group span {
+            display: inline-block;
+            width: 40px;
+            text-align: right;
+        }
+        
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-info {
+            background: rgba(29,78,216,0.2);
+            color: #1d4ed8;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-body {
+            padding: 1rem;
+        }
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        textarea.form-control {
+            resize: vertical;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+        .btn-secondary {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card);
+        }
+        .btn-danger {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid #dc2626;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+            color: white;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--bg-surface);
+            font-weight: 600;
+        }
+        
         @media (max-width: 768px) { 
             .grid-catalogos { grid-template-columns: 1fr; } 
             .add-form { flex-direction: column; } 
             .tab-buttons { flex-direction: column; } 
-            .tab-buttons .btn { width: 100%; } 
+            .tab-buttons .btn { width: 100%; }
+            .theme-options { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <nav class="navbar">
-            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span id="sistemaNombreNavbar">Sistema Policial</span>
+            </div>
             <div class="hamburger"><span></span><span></span><span></span></div>
             <ul class="nav-menu">
                 <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -41,64 +255,86 @@
                 <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
                 <li><a href="configuracion.html" class="nav-link active"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
-            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+            <div class="user-info">
+                <span id="userInfo"></span>
+                <button id="themeToggleBtn" class="theme-toggle" style="background:none;border:none;cursor:pointer;font-size:1.2rem;padding:0.5rem;border-radius:50%;margin-right:0.5rem;" title="Cambiar tema">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                </button>
+                <button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </div>
         </nav>
     </div>
     
     <div class="container">
         <h1><i class="fas fa-cog"></i> Configuración del Sistema</h1>
-        <p class="text-secondary">Gestione los catálogos, feriados y dependencias del sistema</p>
+        <p class="text-secondary">Gestione los catálogos, feriados, dependencias y personalice el sistema</p>
         
         <div class="tab-buttons">
             <button class="btn btn-active" onclick="showTab('catalogos')" id="tabCatalogosBtn"><i class="fas fa-list"></i> Catálogos</button>
             <button class="btn btn-inactive" onclick="showTab('feriados')" id="tabFeriadosBtn"><i class="fas fa-calendar"></i> Feriados</button>
             <button class="btn btn-inactive" onclick="showTab('sistema')" id="tabSistemaBtn"><i class="fas fa-server"></i> Sistema</button>
             <button class="btn btn-inactive" onclick="showTab('dependencias')" id="tabDependenciasBtn"><i class="fas fa-building"></i> Dependencias</button>
+            <button class="btn btn-inactive" onclick="showTab('apariencia')" id="tabAparienciaBtn"><i class="fas fa-palette"></i> Apariencia</button>
         </div>
         
         <!-- Panel Catálogos -->
         <div id="catalogosPanel" class="tab-panel">
             <div class="grid-catalogos">
+                <!-- Jerarquías -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-user-tie"></i> Jerarquías</h3><span class="badge badge-info" id="jerarquiasCount">0</span></div>
                     <div id="jerarquiasList" class="catalogo-items"></div>
                     <div class="add-form"><input type="text" id="newJerarquia" class="form-control" placeholder="Nueva jerarquía"><button class="btn btn-primary" onclick="addCatalogo('jerarquias', 'newJerarquia')"><i class="fas fa-plus"></i> Agregar</button></div>
                 </div>
+                <!-- Tipos Recargo -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-exclamation-triangle"></i> Tipos Recargo</h3><span class="badge badge-info" id="tipos_recargoCount">0</span></div>
                     <div id="tipos_recargoList" class="catalogo-items"></div>
                     <div class="add-form"><input type="text" id="newTipoRecargo" class="form-control" placeholder="Nuevo tipo"><button class="btn btn-primary" onclick="addCatalogo('tipos_recargo', 'newTipoRecargo')"><i class="fas fa-plus"></i> Agregar</button></div>
                 </div>
+                <!-- Oficinas -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-building"></i> Oficinas</h3><span class="badge badge-info" id="oficinasCount">0</span></div>
                     <div id="oficinasList" class="catalogo-items"></div>
                     <div class="add-form"><input type="text" id="newOficina" class="form-control" placeholder="Nueva oficina"><button class="btn btn-primary" onclick="addCatalogo('oficinas', 'newOficina')"><i class="fas fa-plus"></i> Agregar</button></div>
                 </div>
+                <!-- Tipos Oficio -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-file-alt"></i> Tipos Oficio</h3><span class="badge badge-info" id="tipos_oficioCount">0</span></div>
                     <div id="tipos_oficioList" class="catalogo-items"></div>
                     <div class="add-form"><input type="text" id="newTipoOficio" class="form-control" placeholder="Nuevo tipo"><button class="btn btn-primary" onclick="addCatalogo('tipos_oficio', 'newTipoOficio')"><i class="fas fa-plus"></i> Agregar</button></div>
                 </div>
+                <!-- Juzgados -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-gavel"></i> Juzgados</h3><span class="badge badge-info" id="juzgadosCount">0</span></div>
                     <div id="juzgadosList" class="catalogo-items"></div>
                     <div class="add-form"><input type="text" id="newJuzgado" class="form-control" placeholder="Nuevo juzgado"><button class="btn btn-primary" onclick="addCatalogo('juzgados', 'newJuzgado')"><i class="fas fa-plus"></i> Agregar</button></div>
                 </div>
+                <!-- Dependencias Catálogo -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-sitemap"></i> Dependencias</h3><span class="badge badge-info" id="dependenciasCount">0</span></div>
                     <div id="dependenciasList" class="catalogo-items"></div>
                     <div class="add-form"><input type="text" id="newDependencia" class="form-control" placeholder="Nueva dependencia"><button class="btn btn-primary" onclick="addCatalogo('dependencias', 'newDependencia')"><i class="fas fa-plus"></i> Agregar</button></div>
                 </div>
+                <!-- Tipos Requerimiento -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-search"></i> Tipos Requerimiento</h3><span class="badge badge-info" id="tipos_requerimientoCount">0</span></div>
                     <div id="tipos_requerimientoList" class="catalogo-items"></div>
                     <div class="add-form"><input type="text" id="newTipoRequerimiento" class="form-control" placeholder="Nuevo tipo"><button class="btn btn-primary" onclick="addCatalogo('tipos_requerimiento', 'newTipoRequerimiento')"><i class="fas fa-plus"></i> Agregar</button></div>
                 </div>
+                <!-- Tipos Licencia -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-calendar-week"></i> Tipos Licencia</h3><span class="badge badge-info" id="tipos_licenciaCount">0</span></div>
                     <div id="tipos_licenciaList" class="catalogo-items"></div>
                     <div class="add-form"><input type="text" id="newTipoLicencia" class="form-control" placeholder="Nuevo tipo"><button class="btn btn-primary" onclick="addCatalogo('tipos_licencia', 'newTipoLicencia')"><i class="fas fa-plus"></i> Agregar</button></div>
                 </div>
+                <!-- CATEGORÍAS LICENCIA DE CONDUCIR -->
+                <div class="card catalogo-section">
+                    <div class="catalogo-header"><h3><i class="fas fa-id-card"></i> Categorías Licencia</h3><span class="badge badge-info" id="licencia_categoriasCount">0</span></div>
+                    <div id="licencia_categoriasList" class="catalogo-items"></div>
+                    <div class="add-form"><input type="text" id="newLicenciaCategoria" class="form-control" placeholder="Ej: B1, C1, D1"><button class="btn btn-primary" onclick="addCatalogo('licencia_categorias', 'newLicenciaCategoria')"><i class="fas fa-plus"></i> Agregar</button></div>
+                </div>
+                <!-- Obras Sociales -->
                 <div class="card catalogo-section">
                     <div class="catalogo-header"><h3><i class="fas fa-hospital-user"></i> Obras Sociales</h3><span class="badge badge-info" id="obras_socialesCount">0</span></div>
                     <div id="obras_socialesList" class="catalogo-items"></div>
@@ -110,32 +346,124 @@
         <!-- Panel Feriados -->
         <div id="feriadosPanel" class="tab-panel" style="display:none;">
             <div class="card">
-                <div class="card-header"><h3><i class="fas fa-calendar-alt"></i> Feriados</h3><button class="btn btn-primary" onclick="openFeriadoModal()"><i class="fas fa-plus"></i> Agregar</button></div>
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Feriados</h3>
+                    <button class="btn btn-primary" onclick="openFeriadoModal()"><i class="fas fa-plus"></i> Agregar</button>
+                </div>
                 <div class="table-container">
                     <table id="feriadosTable">
                         <thead><tr><th>Fecha</th><th>Motivo</th><th>Tipo</th><th>Acciones</th></tr></thead>
-                        <tbody id="feriadosTableBody"></tbody>
+                        <tbody id="feriadosTableBody"><tr><td colspan="4" class="text-center">Cargando...</td></tr>
                     </table>
                 </div>
             </div>
         </div>
         
-        <!-- Panel Sistema -->
+        <!-- Panel Sistema (con configuración de nombre y logo) -->
         <div id="sistemaPanel" class="tab-panel" style="display:none;">
-            <div class="grid-catalogos">
-                <div class="card">
-                    <div class="card-header"><h3>Configuración General</h3></div>
-                    <div class="card-body">
-                        <div><label>Nombre Sistema</label><input type="text" id="config_nombre_sistema" class="form-control"></div>
-                        <button class="btn btn-primary mt-2" onclick="saveConfiguracionGeneral()">Guardar</button>
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-server"></i> Configuración del Sistema</h3></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Nombre del Sistema</label>
+                        <input type="text" id="config_nombre_sistema" class="form-control" placeholder="Nombre del sistema">
+                        <small class="text-secondary">Se muestra en el título de la página y en la barra de navegación</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Logo del Sistema</label>
+                        <div id="logoPreviewContainer" class="logo-preview-box">
+                            <img id="logoPreview" src="" alt="Logo" style="display: none;">
+                            <div id="noLogoMessage" class="text-secondary">No hay logo configurado</div>
+                            <button type="button" id="btnEliminarLogo" class="btn btn-sm btn-danger" style="display: none;"><i class="fas fa-trash"></i> Eliminar</button>
+                        </div>
+                        
+                        <div class="form-row" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <input type="file" id="logoArchivo" class="form-control" accept="image/jpeg,image/png,image/gif,image/webp" style="flex: 1;">
+                            <button type="button" id="btnSubirLogo" class="btn btn-primary"><i class="fas fa-upload"></i> Subir</button>
+                            <button type="button" id="btnEditarLogo" class="btn btn-secondary" style="display: none;"><i class="fas fa-pen"></i> Editar</button>
+                        </div>
+                        <small class="text-secondary">Formatos: JPG, PNG, GIF, WEBP. Tamaño recomendado: 200x80px</small>
+                        
+                        <!-- Panel de edición de logo -->
+                        <div id="edicionLogo" style="display: none; margin-top: 1rem;">
+                            <div class="logo-editor-controls">
+                                <h4><i class="fas fa-edit"></i> Editar Logo</h4>
+                                <div class="slider-group">
+                                    <label>Brillo</label>
+                                    <input type="range" id="brightness" min="0" max="200" value="100" step="1">
+                                    <span id="brightnessValue">100%</span>
+                                </div>
+                                <div class="slider-group">
+                                    <label>Contraste</label>
+                                    <input type="range" id="contrast" min="0" max="200" value="100" step="1">
+                                    <span id="contrastValue">100%</span>
+                                </div>
+                                <div class="slider-group">
+                                    <label>Opacidad</label>
+                                    <input type="range" id="opacity" min="0" max="100" value="100" step="1">
+                                    <span id="opacityValue">100%</span>
+                                </div>
+                                <div class="slider-group">
+                                    <label>Bordes</label>
+                                    <input type="range" id="borderRadius" min="0" max="50" value="8" step="1">
+                                    <span id="borderRadiusValue">8px</span>
+                                </div>
+                                <div class="form-row" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                    <div>
+                                        <label>Rotación</label>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button type="button" id="rotateLeft" class="btn-sm btn-secondary"><i class="fas fa-undo-alt"></i> -90°</button>
+                                            <button type="button" id="rotateRight" class="btn-sm btn-secondary"><i class="fas fa-redo-alt"></i> +90°</button>
+                                            <button type="button" id="resetRotation" class="btn-sm btn-secondary">Reset</button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label>Fondo</label>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button type="button" id="bgTransparent" class="btn-sm btn-secondary" style="background: repeating-linear-gradient(45deg, #ccc 0px, #ccc 10px, #fff 10px, #fff 20px);">Transparente</button>
+                                            <button type="button" id="bgWhite" class="btn-sm btn-secondary" style="background: white; color: black;">Blanco</button>
+                                            <button type="button" id="bgDark" class="btn-sm btn-secondary" style="background: #1a1a2e; color: white;">Oscuro</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.5rem;">
+                                    <button type="button" id="btnResetEdicion" class="btn-sm btn-secondary"><i class="fas fa-undo"></i> Resetear</button>
+                                    <button type="button" id="btnCerrarEdicion" class="btn-sm btn-secondary"><i class="fas fa-times"></i> Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Vista previa en el sistema</label>
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div id="previewLogoContainer">
+                                    <img id="previewLogo" src="" alt="Logo" style="max-height: 50px; display: none;">
+                                </div>
+                                <div><strong id="previewNombre">Sistema de Gestión Policial</strong></div>
+                                <div style="flex:1"></div>
+                                <div><i class="fas fa-user-circle"></i> Usuario</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button id="btnGuardarConfig" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Configuración</button>
+                        <button id="btnRestaurarLogo" class="btn btn-secondary"><i class="fas fa-undo-alt"></i> Restaurar Logo por Defecto</button>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-header"><h3>Respaldo</h3></div>
-                    <div class="card-body">
-                        <button class="btn btn-primary" onclick="backupDatabase()">Exportar Backup</button>
-                        <button class="btn btn-secondary" onclick="restoreDatabase()">Restaurar</button>
-                        <input type="file" id="restore_file" style="display:none;" accept=".json">
+            </div>
+            
+            <div class="card">
+                <div class="card-header"><h3><i class="fas fa-info-circle"></i> Información del Sistema</h3></div>
+                <div class="card-body">
+                    <div class="form-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div><strong>Versión:</strong> v2.0.0</div>
+                        <div><strong>Última actualización:</strong> 2024</div>
+                        <div><strong>Desarrollado por:</strong> Sistema Policial</div>
+                        <div><strong>Soporte:</strong> soporte@sistemapolicial.com</div>
                     </div>
                 </div>
             </div>
@@ -144,106 +472,133 @@
         <!-- Panel Dependencias -->
         <div id="dependenciasPanel" class="tab-panel" style="display:none;">
             <div class="card">
-                <div class="card-header"><h3>Estructura</h3><button class="btn btn-primary" onclick="openDependenciaModal()"><i class="fas fa-plus"></i> Nueva Dependencia</button></div>
+                <div class="card-header"><h3>Estructura de Dependencias</h3><button class="btn btn-primary" onclick="openDependenciaModal()"><i class="fas fa-plus"></i> Nueva Dependencia</button></div>
                 <div class="table-container">
                     <table id="dependenciasTable">
                         <thead><tr><th>Nombre</th><th>Nivel</th><th>Padre</th><th>Código</th><th>Acciones</th></tr></thead>
-                        <tbody id="dependenciasTableBody"></tbody>
+                        <tbody id="dependenciasTableBody"><tr><td colspan="5" class="text-center">Cargando...</td></tr>
                     </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel Apariencia -->
+        <div id="aparienciaPanel" class="tab-panel" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-palette"></i> Personalizar Apariencia</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-secondary">Selecciona el tema que prefieras para la interfaz del sistema.</p>
+                    <div class="theme-options">
+                        <div class="theme-option dark" onclick="setTheme('dark')">
+                            <i class="fas fa-moon"></i>
+                            <div>
+                                <strong>Oscuro</strong>
+                                <small>Modo nocturno, ideal para poca luz</small>
+                            </div>
+                        </div>
+                        <div class="theme-option light" onclick="setTheme('light')">
+                            <i class="fas fa-sun"></i>
+                            <div>
+                                <strong>Claro</strong>
+                                <small>Modo diurno, alta luminosidad</small>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-secondary mt-2">El tema seleccionado se guarda automáticamente y se aplica en todas las páginas.</p>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- Modales -->
-    <div id="editCatalogoModal" class="modal">
-        <div class="modal-content" style="max-width:400px;">
-            <div class="modal-header"><h3>Editar</h3><span class="close-modal">&times;</span></div>
-            <div class="modal-body"><div><label>Valor</label><input type="text" id="editCatalogoValor" class="form-control"><input type="hidden" id="editCatalogoId"><input type="hidden" id="editCatalogoTipo"></div></div>
-            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveEditCatalogo()">Guardar</button></div>
-        </div>
-    </div>
+    <div id="editCatalogoModal" class="modal"><div class="modal-content" style="max-width:400px;"><div class="modal-header"><h3>Editar</h3><span class="close-modal">&times;</span></div><div class="modal-body"><div><label>Valor</label><input type="text" id="editCatalogoValor" class="form-control"><input type="hidden" id="editCatalogoId"><input type="hidden" id="editCatalogoTipo"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveEditCatalogo()">Guardar</button></div></div></div>
     
-    <div id="feriadoModal" class="modal">
-        <div class="modal-content" style="max-width:400px;">
-            <div class="modal-header"><h3>Agregar Feriado</h3><span class="close-modal">&times;</span></div>
-            <div class="modal-body">
-                <div><label>Fecha</label><input type="date" id="feriado_fecha" class="form-control"></div>
-                <div><label>Motivo</label><input type="text" id="feriado_motivo" class="form-control"></div>
-                <div><label>Tipo</label><select id="feriado_tipo" class="form-control"><option>Nacional</option><option>Provincial</option><option>Municipal</option></select></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveFeriado()">Guardar</button></div>
-        </div>
-    </div>
+    <div id="feriadoModal" class="modal"><div class="modal-content" style="max-width:400px;"><div class="modal-header"><h3>Agregar Feriado</h3><span class="close-modal">&times;</span></div><div class="modal-body"><div><label>Fecha</label><input type="date" id="feriado_fecha" class="form-control"></div><div><label>Motivo</label><input type="text" id="feriado_motivo" class="form-control"></div><div><label>Tipo</label><select id="feriado_tipo" class="form-control"><option>Nacional</option><option>Provincial</option><option>Municipal</option></select></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveFeriado()">Guardar</button></div></div></div>
     
-    <div id="dependenciaModal" class="modal">
-        <div class="modal-content" style="max-width:500px;">
-            <div class="modal-header"><h3>Nueva Dependencia</h3><span class="close-modal">&times;</span></div>
-            <div class="modal-body">
-                <div><label>Nombre</label><input type="text" id="dependencia_nombre" class="form-control"></div>
-                <div><label>Nivel</label><select id="dependencia_nivel" class="form-control"><option>central</option><option>delegacion</option><option>seccion</option></select></div>
-                <div><label>Padre</label><select id="dependencia_padre" class="form-control"><option value="">Ninguno</option></select></div>
-                <div><label>Código</label><input type="text" id="dependencia_codigo" class="form-control"></div>
-                <div><label>Dirección</label><textarea id="dependencia_direccion" class="form-control" rows="2"></textarea></div>
-                <div><label>Teléfono</label><input type="text" id="dependencia_telefono" class="form-control"></div>
-                <div><label>Email</label><input type="email" id="dependencia_email" class="form-control"></div>
-            </div>
-            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveDependencia()">Guardar</button></div>
-        </div>
-    </div>
+    <div id="dependenciaModal" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>Nueva Dependencia</h3><span class="close-modal">&times;</span></div><div class="modal-body"><div><label>Nombre</label><input type="text" id="dependencia_nombre" class="form-control"></div><div><label>Nivel</label><select id="dependencia_nivel" class="form-control"><option>central</option><option>delegacion</option><option>seccion</option></select></div><div><label>Padre</label><select id="dependencia_padre" class="form-control"><option value="">Ninguno</option></select></div><div><label>Código</label><input type="text" id="dependencia_codigo" class="form-control"></div><div><label>Dirección</label><textarea id="dependencia_direccion" class="form-control" rows="2"></textarea></div><div><label>Teléfono</label><input type="text" id="dependencia_telefono" class="form-control"></div><div><label>Email</label><input type="email" id="dependencia_email" class="form-control"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveDependencia()">Guardar</button></div></div></div>
     
     <div id="toast-container" class="toast-container"></div>
     
     <script>
         const API_URL = 'backend/api.php';
         
+        // ==================== TEMA OSCURO/CLARO ====================
+        const THEME_KEY = 'sistema_policial_theme';
+        
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+                const icon = document.getElementById('themeIcon');
+                if (icon) icon.className = 'fas fa-sun';
+            } else {
+                document.body.classList.remove('light-theme');
+                const icon = document.getElementById('themeIcon');
+                if (icon) icon.className = 'fas fa-moon';
+            }
+            localStorage.setItem(THEME_KEY, theme);
+            
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if ((theme === 'dark' && opt.classList.contains('dark')) ||
+                    (theme === 'light' && opt.classList.contains('light'))) {
+                    opt.classList.add('selected');
+                }
+            });
+        }
+        
+        function getCurrentTheme() {
+            const saved = localStorage.getItem(THEME_KEY);
+            if (saved === 'light' || saved === 'dark') return saved;
+            return 'dark';
+        }
+        
+        function setTheme(theme) {
+            applyTheme(theme);
+            showToast(`Tema cambiado a ${theme === 'light' ? 'claro' : 'oscuro'}`, 'success');
+        }
+        
+        function toggleTheme() {
+            const current = getCurrentTheme();
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        }
+        
+        function initTheme() {
+            const savedTheme = getCurrentTheme();
+            applyTheme(savedTheme);
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', toggleTheme);
+            }
+        }
+        
+        // ==================== FUNCIONES BASE ====================
         function showToast(message, type) {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.innerHTML = `<div>${message}</div>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            let container = document.getElementById('toast-container');
+            if (!container) { container = document.createElement('div'); container.id = 'toast-container'; container.className = 'toast-container'; document.body.appendChild(container); }
+            const toast = document.createElement('div'); toast.className = `toast toast-${type}`; toast.innerHTML = `<div>${message}</div>`;
+            container.appendChild(toast); setTimeout(() => toast.remove(), 3000);
         }
         
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function getToken() {
-            return localStorage.getItem('jwt_token');
-        }
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
         
         async function apiRequest(endpoint, method = 'GET', data = null) {
             const token = getToken();
             const headers = { 'Content-Type': 'application/json' };
             if (token) headers['Authorization'] = `Bearer ${token}`;
-            
             let url = `${API_URL}?endpoint=${endpoint}`;
             const options = { method, headers };
             if (data && (method === 'POST' || method === 'PUT')) options.body = JSON.stringify(data);
-            
             try {
                 const response = await fetch(url, options);
                 const result = await response.json();
-                if (response.status === 401) {
-                    window.location.href = 'index.html';
-                    throw new Error('Sesión expirada');
-                }
+                if (response.status === 401) { window.location.href = 'index.html'; throw new Error('Sesión expirada'); }
                 return result;
-            } catch (error) {
-                console.error('API Error:', error);
-                showToast('Error de conexión', 'error');
-                return [];
-            }
-        }
-        
-        function closeModal() {
-            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            } catch (error) { console.error('API Error:', error); showToast('Error de conexión', 'error'); return []; }
         }
         
         function showTab(tab) {
@@ -251,89 +606,182 @@
             document.getElementById('feriadosPanel').style.display = 'none';
             document.getElementById('sistemaPanel').style.display = 'none';
             document.getElementById('dependenciasPanel').style.display = 'none';
+            document.getElementById('aparienciaPanel').style.display = 'none';
             document.getElementById(`${tab}Panel`).style.display = 'block';
-            
-            const btns = ['catalogos', 'feriados', 'sistema', 'dependencias'];
-            btns.forEach(btn => {
-                const el = document.getElementById(`tab${btn.charAt(0).toUpperCase() + btn.slice(1)}Btn`);
-                if (el) {
-                    el.className = btn === tab ? 'btn btn-active' : 'btn btn-inactive';
-                }
-            });
+            const btns = ['catalogos', 'feriados', 'sistema', 'dependencias', 'apariencia'];
+            btns.forEach(btn => { const el = document.getElementById(`tab${btn.charAt(0).toUpperCase() + btn.slice(1)}Btn`); if (el) el.className = btn === tab ? 'btn btn-active' : 'btn btn-inactive'; });
+            if (tab === 'feriados') loadFeriados();
+            if (tab === 'dependencias') loadDependencias();
         }
         
+        // ==================== CONFIGURACIÓN DEL SISTEMA CON LOGO ====================
+        let currentLogoUrl = '';
+        let imageTransformations = { brightness: 100, contrast: 100, opacity: 100, borderRadius: 8, rotation: 0, backgroundColor: 'transparent' };
+        
+        async function loadConfiguracion() {
+            try { 
+                const config = await apiRequest('configuracion_sistema');
+                if (config) {
+                    document.getElementById('config_nombre_sistema').value = config.nombre_sistema || 'Sistema Policial';
+                    document.getElementById('sistemaNombreNavbar').textContent = config.nombre_sistema || 'Sistema Policial';
+                    document.title = config.nombre_sistema || 'Sistema de Gestión Policial';
+                    currentLogoUrl = config.logo_url || '';
+                    
+                    const logoImg = document.getElementById('logoPreview');
+                    const previewLogo = document.getElementById('previewLogo');
+                    const noLogoMsg = document.getElementById('noLogoMessage');
+                    const btnEliminar = document.getElementById('btnEliminarLogo');
+                    const btnEditar = document.getElementById('btnEditarLogo');
+                    
+                    if (currentLogoUrl) {
+                        const logoPath = currentLogoUrl.startsWith('http') ? currentLogoUrl : `../${currentLogoUrl}`;
+                        logoImg.src = logoPath;
+                        previewLogo.src = logoPath;
+                        logoImg.style.display = 'inline-block';
+                        previewLogo.style.display = 'inline-block';
+                        noLogoMsg.style.display = 'none';
+                        btnEliminar.style.display = 'inline-block';
+                        btnEditar.style.display = 'inline-block';
+                    } else {
+                        logoImg.style.display = 'none';
+                        previewLogo.style.display = 'none';
+                        noLogoMsg.style.display = 'block';
+                        btnEliminar.style.display = 'none';
+                        btnEditar.style.display = 'none';
+                    }
+                    document.getElementById('previewNombre').textContent = config.nombre_sistema || 'Sistema de Gestión Policial';
+                }
+            } catch (error) { console.error('Error loading config:', error); }
+        }
+        
+        document.getElementById('btnSubirLogo')?.addEventListener('click', () => {
+            const archivo = document.getElementById('logoArchivo').files[0];
+            if (!archivo) { showToast('Seleccione un archivo de imagen', 'warning'); return; }
+            
+            const formData = new FormData();
+            formData.append('logo', archivo);
+            
+            showToast('Subiendo logo...', 'info');
+            fetch(`${API_URL}?endpoint=subir_logo`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${getToken()}` },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    showToast('Logo subido correctamente', 'success');
+                    loadConfiguracion();
+                    document.getElementById('logoArchivo').value = '';
+                } else { showToast(result.error || 'Error al subir', 'error'); }
+            })
+            .catch(e => showToast('Error de conexión', 'error'));
+        });
+        
+        document.getElementById('btnEliminarLogo')?.addEventListener('click', async () => {
+            if (!confirm('¿Eliminar el logo actual?')) return;
+            try {
+                const token = getToken();
+                await fetch(`${API_URL}?endpoint=eliminar_logo`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                showToast('Logo eliminado', 'success');
+                loadConfiguracion();
+            } catch(e) { showToast('Error', 'error'); }
+        });
+        
+        document.getElementById('btnGuardarConfig')?.addEventListener('click', async () => {
+            const data = { nombre_sistema: document.getElementById('config_nombre_sistema').value };
+            try {
+                const token = getToken();
+                await fetch(`${API_URL}?endpoint=configuracion_sistema`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                showToast('Configuración guardada', 'success');
+                loadConfiguracion();
+            } catch(e) { showToast('Error', 'error'); }
+        });
+        
+        document.getElementById('btnRestaurarLogo')?.addEventListener('click', async () => {
+            if (!confirm('¿Restaurar el logo por defecto?')) return;
+            try {
+                const token = getToken();
+                await fetch(`${API_URL}?endpoint=eliminar_logo`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                showToast('Logo por defecto restaurado', 'success');
+                loadConfiguracion();
+            } catch(e) { showToast('Error', 'error'); }
+        });
+        
+        // Edición de logo
+        document.getElementById('btnEditarLogo')?.addEventListener('click', () => {
+            const edicionDiv = document.getElementById('edicionLogo');
+            edicionDiv.style.display = edicionDiv.style.display === 'none' ? 'block' : 'none';
+        });
+        
+        document.getElementById('btnCerrarEdicion')?.addEventListener('click', () => {
+            document.getElementById('edicionLogo').style.display = 'none';
+        });
+        
+        function actualizarVistaPreviaEdicion() {
+            const logoImg = document.getElementById('logoPreview');
+            logoImg.style.filter = `brightness(${imageTransformations.brightness}%) contrast(${imageTransformations.contrast}%)`;
+            logoImg.style.opacity = imageTransformations.opacity / 100;
+            logoImg.style.borderRadius = `${imageTransformations.borderRadius}px`;
+            logoImg.style.transform = `rotate(${imageTransformations.rotation}deg)`;
+            document.getElementById('brightnessValue').textContent = `${imageTransformations.brightness}%`;
+            document.getElementById('contrastValue').textContent = `${imageTransformations.contrast}%`;
+            document.getElementById('opacityValue').textContent = `${imageTransformations.opacity}%`;
+            document.getElementById('borderRadiusValue').textContent = `${imageTransformations.borderRadius}px`;
+        }
+        
+        document.getElementById('brightness')?.addEventListener('input', (e) => { imageTransformations.brightness = e.target.value; actualizarVistaPreviaEdicion(); });
+        document.getElementById('contrast')?.addEventListener('input', (e) => { imageTransformations.contrast = e.target.value; actualizarVistaPreviaEdicion(); });
+        document.getElementById('opacity')?.addEventListener('input', (e) => { imageTransformations.opacity = e.target.value; actualizarVistaPreviaEdicion(); });
+        document.getElementById('borderRadius')?.addEventListener('input', (e) => { imageTransformations.borderRadius = e.target.value; actualizarVistaPreviaEdicion(); });
+        document.getElementById('rotateLeft')?.addEventListener('click', () => { imageTransformations.rotation -= 90; actualizarVistaPreviaEdicion(); });
+        document.getElementById('rotateRight')?.addEventListener('click', () => { imageTransformations.rotation += 90; actualizarVistaPreviaEdicion(); });
+        document.getElementById('resetRotation')?.addEventListener('click', () => { imageTransformations.rotation = 0; actualizarVistaPreviaEdicion(); });
+        document.getElementById('bgTransparent')?.addEventListener('click', () => { document.getElementById('logoPreview').style.backgroundColor = 'transparent'; });
+        document.getElementById('bgWhite')?.addEventListener('click', () => { document.getElementById('logoPreview').style.backgroundColor = 'white'; });
+        document.getElementById('bgDark')?.addEventListener('click', () => { document.getElementById('logoPreview').style.backgroundColor = '#1a1a2e'; });
+        document.getElementById('btnResetEdicion')?.addEventListener('click', () => {
+            imageTransformations = { brightness: 100, contrast: 100, opacity: 100, borderRadius: 8, rotation: 0, backgroundColor: 'transparent' };
+            document.getElementById('brightness').value = 100;
+            document.getElementById('contrast').value = 100;
+            document.getElementById('opacity').value = 100;
+            document.getElementById('borderRadius').value = 8;
+            actualizarVistaPreviaEdicion();
+            document.getElementById('logoPreview').style.backgroundColor = 'transparent';
+        });
+        
+        // ==================== CATÁLOGOS ====================
         async function loadCatalogo(tipo) {
             try {
-                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=${tipo}`, {
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                const data = await response.json();
+                const data = await apiRequest(`catalogos&tipo=${tipo}`);
                 const container = document.getElementById(`${tipo}List`);
                 const countSpan = document.getElementById(`${tipo}Count`);
                 if (countSpan) countSpan.textContent = data.length;
                 if (container) {
-                    if (!data || data.length === 0) {
-                        container.innerHTML = '<div class="empty-catalogo">No hay elementos registrados</div>';
-                    } else {
-                        container.innerHTML = data.map(item => `
-                            <div class="catalogo-item">
-                                <span>${escapeHtml(item.valor)}</span>
-                                <div>
-                                    <button class="btn-sm btn-warning" onclick="openEditModal(${item.id}, '${tipo}', '${escapeHtml(item.valor)}')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn-sm btn-danger" onclick="deleteCatalogo(${item.id}, '${tipo}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `).join('');
-                    }
+                    if (!data || data.length === 0) container.innerHTML = '<div class="empty-catalogo">No hay elementos registrados</div>';
+                    else container.innerHTML = data.map(item => `<div class="catalogo-item"><span>${escapeHtml(item.valor)}</span><div><button class="btn-accion btn-editar" onclick="openEditModal(${item.id}, '${tipo}', '${escapeHtml(item.valor)}')"><i class="fas fa-edit"></i></button><button class="btn-accion btn-eliminar" onclick="deleteCatalogo(${item.id}, '${tipo}')"><i class="fas fa-trash"></i></button></div></div>`).join('');
                 }
-            } catch (error) {
-                console.error(`Error loading ${tipo}:`, error);
-                showToast(`Error cargando ${tipo}`, 'error');
-            }
+            } catch (error) { console.error(`Error loading ${tipo}:`, error); showToast(`Error cargando ${tipo}`, 'error'); }
         }
         
         async function loadAllCatalogos() {
-            const catalogosList = [
-                'jerarquias', 'tipos_recargo', 'oficinas', 'tipos_oficio',
-                'juzgados', 'dependencias', 'tipos_requerimiento', 
-                'tipos_licencia', 'obras_sociales'
-            ];
-            for (const tipo of catalogosList) {
-                await loadCatalogo(tipo);
-            }
+            const tipos = ['jerarquias', 'tipos_recargo', 'oficinas', 'tipos_oficio', 'juzgados', 'dependencias', 'tipos_requerimiento', 'tipos_licencia', 'licencia_categorias', 'obras_sociales'];
+            for (const tipo of tipos) await loadCatalogo(tipo);
         }
         
         async function addCatalogo(tipo, inputId) {
             const input = document.getElementById(inputId);
             const valor = input.value.trim();
-            if (!valor) {
-                showToast('Ingrese un valor', 'warning');
-                return;
-            }
+            if (!valor) { showToast('Ingrese un valor', 'warning'); return; }
             try {
-                const response = await fetch(`${API_URL}?endpoint=catalogos`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getToken()}`
-                    },
-                    body: JSON.stringify({ tipo, valor, orden: 0 })
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast('Elemento agregado correctamente', 'success');
-                    input.value = '';
-                    await loadCatalogo(tipo);
-                } else {
-                    showToast(result.error || 'Error al agregar', 'error');
-                }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
-            }
+                const result = await apiRequest('catalogos', 'POST', { tipo, valor, orden: 0 });
+                if (result.success) { showToast('Elemento agregado', 'success'); input.value = ''; await loadCatalogo(tipo); }
+                else showToast(result.error || 'Error', 'error');
+            } catch (error) { showToast('Error de conexión', 'error'); }
         }
         
         function openEditModal(id, tipo, valor) {
@@ -347,107 +795,103 @@
             const id = document.getElementById('editCatalogoId').value;
             const tipo = document.getElementById('editCatalogoTipo').value;
             const nuevoValor = document.getElementById('editCatalogoValor').value.trim();
-            if (!nuevoValor) {
-                showToast('El valor no puede estar vacío', 'warning');
-                return;
-            }
+            if (!nuevoValor) { showToast('El valor no puede estar vacío', 'warning'); return; }
             try {
-                const response = await fetch(`${API_URL}?endpoint=catalogos&id=${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getToken()}`
-                    },
-                    body: JSON.stringify({ valor: nuevoValor, orden: 0 })
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast('Elemento actualizado', 'success');
-                    closeModal();
-                    await loadCatalogo(tipo);
-                } else {
-                    showToast(result.error || 'Error al actualizar', 'error');
-                }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
-            }
+                const result = await apiRequest(`catalogos&id=${id}`, 'PUT', { valor: nuevoValor, orden: 0 });
+                if (result.success) { showToast('Elemento actualizado', 'success'); closeModal(); await loadCatalogo(tipo); }
+                else showToast(result.error || 'Error', 'error');
+            } catch (error) { showToast('Error de conexión', 'error'); }
         }
         
         async function deleteCatalogo(id, tipo) {
-            if (!confirm('¿Eliminar este elemento? Podría afectar registros existentes.')) return;
+            if (!confirm('¿Eliminar este elemento?')) return;
             try {
-                const response = await fetch(`${API_URL}?endpoint=catalogos&id=${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast('Elemento eliminado', 'success');
-                    await loadCatalogo(tipo);
-                } else {
-                    showToast(result.error || 'Error al eliminar', 'error');
-                }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
-            }
+                const result = await apiRequest(`catalogos&id=${id}`, 'DELETE');
+                if (result.success) { showToast('Elemento eliminado', 'success'); await loadCatalogo(tipo); }
+                else showToast(result.error || 'Error', 'error');
+            } catch (error) { showToast('Error de conexión', 'error'); }
         }
         
+        // ==================== FERIADOS ====================
         async function loadFeriados() {
+            const tbody = document.getElementById('feriadosTableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando feriados...</td></tr>';
+            
             try {
+                const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=feriados`, {
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
-                const tbody = document.getElementById('feriadosTableBody');
+                console.log('Feriados recibidos:', data);
+                
                 if (!data || data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay feriados registrados</td></tr>';
-                } else {
-                    tbody.innerHTML = data.map(item => `
-                        <tr>
-                            <td>${item.fecha}</td>
-                            <td>${escapeHtml(item.motivo)}</td>
-                            <td><span class="badge badge-info">${item.tipo}</span></td>
-                            <td><button class="btn-sm btn-danger" onclick="deleteFeriado(${item.id})"><i class="fas fa-trash"></i> Eliminar</button></td>
-                        </tr>
-                    `).join('');
+                    return;
                 }
+                
+                tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td>${escapeHtml(item.fecha)}</td>
+                        <td>${escapeHtml(item.motivo)}</td>
+                        <td><span class="badge badge-info">${escapeHtml(item.tipo || 'Nacional')}</span></td>
+                        <td class="acciones-cell">
+                            <button class="btn-accion btn-eliminar" onclick="deleteFeriado(${item.id})">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                showToast(`✅ ${data.length} feriados cargados`, 'success');
             } catch (error) {
                 console.error('Error loading feriados:', error);
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center">Error cargando feriados: ${error.message}</td></tr>`;
                 showToast('Error cargando feriados', 'error');
             }
         }
         
         function openFeriadoModal() {
-            document.getElementById('feriadoModal').style.display = 'flex';
             document.getElementById('feriado_fecha').value = new Date().toISOString().split('T')[0];
             document.getElementById('feriado_motivo').value = '';
             document.getElementById('feriado_tipo').value = 'Nacional';
+            document.getElementById('feriadoModal').style.display = 'flex';
         }
         
         async function saveFeriado() {
             const fecha = document.getElementById('feriado_fecha').value;
             const motivo = document.getElementById('feriado_motivo').value;
             const tipo = document.getElementById('feriado_tipo').value;
+            
             if (!fecha || !motivo) {
                 showToast('Complete todos los campos', 'warning');
                 return;
             }
+            
             try {
+                const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=feriados`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getToken()}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ fecha, motivo, tipo })
                 });
                 const result = await response.json();
                 if (result.success) {
-                    showToast('Feriado agregado correctamente', 'success');
+                    showToast('Feriado agregado', 'success');
                     closeModal();
                     loadFeriados();
                 } else {
-                    showToast(result.error || 'Error al agregar', 'error');
+                    showToast('Error al guardar', 'error');
                 }
             } catch (error) {
                 showToast('Error de conexión', 'error');
@@ -457,139 +901,42 @@
         async function deleteFeriado(id) {
             if (!confirm('¿Eliminar este feriado?')) return;
             try {
+                const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=feriados&id=${id}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const result = await response.json();
                 if (result.success) {
                     showToast('Feriado eliminado', 'success');
                     loadFeriados();
                 } else {
-                    showToast(result.error || 'Error al eliminar', 'error');
+                    showToast('Error al eliminar', 'error');
                 }
             } catch (error) {
                 showToast('Error de conexión', 'error');
             }
         }
         
-        async function loadConfiguracion() {
-            try {
-                const response = await fetch(`${API_URL}?endpoint=configuracion`, {
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                const config = await response.json();
-                document.getElementById('config_nombre_sistema').value = config.nombre_sistema || 'Sistema Policial';
-            } catch (error) {
-                console.error('Error loading config:', error);
-            }
-        }
-        
-        async function saveConfiguracionGeneral() {
-            const nombreSistema = document.getElementById('config_nombre_sistema').value;
-            try {
-                const response = await fetch(`${API_URL}?endpoint=configuracion`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getToken()}`
-                    },
-                    body: JSON.stringify({ clave: 'nombre_sistema', valor: nombreSistema, tipo: 'text' })
-                });
-                const result = await response.json();
-                if (result.success) {
-                    showToast('Configuración guardada', 'success');
-                } else {
-                    showToast('Error al guardar', 'error');
-                }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
-            }
-        }
-        
-        async function backupDatabase() {
-            try {
-                const response = await fetch(`${API_URL}?endpoint=backup`, {
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                const data = await response.json();
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('Backup generado correctamente', 'success');
-            } catch (error) {
-                showToast('Error generando backup', 'error');
-            }
-        }
-        
-        function restoreDatabase() {
-            document.getElementById('restore_file').click();
-            document.getElementById('restore_file').onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = async (event) => {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        const response = await fetch(`${API_URL}?endpoint=restore`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${getToken()}`
-                            },
-                            body: JSON.stringify(data)
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                            showToast('Base de datos restaurada correctamente', 'success');
-                            location.reload();
-                        } else {
-                            showToast('Error al restaurar', 'error');
-                        }
-                    } catch (error) {
-                        showToast('Error restaurando backup', 'error');
-                    }
-                };
-                reader.readAsText(file);
-            };
-        }
-        
+        // ==================== DEPENDENCIAS ====================
         async function loadDependencias() {
             try {
-                const response = await fetch(`${API_URL}?endpoint=dependencias`, {
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                const data = await response.json();
+                const data = await apiRequest('dependencias');
                 const tbody = document.getElementById('dependenciasTableBody');
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay dependencias registradas</td></tr>';
-                } else {
-                    tbody.innerHTML = data.map(item => `
-                        <tr>
-                            <td>${escapeHtml(item.nombre)}</td>
-                            <td><span class="badge badge-info">${item.nivel}</span></td>
-                            <td>${escapeHtml(item.padre_nombre || '-')}</td>
-                            <td>${escapeHtml(item.codigo || '-')}</td>
-                            <td>
-                                <button class="btn-sm btn-primary" onclick="editDependencia(${item.id})"><i class="fas fa-edit"></i></button>
-                                <button class="btn-sm btn-danger" onclick="deleteDependencia(${item.id})"><i class="fas fa-trash"></i></button>
-                             </td>
-                        </tr>
-                    `).join('');
-                }
+                if (!tbody) return;
+                if (!data || data.length === 0) tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay dependencias registradas</td></tr>';
+                else tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td>${escapeHtml(item.nombre)}</td>
+                        <td><span class="badge badge-info">${escapeHtml(item.nivel)}</span></td>
+                        <td>${escapeHtml(item.padre_nombre || '-')}</td>
+                        <td>${escapeHtml(item.codigo || '-')}</td>
+                        <td><button class="btn-accion btn-editar" onclick="editDependencia(${item.id})"><i class="fas fa-edit"></i></button><button class="btn-accion btn-eliminar" onclick="deleteDependencia(${item.id})"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
                 const selectPadre = document.getElementById('dependencia_padre');
-                if (selectPadre) {
-                    selectPadre.innerHTML = '<option value="">Ninguna (Nivel superior)</option>' + 
-                        data.filter(d => d.nivel !== 'seccion').map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
-                }
-            } catch (error) {
-                console.error('Error loading dependencias:', error);
-                showToast('Error cargando dependencias', 'error');
-            }
+                if (selectPadre) selectPadre.innerHTML = '<option value="">Ninguna (Nivel superior)</option>' + data.filter(d => d.nivel !== 'seccion').map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+            } catch (error) { console.error('Error loading dependencias:', error); showToast('Error cargando dependencias', 'error'); }
         }
         
         function openDependenciaModal(data = null) {
@@ -606,8 +953,7 @@
                 modal.dataset.id = data.id;
                 document.querySelector('#dependenciaModal .modal-header h3').textContent = 'Editar Dependencia';
             } else {
-                const form = document.getElementById('dependenciaForm');
-                if (form) form.reset();
+                ['dependencia_nombre', 'dependencia_nivel', 'dependencia_padre', 'dependencia_codigo', 'dependencia_direccion', 'dependencia_telefono', 'dependencia_email'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
                 delete modal.dataset.id;
                 document.querySelector('#dependenciaModal .modal-header h3').textContent = 'Nueva Dependencia';
             }
@@ -617,120 +963,55 @@
         async function saveDependencia() {
             const modal = document.getElementById('dependenciaModal');
             const id = modal.dataset?.id;
-            const data = {
-                nombre: document.getElementById('dependencia_nombre').value,
-                nivel: document.getElementById('dependencia_nivel').value,
-                padre_id: document.getElementById('dependencia_padre').value || null,
-                codigo: document.getElementById('dependencia_codigo').value,
-                direccion: document.getElementById('dependencia_direccion').value,
-                telefono: document.getElementById('dependencia_telefono').value,
-                email: document.getElementById('dependencia_email').value
-            };
-            if (!data.nombre) {
-                showToast('Complete el nombre de la dependencia', 'warning');
-                return;
-            }
+            const data = { nombre: document.getElementById('dependencia_nombre').value, nivel: document.getElementById('dependencia_nivel').value, padre_id: document.getElementById('dependencia_padre').value || null, codigo: document.getElementById('dependencia_codigo').value, direccion: document.getElementById('dependencia_direccion').value, telefono: document.getElementById('dependencia_telefono').value, email: document.getElementById('dependencia_email').value };
+            if (!data.nombre) { showToast('Complete el nombre', 'warning'); return; }
             try {
-                let result;
-                if (id) {
-                    result = await apiRequest(`dependencias&id=${id}`, 'PUT', data);
-                } else {
-                    result = await apiRequest('dependencias', 'POST', data);
-                }
-                if (result && result.success) {
-                    showToast(`Dependencia ${id ? 'actualizada' : 'creada'} correctamente`, 'success');
-                    closeModal();
-                    loadDependencias();
-                } else {
-                    showToast('Error al guardar', 'error');
-                }
-            } catch (error) {
-                showToast('Error guardando dependencia', 'error');
-            }
+                let result; if (id) result = await apiRequest(`dependencias&id=${id}`, 'PUT', data); else result = await apiRequest('dependencias', 'POST', data);
+                if (result && result.success) { showToast(`Dependencia ${id ? 'actualizada' : 'creada'}`, 'success'); closeModal(); loadDependencias(); }
+                else showToast('Error al guardar', 'error');
+            } catch (error) { showToast('Error guardando', 'error'); }
         }
         
-        async function editDependencia(id) {
-            try {
-                const data = await apiRequest(`dependencias&id=${id}`);
-                if (data) openDependenciaModal(data);
-            } catch (error) {
-                showToast('Error cargando datos', 'error');
-            }
-        }
+        async function editDependencia(id) { try { const data = await apiRequest(`dependencias&id=${id}`); if (data) openDependenciaModal(data); } catch (error) { showToast('Error cargando', 'error'); } }
+        async function deleteDependencia(id) { if (confirm('¿Eliminar esta dependencia?')) { try { const result = await apiRequest(`dependencias&id=${id}`, 'DELETE'); if (result.success) { showToast('Dependencia eliminada', 'success'); loadDependencias(); } } catch (error) { showToast('Error eliminando', 'error'); } } }
         
-        async function deleteDependencia(id) {
-            if (confirm('¿Eliminar esta dependencia? Se eliminarán también sus sub-dependencias.')) {
-                try {
-                    const result = await apiRequest(`dependencias&id=${id}`, 'DELETE');
-                    if (result && result.success) {
-                        showToast('Dependencia eliminada', 'success');
-                        loadDependencias();
-                    } else {
-                        showToast('Error al eliminar', 'error');
-                    }
-                } catch (error) {
-                    showToast('Error eliminando dependencia', 'error');
-                }
-            }
-        }
-        
+        // ==================== INICIALIZACIÓN ====================
         function checkAuth() {
             const user = localStorage.getItem('current_user');
-            if (!user) {
-                window.location.href = 'index.html';
-                return false;
-            }
+            if (!user) { window.location.href = 'index.html'; return false; }
             const userData = JSON.parse(user);
-            const userInfoEl = document.getElementById('userInfo');
-            if (userInfoEl) {
-                userInfoEl.innerHTML = `<span>${userData.nombre}</span><span class="badge badge-info">${userData.rol}</span>`;
-            }
+            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
             return true;
-        }
-        
-        function handleLogout() {
-            localStorage.removeItem('current_user');
-            localStorage.removeItem('jwt_token');
-            window.location.href = 'index.html';
-        }
-        
-        function toggleMobileMenu() {
-            document.querySelector('.nav-menu')?.classList.toggle('active');
         }
         
         document.addEventListener('DOMContentLoaded', async () => {
             if (!checkAuth()) return;
+            initTheme();
             await loadAllCatalogos();
-            await loadFeriados();
             await loadConfiguracion();
             await loadDependencias();
-            document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
-            document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu);
+            document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
             document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
-            window.addEventListener('click', (e) => {
-                if (e.target.classList?.contains('modal')) closeModal();
-            });
+            window.addEventListener('click', (e) => { if (e.target.classList?.contains('modal')) closeModal(); });
         });
         
         // Exponer funciones globales
-        window.showTab = showTab;
-        window.addCatalogo = addCatalogo;
-        window.openEditModal = openEditModal;
-        window.saveEditCatalogo = saveEditCatalogo;
+        window.showTab = showTab; 
+        window.addCatalogo = addCatalogo; 
+        window.openEditModal = openEditModal; 
+        window.saveEditCatalogo = saveEditCatalogo; 
         window.deleteCatalogo = deleteCatalogo;
-        window.openFeriadoModal = openFeriadoModal;
-        window.saveFeriado = saveFeriado;
-        window.deleteFeriado = deleteFeriado;
-        window.saveConfiguracionGeneral = saveConfiguracionGeneral;
-        window.backupDatabase = backupDatabase;
-        window.restoreDatabase = restoreDatabase;
-        window.openDependenciaModal = openDependenciaModal;
-        window.saveDependencia = saveDependencia;
-        window.editDependencia = editDependencia;
+        window.openFeriadoModal = openFeriadoModal; 
+        window.saveFeriado = saveFeriado; 
+        window.deleteFeriado = deleteFeriado; 
+        window.loadFeriados = loadFeriados;
+        window.openDependenciaModal = openDependenciaModal; 
+        window.saveDependencia = saveDependencia; 
+        window.editDependencia = editDependencia; 
         window.deleteDependencia = deleteDependencia;
         window.closeModal = closeModal;
-        window.handleLogout = handleLogout;
-        window.toggleMobileMenu = toggleMobileMenu;
+        window.setTheme = setTheme;
+        window.toggleTheme = toggleTheme;
     </script>
 </body>
 </html>

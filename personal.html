@@ -2,26 +2,412 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal - Sistema de Gestión Policial</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
-        input[list], select { width: 100%; padding: 0.5rem 0.75rem; background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); }
-        .documentos-container { max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; background-color: var(--bg-surface); }
-        .documento-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid var(--border); }
-        .filtros-container { background-color: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
-        .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .btn-accion { padding: 0.25rem 0.5rem; margin: 0 0.25rem; border-radius: 6px; font-size: 0.7rem; cursor: pointer; }
-        .btn-ver { background-color: rgba(29, 78, 216, 0.2); color: #1d4ed8; border: none; }
-        .btn-ver:hover { background-color: #1d4ed8; color: white; }
-        .btn-eliminar { background-color: rgba(220, 38, 38, 0.2); color: #dc2626; border: none; }
-        .btn-eliminar:hover { background-color: #dc2626; color: white; }
-        .btn-editar { background-color: rgba(217, 119, 6, 0.2); color: #d97706; border: none; }
-        .btn-editar:hover { background-color: #d97706; color: white; }
-        @media (max-width: 768px) { .filtros-grid { grid-template-columns: 1fr; } }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .filtros-container {
+            background-color: var(--bg-surface);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .config-columnas {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .config-item:hover {
+            background: var(--bg-card);
+        }
+        .btn-config {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-config:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-primary);
+        }
+        
+        th.draggable {
+            cursor: move;
+            user-select: none;
+            position: relative;
+        }
+        th.draggable:active {
+            cursor: grabbing;
+        }
+        th .drag-handle {
+            display: inline-block;
+            margin-right: 5px;
+            opacity: 0.5;
+            cursor: move;
+        }
+        th:hover .drag-handle {
+            opacity: 1;
+        }
+        th.drag-over {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+        .column-order-list {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            padding: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .column-order-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: move;
+            transition: all 0.2s;
+        }
+        .column-order-item:hover {
+            background: var(--bg-surface);
+            border-color: var(--accent-primary);
+        }
+        .column-order-item.dragging {
+            opacity: 0.5;
+        }
+        .column-order-item .drag-icon {
+            color: var(--text-secondary);
+            cursor: grab;
+        }
+        .column-order-item .drag-icon:active {
+            cursor: grabbing;
+        }
+        .column-order-item .col-name {
+            flex: 1;
+        }
+        
+        .documentos-container {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            background-color: var(--bg-surface);
+            margin-top: 0.5rem;
+        }
+        .documento-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .documento-item:last-child {
+            border-bottom: none;
+        }
+        .btn-doc {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .export-categorias {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .export-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background: var(--accent-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .dropbtn:hover {
+            background: #1e40af;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--bg-card);
+            min-width: 220px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3);
+            z-index: 1;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .dropdown-content a {
+            color: var(--text-primary);
+            padding: 10px 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .dropdown-content a:hover {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .btn-pdf {
+            background: rgba(220,38,38,0.2);
+            color: #dc2626;
+            border: 1px solid #dc2626;
+        }
+        .btn-pdf:hover {
+            background: #dc2626;
+            color: white;
+        }
+        .badge-arma-si {
+            background-color: rgba(22,163,74,0.2);
+            color: #16a34a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .badge-arma-no {
+            background-color: rgba(107,114,128,0.2);
+            color: #9ca3af;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .badge-chofer-si {
+            background-color: rgba(22,163,74,0.2);
+            color: #16a34a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .badge-chofer-no {
+            background-color: rgba(107,114,128,0.2);
+            color: #9ca3af;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .badge-doc-count {
+            background-color: rgba(29,78,216,0.2);
+            color: #1d4ed8;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+        .badge-doc-count:hover {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+        .badge-danger {
+            background-color: rgba(220,38,38,0.2);
+            color: #dc2626;
+        }
+        .badge-success {
+            background-color: rgba(22,163,74,0.2);
+            color: #16a34a;
+        }
+        .badge-warning {
+            background-color: rgba(217,119,6,0.2);
+            color: #d97706;
+        }
+        
+        .conditional-fields {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg-surface);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-primary);
+        }
+        
+        .acciones-buttons {
+            display: flex;
+            gap: 0.3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-accion {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-editar {
+            background-color: rgba(29, 78, 216, 0.15);
+            color: #3b82f6;
+        }
+        .btn-editar:hover {
+            background-color: #1d4ed8;
+            color: white;
+        }
+        
+        .btn-eliminar {
+            background-color: rgba(220, 38, 38, 0.15);
+            color: #ef4444;
+        }
+        .btn-eliminar:hover {
+            background-color: #dc2626;
+            color: white;
+        }
+        
+        .btn-pdf {
+            background-color: rgba(220, 38, 38, 0.15);
+            color: #dc2626;
+        }
+        .btn-pdf:hover {
+            background-color: #dc2626;
+            color: white;
+        }
+        
+        .equipamiento-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        .equipamiento-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .equipamiento-tab.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+        .equipamiento-tab:hover:not(.active) {
+            background: var(--bg-card);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-body {
+            padding: 1rem;
+        }
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        
+        @media (max-width:768px) {
+            .filtros-grid {
+                grid-template-columns: 1fr;
+            }
+            .export-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .dropdown-content {
+                position: static;
+                width: 100%;
+            }
+            .acciones-buttons {
+                flex-direction: column;
+                gap: 0.2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -36,6 +422,7 @@
                 <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
                 <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
                 <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
             <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
@@ -45,91 +432,1596 @@
     <div class="container">
         <div class="card-header">
             <h1><i class="fas fa-users"></i> Gestión de Personal</h1>
-            <div>
-                <button id="btnNuevoPersonal" class="btn btn-primary" onclick="openPersonalModal()"><i class="fas fa-plus"></i> Nuevo Personal</button>
-                <button id="btnImportar" class="btn btn-secondary" onclick="openImportModal()"><i class="fas fa-upload"></i> Importar CSV</button>
-                <button id="btnReportePDF" class="btn btn-secondary" onclick="generarPDFPersonal()"><i class="fas fa-file-pdf"></i> Reporte PDF</button>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button id="btnSeccionesGuardia" class="btn-config" onclick="window.location.href='secciones_guardia.html'">
+                    <i class="fas fa-layer-group"></i> Secciones
+                </button>
+                <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar</button>
+                <button id="btnNuevoPersonal" class="btn btn-primary" onclick="openPersonalModal()"><i class="fas fa-plus"></i> Nuevo</button>
+            </div>
+        </div>
+        
+        <div class="export-categorias">
+            <div class="export-header">
+                <h3><i class="fas fa-download"></i> Exportar Reportes</h3>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <div class="dropdown">
+                        <button class="dropbtn"><i class="fas fa-chart-bar"></i> Exportar por Categoría ▼</button>
+                        <div class="dropdown-content">
+                            <a onclick="exportarPDFCategoria('jerarquia')"><i class="fas fa-user-tie"></i> Por Jerarquía</a>
+                            <a onclick="exportarPDFCategoria('sexo')"><i class="fas fa-venus-mars"></i> Por Sexo</a>
+                            <a onclick="exportarPDFCategoria('mes_cumple')"><i class="fas fa-birthday-cake"></i> Por Mes de Cumpleaños</a>
+                            <a onclick="exportarPDFCategoria('tiene_arma')"><i class="fas fa-gun"></i> Con/Sin Arma</a>
+                            <a onclick="exportarPDFCategoria('es_chofer')"><i class="fas fa-truck"></i> Es Chofer</a>
+                            <a onclick="exportarPDFCategoria('dependencia')"><i class="fas fa-building"></i> Por Dependencia</a>
+                            <a onclick="exportarPDFCategoria('oficina')"><i class="fas fa-location-dot"></i> Por Oficina</a>
+                            <a onclick="exportarPDFCategoria('edad_rango')"><i class="fas fa-chart-line"></i> Por Rango de Edad</a>
+                            <a onclick="exportarPDFCategoria('seccion_guardia')"><i class="fas fa-layer-group"></i> Por Sección Guardia</a>
+                        </div>
+                    </div>
+                    <button class="dropbtn btn-pdf" onclick="exportarPDFCompleto()"><i class="fas fa-file-pdf"></i> PDF Completo</button>
+                    <button class="dropbtn btn-pdf" onclick="exportarPDFResumen()"><i class="fas fa-chart-pie"></i> PDF Resumen</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="configPanel" class="config-columnas" style="display: none;">
+            <h3><i class="fas fa-sliders-h"></i> Personalizar Columnas</h3>
+            <p class="text-secondary">Arrastre para reordenar. Marque/desmarque para mostrar/ocultar.</p>
+            <div id="columnOrderList" class="column-order-list"></div>
+            <div class="mt-2">
+                <button id="btnResetColumns" class="btn btn-secondary btn-sm">Restablecer</button>
+                <button id="btnGuardarConfig" class="btn btn-primary">Guardar</button>
+                <button id="btnCerrarConfig" class="btn btn-secondary">Cancelar</button>
             </div>
         </div>
         
         <div class="filtros-container">
-            <h3><i class="fas fa-filter"></i> Filtros</h3>
+            <h3>Filtros</h3>
             <div class="filtros-grid">
                 <div><label>Legajo</label><input type="text" id="filtro_legajo" class="form-control"></div>
                 <div><label>Apellido</label><input type="text" id="filtro_apellido" class="form-control"></div>
                 <div><label>Nombre</label><input type="text" id="filtro_nombre" class="form-control"></div>
                 <div><label>DNI</label><input type="text" id="filtro_dni" class="form-control"></div>
                 <div><label>Jerarquía</label><select id="filtro_jerarquia" class="form-control"><option value="">Todas</option></select></div>
-                <div id="filtroDependenciaContainer" style="display:none;"><label>Dependencia</label><select id="filtro_dependencia" class="form-control" data-dependencia><option value="">Todas</option></select></div>
+                <div><label>Sexo</label><select id="filtro_sexo" class="form-control"><option value="">Todos</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div>
+                <div><label>Con Arma</label><select id="filtro_arma" class="form-control"><option value="">Todos</option><option value="1">Sí</option><option value="0">No</option></select></div>
+                <div><label>Es Chofer</label><select id="filtro_chofer" class="form-control"><option value="">Todos</option><option value="1">Sí</option><option value="0">No</option></select></div>
+                <div><label>Sección Guardia</label><select id="filtro_seccion" class="form-control"><option value="">Todas</option></select></div>
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem;">
-                <button class="btn btn-primary" onclick="aplicarFiltros()"><i class="fas fa-search"></i> Buscar</button>
-                <button class="btn btn-secondary" onclick="limpiarFiltros()"><i class="fas fa-eraser"></i> Limpiar</button>
-                <button class="btn btn-secondary" onclick="exportarFiltradosCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                <button class="btn btn-primary" onclick="aplicarFiltros()">Buscar</button>
+                <button class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar</button>
             </div>
         </div>
         
         <div class="table-container">
             <table id="personalTable">
-                <thead><tr><th>Legajo</th><th>Jerarquía</th><th>Apellido/Nombre</th><th>DNI</th><th>Oficina</th><th>Edad</th><th>Dependencia</th><th>Acciones</th></tr></thead>
-                <tbody id="personalTableBody"><tr><td colspan="8" class="text-center">Cargando...<\/td></tr></tbody>
+                <thead id="tableHeader"></thead>
+                <tbody id="personalTableBody"></tbody>
             </table>
         </div>
     </div>
     
-    <div id="personalModal" class="modal"><div class="modal-content" style="max-width:900px;max-height:90vh;overflow-y:auto;">
-        <div class="modal-header"><h3 id="modalTitle">Nuevo Personal</h3><span class="close-modal">&times;</span></div>
-        <div class="modal-body">
-            <form id="personalForm">
-                <input type="hidden" id="personalId"><input type="hidden" id="jerarquia"><input type="hidden" id="oficina"><input type="hidden" id="obra_social"><input type="hidden" id="dependencia_id">
-                <div class="form-row"><div><label>Legajo *</label><input type="text" id="legajo" class="form-control" required></div><div><label>Jerarquía *</label><input type="text" id="jerarquia_input" class="form-control" list="jerarquiasList" placeholder="Buscar..." autocomplete="off" required><datalist id="jerarquiasList"></datalist></div></div>
-                <div class="form-row"><div><label>Apellido *</label><input type="text" id="apellido" class="form-control" required></div><div><label>Nombre *</label><input type="text" id="nombre" class="form-control" required></div></div>
-                <div class="form-row"><div><label>DNI *</label><input type="text" id="dni" class="form-control" required></div><div><label>Sexo</label><select id="sexo" class="form-control"><option value="">Seleccionar</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div></div>
-                <div class="form-row"><div><label>Oficina</label><input type="text" id="oficina_input" class="form-control" list="oficinasList" placeholder="Buscar..."><datalist id="oficinasList"></datalist></div><div><label>Fecha Nac.</label><input type="date" id="fecha_nacimiento" class="form-control"></div></div>
-                <div class="form-row"><div><label>Teléfono</label><input type="text" id="telefono" class="form-control"></div><div><label>Email</label><input type="email" id="email" class="form-control"></div></div>
-                <div><label>Dependencia</label><select id="dependencia_select" class="form-control" data-dependencia><option value="">Seleccionar</option></select></div>
-                <div><label><input type="checkbox" id="tiene_arma"> Tiene arma</label></div>
-                <div id="armamentoFields" style="display:none;"><div class="form-row"><div><label>Marca</label><input type="text" id="arma_marca" class="form-control"></div><div><label>Modelo</label><input type="text" id="arma_modelo" class="form-control"></div><div><label>Serie</label><input type="text" id="arma_serie" class="form-control"></div></div></div>
-                <div id="sinArmaFields" style="display:block;"><div><label>Justificación</label><textarea id="sin_arma_justificacion" class="form-control" rows="2"></textarea></div></div>
-                <div class="form-row"><div><label>N° Credencial</label><input type="text" id="nro_credencial" class="form-control"></div><div><label>N° Licencia</label><input type="text" id="nro_licencia_conducir" class="form-control"></div></div>
-                <div class="form-row"><div><label>Vencimiento Licencia</label><input type="date" id="fecha_vencimiento_licencia" class="form-control"></div><div><label>Obra Social</label><input type="text" id="obra_social_input" class="form-control" list="obrasSocialesList" placeholder="Buscar..."><datalist id="obrasSocialesList"></datalist></div></div>
-                <div class="form-row"><div><label>N° Afiliado</label><input type="text" id="nro_afiliado" class="form-control"></div></div>
-                <div><label>Documentos</label><div id="documentosList" class="documentos-container"><p class="text-center">No hay documentos</p></div><button type="button" class="btn-sm btn-secondary mt-1" onclick="abrirModalDocumento()"><i class="fas fa-upload"></i> Agregar</button></div>
-            </form>
+    <!-- Modal Personal Principal -->
+    <div id="personalModal" class="modal">
+        <div class="modal-content" style="max-width:900px; max-height:90vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nuevo Personal</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="personalForm">
+                    <input type="hidden" id="personalId">
+                    
+                    <div class="form-row">
+                        <div><label>Legajo *</label><input type="text" id="legajo" class="form-control" required></div>
+                        <div><label>Jerarquía</label><input type="text" id="jerarquia" class="form-control"></div>
+                    </div>
+                    <div class="form-row">
+                        <div><label>Apellido *</label><input type="text" id="apellido" class="form-control" required></div>
+                        <div><label>Nombre *</label><input type="text" id="nombre" class="form-control" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div><label>DNI *</label><input type="text" id="dni" class="form-control" required></div>
+                        <div><label>Sexo</label><select id="sexo" class="form-control"><option value="">Seleccionar</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div>
+                    </div>
+                    <div class="form-row">
+                        <div><label>Fecha Nacimiento</label><input type="date" id="fecha_nacimiento" class="form-control"></div>
+                        <div><label>Teléfono</label><input type="text" id="telefono" class="form-control"></div>
+                    </div>
+                    <div class="form-row">
+                        <div><label>Email</label><input type="email" id="email" class="form-control"></div>
+                        <div><label>Oficina</label><input type="text" id="oficina" class="form-control"></div>
+                    </div>
+                    <div class="form-row">
+                        <div><label>Dependencia</label><select id="dependencia_id" class="form-control"></select></div>
+                        <div><label>Sección Guardia</label><select id="seccion_guardia_id" class="form-control">
+                            <option value="">Seleccionar...</option>
+                        </select></div>
+                    </div>
+                    <div class="form-row">
+                        <div><label>Dirección</label><textarea id="direccion" class="form-control" rows="2"></textarea></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div><label>Tiene Arma</label>
+                            <select id="tiene_arma" class="form-control" onchange="toggleArmamentoFields()">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- MOTIVO SIN ARMA - Solo visible si NO tiene arma -->
+                    <div id="sinArmaFields" style="display: block;">
+                        <div class="conditional-fields">
+                            <h4><i class="fas fa-ban"></i> Motivo (sin arma reglamentaria)</h4>
+                            <textarea id="sin_arma_motivo" class="form-control" rows="2" placeholder="Justificación por la cual no posee arma reglamentaria"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="conditional-fields">
+                        <h4><i class="fas fa-id-card"></i> Licencia de Conducir</h4>
+                        <div class="form-row">
+                            <div><label>N° Licencia</label><input type="text" id="nro_licencia_conducir" class="form-control"></div>
+                            <div><label>Categoría</label>
+                                <select id="licencia_categoria" class="form-control">
+                                    <option value="">Seleccionar</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div><label>Vencimiento Licencia</label><input type="date" id="fecha_vencimiento_licencia" class="form-control"></div>
+                            <div><label>Es Chofer</label>
+                                <select id="es_chofer" class="form-control">
+                                    <option value="0">No</option>
+                                    <option value="1">Sí</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="conditional-fields">
+                        <h4><i class="fas fa-hospital-user"></i> Obra Social</h4>
+                        <div class="form-row">
+                            <div><label>Obra Social</label><input type="text" id="obra_social" class="form-control"></div>
+                            <div><label>N° Afiliado</label><input type="text" id="obra_social_numero" class="form-control"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="conditional-fields">
+                        <h4><i class="fas fa-paperclip"></i> Documentos Adjuntos</h4>
+                        <div id="documentosList" class="documentos-container"></div>
+                        <div class="form-row mt-2">
+                            <div><label>Título</label><input type="text" id="doc_titulo" class="form-control" placeholder="Ej: DNI, Título, Certificado"></div>
+                            <div><label>Descripción</label><input type="text" id="doc_descripcion" class="form-control" placeholder="Descripción opcional"></div>
+                        </div>
+                        <div class="form-row">
+                            <div><label>Archivo</label><input type="file" id="doc_archivo" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf"></div>
+                            <div><button type="button" class="btn btn-primary" onclick="subirDocumento()"><i class="fas fa-upload"></i> Subir Documento</button></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Equipamiento -->
+                    <div class="conditional-fields">
+                        <h4><i class="fas fa-gun"></i> Equipamiento</h4>
+                        <div class="equipamiento-tabs">
+                            <div class="equipamiento-tab active" onclick="mostrarArmas()">Armas</div>
+                            <div class="equipamiento-tab" onclick="mostrarChalecos()">Chalecos Antibalas</div>
+                        </div>
+                        <div id="equipamientoContainer"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="savePersonal()">Guardar</button>
+            </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="savePersonal()">Guardar</button></div>
-    </div></div>
+    </div>
     
-    <div id="documentoModal" class="modal"><div class="modal-content" style="max-width:400px;"><div class="modal-header"><h3>Agregar Documento</h3><span class="close-modal" onclick="cerrarModalDocumento()">&times;</span></div><div class="modal-body"><div><label>Título</label><input type="text" id="doc_titulo" class="form-control"></div><div><label>Descripción</label><textarea id="doc_descripcion" class="form-control" rows="2"></textarea></div><div><label>Archivo</label><input type="file" id="doc_archivo" class="form-control" accept=".pdf,.jpg,.png,.doc"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModalDocumento()">Cancelar</button><button class="btn btn-primary" onclick="guardarDocumento()">Subir</button></div></div></div>
+    <!-- Modal Arma -->
+    <div id="armaModal" class="modal">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h3>Registrar Arma</h3>
+                <span class="close-modal" onclick="cerrarModalArma()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="arma_id">
+                <input type="hidden" id="arma_personal_id">
+                <div><label>Marca</label><input type="text" id="arma_marca_field" class="form-control"></div>
+                <div><label>Modelo</label><input type="text" id="arma_modelo_field" class="form-control"></div>
+                <div><label>N° Serie *</label><input type="text" id="arma_serie_field" class="form-control" required></div>
+                <div><label>Calibre</label><input type="text" id="arma_calibre_field" class="form-control"></div>
+                <div><label>Fecha Asignación</label><input type="date" id="arma_fecha_asignacion_field" class="form-control"></div>
+                <div><label>Estado</label>
+                    <select id="arma_estado_field" class="form-control">
+                        <option>Asignada</option>
+                        <option>En mantenimiento</option>
+                        <option>Dado de baja</option>
+                    </select>
+                </div>
+                <div><label>Observaciones</label><textarea id="arma_observaciones_field" class="form-control" rows="2"></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalArma()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarArma()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Chaleco -->
+    <div id="chalecoModal" class="modal">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h3>Registrar Chaleco Antibalas</h3>
+                <span class="close-modal" onclick="cerrarModalChaleco()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="chaleco_id">
+                <input type="hidden" id="chaleco_personal_id">
+                <div><label>N° Serie *</label><input type="text" id="chaleco_numero_serie_field" class="form-control" required></div>
+                <div><label>Talla</label>
+                    <select id="chaleco_talla_field" class="form-control">
+                        <option value="">Seleccionar</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
+                    </select>
+                </div>
+                <div><label>Nivel Protección</label>
+                    <select id="chaleco_nivel_field" class="form-control">
+                        <option value="">Seleccionar</option><option>Nivel IIA</option><option>Nivel II</option><option>Nivel IIIA</option><option>Nivel III</option><option>Nivel IV</option>
+                    </select>
+                </div>
+                <div><label>Fecha Asignación</label><input type="date" id="chaleco_fecha_asignacion_field" class="form-control"></div>
+                <div><label>Fecha Vencimiento *</label><input type="date" id="chaleco_fecha_vencimiento_field" class="form-control" required></div>
+                <div><label>Estado</label>
+                    <select id="chaleco_estado_field" class="form-control">
+                        <option>Activo</option><option>Vencido</option><option>En mantenimiento</option>
+                    </select>
+                </div>
+                <div><label>Observaciones</label><textarea id="chaleco_observaciones_field" class="form-control" rows="2"></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalChaleco()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarChaleco()">Guardar</button>
+            </div>
+        </div>
+    </div>
     
-    <div id="importModal" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>Importar CSV</h3><span class="close-modal">&times;</span></div><div class="modal-body"><div id="dropZone" class="import-area" style="border:2px dashed var(--border);padding:2rem;text-align:center;cursor:pointer;"><i class="fas fa-cloud-upload-alt fa-2x"></i><p>Arrastre CSV</p><input type="file" id="fileInput" accept=".csv" style="display:none;"></div><div id="importPreview"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="procesarImportacion()">Importar</button></div></div></div>
+    <!-- Modal Visualizar Documento -->
+    <div id="documentoModal" class="modal">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-header"><h3>Documento</h3><span class="close-modal" onclick="cerrarDocumentoModal()">&times;</span></div>
+            <div class="modal-body" style="text-align:center;">
+                <img id="documentoPreview" src="" style="max-width:100%; border-radius:8px; display:none;">
+                <iframe id="documentoPdf" src="" style="width:100%; height:500px; display:none;"></iframe>
+            </div>
+        </div>
+    </div>
     
     <div id="toast-container" class="toast-container"></div>
-    <datalist id="jerarquiasList"></datalist><datalist id="oficinasList"></datalist><datalist id="obrasSocialesList"></datalist>
-    <script src="main.js"></script>
+    
     <script>
-        let datosOriginales=[],datosFiltrados=[],personalIdActual=null,importData=[];
-        function calcularEdad(f){if(!f)return'-';const hoy=new Date(),nac=new Date(f);let e=hoy.getFullYear()-nac.getFullYear();const m=hoy.getMonth()-nac.getMonth();if(m<0||(m===0&&hoy.getDate()<nac.getDate()))e--;return e;}
-        function renderPersonalTable(d){const t=document.getElementById('personalTableBody');if(!t)return;if(!d||d.length===0){t.innerHTML='<tr><td colspan="8" class="text-center">No hay registros</td></tr>';return;}const puedeEditar=window.canEdit&&window.canEdit('personal'),puedeEliminar=window.canDelete&&window.canDelete('personal');t.innerHTML=d.map(i=>`<tr><td>${escapeHtml(i.legajo)}</td><td>${escapeHtml(i.jerarquia||'-')}</td><td>${escapeHtml(i.apellido)}, ${escapeHtml(i.nombre)}</td><td>${escapeHtml(i.dni)}</td><td>${escapeHtml(i.oficina||'-')}</td><td>${calcularEdad(i.fecha_nacimiento)} años</td><td>${escapeHtml(i.dependencia_nombre||'-')}</td><td>${puedeEditar?`<button class="btn-accion btn-editar" onclick="editPersonal(${i.id})"><i class="fas fa-edit"></i></button>`:''}${puedeEliminar?`<button class="btn-accion btn-eliminar" onclick="deletePersonal(${i.id})"><i class="fas fa-trash"></i></button>`:''}</td></tr>`).join('');}
-        async function aplicarFiltros(){let f=[...datosOriginales];const l=document.getElementById('filtro_legajo')?.value.toLowerCase();if(l)f=f.filter(p=>(p.legajo||'').toLowerCase().includes(l));const a=document.getElementById('filtro_apellido')?.value.toLowerCase();if(a)f=f.filter(p=>(p.apellido||'').toLowerCase().includes(a));const n=document.getElementById('filtro_nombre')?.value.toLowerCase();if(n)f=f.filter(p=>(p.nombre||'').toLowerCase().includes(n));const d=document.getElementById('filtro_dni')?.value.toLowerCase();if(d)f=f.filter(p=>(p.dni||'').includes(d));const j=document.getElementById('filtro_jerarquia')?.value;if(j)f=f.filter(p=>p.jerarquia===j);const dep=document.getElementById('filtro_dependencia')?.value;if(dep)f=f.filter(p=>p.dependencia_id==dep);datosFiltrados=f;renderPersonalTable(f);showToast(`Encontrados ${f.length} agentes`,f.length>0?'success':'warning');}
-        function limpiarFiltros(){['filtro_legajo','filtro_apellido','filtro_nombre','filtro_dni','filtro_jerarquia','filtro_dependencia'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderPersonalTable(datosOriginales);datosFiltrados=[...datosOriginales];showToast('Filtros limpiados','info');}
-        function exportarFiltradosCSV(){const d=datosFiltrados.length>0?datosFiltrados:datosOriginales;if(!d||d.length===0){showToast('No hay datos','warning');return;}const headers=['Legajo','Jerarquía','Apellido','Nombre','DNI','Oficina','Teléfono','Email'];const csv=[headers.join(',')];d.forEach(p=>{csv.push([`"${p.legajo||''}"`,`"${p.jerarquia||''}"`,`"${p.apellido||''}"`,`"${p.nombre||''}"`,`"${p.dni||''}"`,`"${p.oficina||''}"`,`"${p.telefono||''}"`,`"${p.email||''}"`].join(','));});const blob=new Blob([csv.join('\n')],{type:'text/csv'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`personal_${new Date().toISOString().split('T')[0]}.csv`;link.click();URL.revokeObjectURL(link.href);showToast('Exportación completada','success');}
-        async function generarPDFPersonal(){const t=document.getElementById('personalTable');if(!t){showToast('No hay datos','warning');return;}showToast('Generando PDF...','info');try{const{jsPDF}=window.jspdf;const pdf=new jsPDF('landscape','mm','a4');pdf.setFontSize(18);pdf.text('Reporte de Personal',14,20);pdf.setFontSize(10);pdf.text(`Fecha: ${new Date().toLocaleString()}`,14,30);const canvas=await html2canvas(t,{scale:2,backgroundColor:'#1c2128'});const imgData=canvas.toDataURL('image/png');const pdfWidth=pdf.internal.pageSize.getWidth()-20;const pdfHeight=(canvas.height*pdfWidth)/canvas.width;pdf.addImage(imgData,'PNG',10,40,pdfWidth,pdfHeight);pdf.save(`reporte_personal_${new Date().toISOString().split('T')[0]}.pdf`);showToast('PDF generado','success');}catch(e){showToast('Error','error');}}
-        function openImportModal(){document.getElementById('importModal').style.display='flex';}
-        function cerrarModalDocumento(){document.getElementById('documentoModal').style.display='none';document.getElementById('doc_titulo').value='';document.getElementById('doc_descripcion').value='';document.getElementById('doc_archivo').value='';}
-        function abrirModalDocumento(){document.getElementById('documentoModal').style.display='flex';}
-        async function guardarDocumento(){const titulo=document.getElementById('doc_titulo').value,desc=document.getElementById('doc_descripcion').value,archivo=document.getElementById('doc_archivo').files[0];if(!titulo||!archivo){showToast('Complete campos','warning');return;}const fd=new FormData();fd.append('personal_id',document.getElementById('personalId').value||'');fd.append('titulo',titulo);fd.append('descripcion',desc);fd.append('archivo',archivo);try{const res=await fetch(`${API_URL}?endpoint=upload_documento`,{method:'POST',headers:{'Authorization':`Bearer ${localStorage.getItem('jwt_token')}`},body:fd});const d=await res.json();if(d.success){showToast('Documento subido','success');cerrarModalDocumento();if(document.getElementById('personalId').value)await cargarDocumentos(document.getElementById('personalId').value);}else showToast('Error','error');}catch(e){showToast('Error','error');}}
-        function setupDragAndDrop(){const dz=document.getElementById('dropZone'),fi=document.getElementById('fileInput');if(dz){dz.addEventListener('click',()=>fi.click());dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));dz.addEventListener('drop',handleDrop);fi.addEventListener('change',handleFileSelect);}}
-        function handleDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('drag-over');const file=e.dataTransfer.files[0];if(file&&file.type==='text/csv')leerCSV(file);else showToast('Seleccione CSV','error');}
-        function handleFileSelect(e){const file=e.target.files[0];if(file)leerCSV(file);}
-        function leerCSV(file){const r=new FileReader();r.onload=function(e){const lines=e.target.result.split('\n');const headers=lines[0].split(',');importData=[];for(let i=1;i<lines.length;i++){if(lines[i].trim()){const values=lines[i].split(',');const reg={};headers.forEach((h,idx)=>reg[h.trim()]=values[idx]?.trim());importData.push(reg);}}const preview=document.getElementById('importPreview');if(preview)preview.innerHTML=`<p class="success">✅ ${importData.length} registros listos</p>`;};r.readAsText(file);}
-        async function procesarImportacion(){if(importData.length===0){showToast('No hay datos','warning');return;}try{const result=await apiRequest('importar_datos','POST',{tabla:'personal',datos:importData});if(result&&result.success){showToast(`${result.importados} registros importados`,'success');closeModal();loadPersonal();}else showToast('Error','error');}catch(e){showToast('Error','error');}}
-        async function cargarDependenciasSelect(){try{const res=await fetch(`${API_URL}?endpoint=dependencias`,{headers:{'Authorization':`Bearer ${localStorage.getItem('jwt_token')}`}});const d=await res.json();document.querySelectorAll('select[data-dependencia]').forEach(s=>{s.innerHTML='<option value="">Seleccionar...</option>'+d.map(dep=>`<option value="${dep.id}">${escapeHtml(dep.nombre)}</option>`).join('');});}catch(e){console.error(e);}}
-        const originalLoadPersonal=window.loadPersonal;window.loadPersonal=async function(){try{const data=await apiRequest('personal');datosOriginales=data;datosFiltrados=[...data];renderPersonalTable(data);const jerarquias=[...new Set(data.map(p=>p.jerarquia).filter(j=>j))];document.getElementById('filtro_jerarquia').innerHTML='<option value="">Todas</option>'+jerarquias.map(j=>`<option value="${j}">${j}</option>`).join('');showToast('Personal cargado','success');}catch(e){showToast('Error','error');}};
-        window.editPersonal=async function(id){try{const data=await apiRequest(`personal&id=${id}`);if(data)openPersonalModal(data);}catch(e){showToast('Error','error');}};
-        window.deletePersonal=async function(id){if(confirm('¿Eliminar?')){try{const result=await apiRequest(`personal&id=${id}`,'DELETE');if(result&&result.success){showToast('Eliminado','success');await loadPersonal();}}catch(e){showToast('Error','error');}}};
-        document.addEventListener('DOMContentLoaded',()=>{setupDragAndDrop();cargarDependenciasSelect();});
-        window.openImportModal=openImportModal;window.cerrarModalDocumento=cerrarModalDocumento;window.abrirModalDocumento=abrirModalDocumento;window.guardarDocumento=guardarDocumento;window.aplicarFiltros=aplicarFiltros;window.limpiarFiltros=limpiarFiltros;window.exportarFiltradosCSV=exportarFiltradosCSV;window.generarPDFPersonal=generarPDFPersonal;
+        const API_URL = 'backend/api.php';
+        let personalData = [];
+        
+        const allColumnsInfo = {
+            'legajo': 'Legajo',
+            'jerarquia': 'Jerarquía',
+            'apellido_nombre': 'Apellido y Nombre',
+            'dni': 'DNI',
+            'sexo': 'Sexo',
+            'fecha_nacimiento': 'Fecha Nacimiento',
+            'edad': 'Edad',
+            'telefono': 'Teléfono',
+            'email': 'Email',
+            'tiene_arma': 'Tiene Arma',
+            'es_chofer': 'Es Chofer',
+            'oficina': 'Oficina',
+            'dependencia': 'Dependencia',
+            'seccion_guardia': 'Sección Guardia',
+            'documentos': 'Documentos'
+        };
+        
+        let activeColumns = ['legajo', 'jerarquia', 'apellido_nombre', 'dni', 'sexo', 'fecha_nacimiento', 'edad', 'tiene_arma', 'oficina', 'dependencia'];
+        
+        let documentosPorAgente = {};
+        let armasActuales = [];
+        let chalecosActuales = [];
+        let documentosActuales = [];
+        
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        
+        function showToast(msg, type) {
+            let c = document.getElementById('toast-container');
+            if (!c) { c = document.createElement('div'); c.id = 'toast-container'; c.className = 'toast-container'; document.body.appendChild(c); }
+            const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerHTML = `<div>${msg}</div>`;
+            c.appendChild(t); setTimeout(() => t.remove(), 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function calcularEdad(fecha) {
+            if (!fecha) return '-';
+            const hoy = new Date();
+            const nac = new Date(fecha);
+            let edad = hoy.getFullYear() - nac.getFullYear();
+            const m = hoy.getMonth() - nac.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+            return edad;
+        }
+        
+        function getRangoEdad(edad) {
+            if (edad === '-') return 'Sin datos';
+            if (edad < 25) return 'Menos de 25 años';
+            if (edad < 35) return '25-34 años';
+            if (edad < 45) return '35-44 años';
+            if (edad < 55) return '45-54 años';
+            return '55+ años';
+        }
+        
+        function toggleArmamentoFields() {
+            const tieneArma = document.getElementById('tiene_arma').value === '1';
+            
+            const sinArmaFields = document.getElementById('sinArmaFields');
+            if (sinArmaFields) {
+                sinArmaFields.style.display = tieneArma ? 'none' : 'block';
+            }
+            
+            if (tieneArma) {
+                document.getElementById('sin_arma_motivo').value = '';
+            }
+        }
+        
+        async function cargarCategoriasLicencia() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=licencia_categorias`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                const select = document.getElementById('licencia_categoria');
+                if (select && Array.isArray(data)) {
+                    select.innerHTML = '<option value="">Seleccionar</option>' + data.map(c => `<option value="${escapeHtml(c.valor)}">${escapeHtml(c.valor)}</option>`).join('');
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        async function cargarSeccionesGuardia() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=secciones_guardia`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                const select = document.getElementById('seccion_guardia_id');
+                const filtroSelect = document.getElementById('filtro_seccion');
+                if (select && Array.isArray(data)) {
+                    select.innerHTML = '<option value="">Seleccionar...</option>' + data.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+                }
+                if (filtroSelect && Array.isArray(data)) {
+                    filtroSelect.innerHTML = '<option value="">Todas</option>' + data.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        // ==================== DOCUMENTOS ====================
+        async function cargarDocumentosPorAgente(personalId) {
+            if (!personalId) return [];
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=personal_documentos&personal_id=${personalId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                documentosPorAgente[personalId] = Array.isArray(data) ? data : [];
+                return documentosPorAgente[personalId];
+            } catch(e) { console.error(e); return []; }
+        }
+        
+        async function cargarDocumentos(personalId) {
+            if (!personalId) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=personal_documentos&personal_id=${personalId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                documentosActuales = Array.isArray(data) ? data : [];
+                renderDocumentosList();
+            } catch(e) { console.error(e); }
+        }
+        
+        function renderDocumentosList() {
+            const container = document.getElementById('documentosList');
+            if (!container) return;
+            if (documentosActuales.length === 0) {
+                container.innerHTML = '<p class="text-secondary text-center">No hay documentos adjuntos</p>';
+                return;
+            }
+            container.innerHTML = documentosActuales.map(doc => `
+                <div class="documento-item">
+                    <div>
+                        <i class="fas ${doc.tipo_archivo === 'pdf' ? 'fa-file-pdf' : 'fa-image'}"></i>
+                        <strong>${escapeHtml(doc.titulo || 'Documento')}</strong>
+                        ${doc.descripcion ? `<br><small>${escapeHtml(doc.descripcion)}</small>` : ''}
+                    </div>
+                    <div>
+                        <button class="btn-doc btn-editar" onclick="verDocumento('${doc.archivo_ruta}', '${doc.tipo_archivo}')"> Ver</button>
+                        <button class="btn-doc btn-eliminar" onclick="eliminarDocumento(${doc.id})"> Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function subirDocumento() {
+            const personalId = document.getElementById('personalId').value;
+            if (!personalId) { showToast('Primero guarde el registro para subir documentos', 'warning'); return; }
+            const titulo = document.getElementById('doc_titulo').value;
+            const descripcion = document.getElementById('doc_descripcion').value;
+            const archivo = document.getElementById('doc_archivo').files[0];
+            
+            if (!titulo || !archivo) { showToast('Complete título y seleccione un archivo', 'warning'); return; }
+            
+            const formData = new FormData();
+            formData.append('personal_id', personalId);
+            formData.append('titulo', titulo);
+            formData.append('descripcion', descripcion);
+            formData.append('archivo', archivo);
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=personal_documentos`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Documento subido correctamente', 'success');
+                    document.getElementById('doc_titulo').value = '';
+                    document.getElementById('doc_descripcion').value = '';
+                    document.getElementById('doc_archivo').value = '';
+                    await cargarDocumentos(personalId);
+                    await cargarDocumentosPorAgente(personalId);
+                    renderTable();
+                } else { showToast(result.error || 'Error al subir', 'error'); }
+            } catch(e) { showToast('Error de conexión', 'error'); }
+        }
+        
+        async function eliminarDocumento(id) {
+            if (!confirm('¿Eliminar este documento?')) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=personal_documentos&id=${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Documento eliminado', 'success');
+                    const personalId = document.getElementById('personalId').value;
+                    await cargarDocumentos(personalId);
+                    await cargarDocumentosPorAgente(personalId);
+                    renderTable();
+                } else { showToast('Error al eliminar', 'error'); }
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        function verDocumento(ruta, tipo) {
+            const modal = document.getElementById('documentoModal');
+            const imgPreview = document.getElementById('documentoPreview');
+            const pdfPreview = document.getElementById('documentoPdf');
+            if (tipo === 'pdf') {
+                imgPreview.style.display = 'none';
+                pdfPreview.style.display = 'block';
+                pdfPreview.src = ruta;
+            } else {
+                imgPreview.style.display = 'block';
+                pdfPreview.style.display = 'none';
+                imgPreview.src = ruta;
+            }
+            modal.style.display = 'flex';
+        }
+        
+        function cerrarDocumentoModal() { document.getElementById('documentoModal').style.display = 'none'; }
+        
+        function verDocumentosAgente(id) {
+            const docs = documentosPorAgente[id] || [];
+            if (docs.length === 0) { showToast('No hay documentos adjuntos', 'info'); return; }
+            const modal = document.getElementById('documentoModal');
+            const imgPreview = document.getElementById('documentoPreview');
+            const pdfPreview = document.getElementById('documentoPdf');
+            
+            if (docs.length === 1) {
+                const doc = docs[0];
+                if (doc.tipo_archivo === 'pdf') {
+                    imgPreview.style.display = 'none';
+                    pdfPreview.style.display = 'block';
+                    pdfPreview.src = doc.archivo_ruta;
+                } else {
+                    imgPreview.style.display = 'block';
+                    pdfPreview.style.display = 'none';
+                    imgPreview.src = doc.archivo_ruta;
+                }
+            } else {
+                let html = '<div style="display:grid;gap:0.5rem;">';
+                docs.forEach(doc => {
+                    html += `<div style="border:1px solid var(--border);padding:0.5rem;border-radius:8px;">
+                        <i class="fas ${doc.tipo_archivo === 'pdf' ? 'fa-file-pdf' : 'fa-image'}"></i>
+                        <strong>${escapeHtml(doc.titulo)}</strong><br>
+                        <small>${escapeHtml(doc.descripcion || '')}</small><br>
+                        <button class="btn-doc btn-editar" onclick="verDocumento('${doc.archivo_ruta}', '${doc.tipo_archivo}')">Ver</button>
+                    </div>`;
+                });
+                html += '</div>';
+                document.querySelector('#documentoModal .modal-body').innerHTML = html;
+                imgPreview.style.display = 'none';
+                pdfPreview.style.display = 'none';
+            }
+            modal.style.display = 'flex';
+        }
+        
+        // ==================== EQUIPAMIENTO ====================
+        async function cargarArmas(personalId) {
+            if (!personalId) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=equipamiento_armas&personal_id=${personalId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                armasActuales = Array.isArray(data) ? data : [];
+                return armasActuales;
+            } catch(e) { console.error(e); return []; }
+        }
+        
+        async function cargarChalecos(personalId) {
+            if (!personalId) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=equipamiento_chalecos&personal_id=${personalId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                chalecosActuales = Array.isArray(data) ? data : [];
+                return chalecosActuales;
+            } catch(e) { console.error(e); return []; }
+        }
+        
+        function mostrarArmas() {
+            const container = document.getElementById('equipamientoContainer');
+            if (!container) return;
+            
+            document.querySelectorAll('.equipamiento-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector('.equipamiento-tab:first-child').classList.add('active');
+            
+            if (armasActuales.length === 0) {
+                container.innerHTML = `
+                    <div class="documentos-container">
+                        <p class="text-secondary text-center">No hay armas registradas</p>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarArma()">+ Agregar Arma</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="documentos-container">
+                        ${armasActuales.map(arma => `
+                            <div class="documento-item">
+                                <div>
+                                    <strong>${escapeHtml(arma.marca || '')} ${escapeHtml(arma.modelo || '')}</strong><br>
+                                    <small>Serie: ${escapeHtml(arma.serie || '-')} | Calibre: ${escapeHtml(arma.calibre || '-')}</small><br>
+                                    <small>Estado: <span class="badge ${arma.estado === 'Asignada' ? 'badge-success' : 'badge-warning'}">${arma.estado}</span></small>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn-doc btn-editar" onclick="editarArma(${arma.id})">Editar</button>
+                                    <button type="button" class="btn-doc btn-eliminar" onclick="eliminarArma(${arma.id})">Eliminar</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarArma()">+ Agregar Arma</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function mostrarChalecos() {
+            const container = document.getElementById('equipamientoContainer');
+            if (!container) return;
+            
+            document.querySelectorAll('.equipamiento-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector('.equipamiento-tab:last-child').classList.add('active');
+            
+            const hoy = new Date();
+            if (chalecosActuales.length === 0) {
+                container.innerHTML = `
+                    <div class="documentos-container">
+                        <p class="text-secondary text-center">No hay chalecos registrados</p>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarChaleco()">+ Agregar Chaleco</button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="documentos-container">
+                        ${chalecosActuales.map(chaleco => {
+                            const vencimiento = new Date(chaleco.fecha_vencimiento);
+                            const diasRestantes = Math.ceil((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+                            let claseVencimiento = 'badge-success';
+                            if (diasRestantes < 0) claseVencimiento = 'badge-danger';
+                            else if (diasRestantes < 30) claseVencimiento = 'badge-warning';
+                            
+                            return `
+                                <div class="documento-item">
+                                    <div>
+                                        <strong>N° Serie: ${escapeHtml(chaleco.numero_serie || '-')}</strong><br>
+                                        <small>Talla: ${escapeHtml(chaleco.talla || '-')} | Nivel: ${escapeHtml(chaleco.nivel_proteccion || '-')}</small><br>
+                                        <small>Vencimiento: ${escapeHtml(chaleco.fecha_vencimiento || '-')} <span class="badge ${claseVencimiento}">${diasRestantes < 0 ? 'Vencido' : diasRestantes + ' días'}</span></small>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn-doc btn-editar" onclick="editarChaleco(${chaleco.id})">Editar</button>
+                                        <button type="button" class="btn-doc btn-eliminar" onclick="eliminarChaleco(${chaleco.id})">Eliminar</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarChaleco()">+ Agregar Chaleco</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function agregarArma() {
+            const personalId = document.getElementById('personalId').value;
+            if (!personalId) { 
+                showToast('Primero guarde el registro del agente', 'warning'); 
+                return;
+            }
+            
+            document.getElementById('arma_id').value = '';
+            document.getElementById('arma_personal_id').value = personalId;
+            document.getElementById('arma_marca_field').value = '';
+            document.getElementById('arma_modelo_field').value = '';
+            document.getElementById('arma_serie_field').value = '';
+            document.getElementById('arma_calibre_field').value = '';
+            document.getElementById('arma_fecha_asignacion_field').value = new Date().toISOString().split('T')[0];
+            document.getElementById('arma_estado_field').value = 'Asignada';
+            document.getElementById('arma_observaciones_field').value = '';
+            
+            document.getElementById('armaModal').style.display = 'flex';
+        }
+        
+        function editarArma(id) {
+            const arma = armasActuales.find(a => a.id == id);
+            if (!arma) return;
+            
+            document.getElementById('arma_id').value = arma.id;
+            document.getElementById('arma_personal_id').value = arma.personal_id;
+            document.getElementById('arma_marca_field').value = arma.marca || '';
+            document.getElementById('arma_modelo_field').value = arma.modelo || '';
+            document.getElementById('arma_serie_field').value = arma.serie || '';
+            document.getElementById('arma_calibre_field').value = arma.calibre || '';
+            document.getElementById('arma_fecha_asignacion_field').value = arma.fecha_asignacion || '';
+            document.getElementById('arma_estado_field').value = arma.estado || 'Asignada';
+            document.getElementById('arma_observaciones_field').value = arma.observaciones || '';
+            document.getElementById('armaModal').style.display = 'flex';
+        }
+        
+        function cerrarModalArma() {
+            document.getElementById('armaModal').style.display = 'none';
+        }
+        
+        async function guardarArma() {
+            const id = document.getElementById('arma_id').value;
+            const data = {
+                personal_id: document.getElementById('arma_personal_id').value,
+                tipo: 'Arma de fuego',
+                marca: document.getElementById('arma_marca_field').value,
+                modelo: document.getElementById('arma_modelo_field').value,
+                serie: document.getElementById('arma_serie_field').value,
+                calibre: document.getElementById('arma_calibre_field').value,
+                fecha_asignacion: document.getElementById('arma_fecha_asignacion_field').value,
+                estado: document.getElementById('arma_estado_field').value,
+                observaciones: document.getElementById('arma_observaciones_field').value
+            };
+            
+            if (!data.serie) { 
+                showToast('El número de serie es requerido', 'warning'); 
+                return;
+            }
+            
+            const btnGuardar = document.querySelector('#armaModal .btn-primary');
+            const textoOriginal = btnGuardar.innerHTML;
+            btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            btnGuardar.disabled = true;
+            
+            try {
+                const token = getToken();
+                const url = id ? `${API_URL}?endpoint=equipamiento_armas&id=${id}` : `${API_URL}?endpoint=equipamiento_armas`;
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast(`Arma ${id ? 'actualizada' : 'registrada'} correctamente`, 'success');
+                    document.getElementById('armaModal').style.display = 'none';
+                    await cargarArmas(data.personal_id);
+                    mostrarArmas();
+                } else { 
+                    showToast(result.error || 'Error al guardar', 'error'); 
+                }
+            } catch(e) { 
+                console.error(e);
+                showToast('Error de conexión: ' + e.message, 'error'); 
+            } finally {
+                btnGuardar.innerHTML = textoOriginal;
+                btnGuardar.disabled = false;
+            }
+        }
+        
+        async function eliminarArma(id) {
+            if (!confirm('¿Eliminar esta arma?')) return;
+            try {
+                const token = getToken();
+                await fetch(`${API_URL}?endpoint=equipamiento_armas&id=${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                showToast('Arma eliminada', 'success');
+                const personalId = document.getElementById('personalId').value;
+                await cargarArmas(personalId);
+                mostrarArmas();
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        function agregarChaleco() {
+            const personalId = document.getElementById('personalId').value;
+            if (!personalId) { 
+                showToast('Primero guarde el registro del agente', 'warning'); 
+                return;
+            }
+            
+            document.getElementById('chaleco_id').value = '';
+            document.getElementById('chaleco_personal_id').value = personalId;
+            document.getElementById('chaleco_numero_serie_field').value = '';
+            document.getElementById('chaleco_talla_field').value = '';
+            document.getElementById('chaleco_nivel_field').value = '';
+            document.getElementById('chaleco_fecha_asignacion_field').value = new Date().toISOString().split('T')[0];
+            document.getElementById('chaleco_fecha_vencimiento_field').value = '';
+            document.getElementById('chaleco_estado_field').value = 'Activo';
+            document.getElementById('chaleco_observaciones_field').value = '';
+            
+            document.getElementById('chalecoModal').style.display = 'flex';
+        }
+        
+        function editarChaleco(id) {
+            const chaleco = chalecosActuales.find(c => c.id == id);
+            if (!chaleco) return;
+            
+            document.getElementById('chaleco_id').value = chaleco.id;
+            document.getElementById('chaleco_personal_id').value = chaleco.personal_id;
+            document.getElementById('chaleco_numero_serie_field').value = chaleco.numero_serie || '';
+            document.getElementById('chaleco_talla_field').value = chaleco.talla || '';
+            document.getElementById('chaleco_nivel_field').value = chaleco.nivel_proteccion || '';
+            document.getElementById('chaleco_fecha_asignacion_field').value = chaleco.fecha_asignacion || '';
+            document.getElementById('chaleco_fecha_vencimiento_field').value = chaleco.fecha_vencimiento || '';
+            document.getElementById('chaleco_estado_field').value = chaleco.estado || 'Activo';
+            document.getElementById('chaleco_observaciones_field').value = chaleco.observaciones || '';
+            document.getElementById('chalecoModal').style.display = 'flex';
+        }
+        
+        function cerrarModalChaleco() { 
+            document.getElementById('chalecoModal').style.display = 'none'; 
+        }
+        
+        async function guardarChaleco() {
+            const id = document.getElementById('chaleco_id').value;
+            const data = {
+                personal_id: document.getElementById('chaleco_personal_id').value,
+                numero_serie: document.getElementById('chaleco_numero_serie_field').value,
+                talla: document.getElementById('chaleco_talla_field').value,
+                nivel_proteccion: document.getElementById('chaleco_nivel_field').value,
+                fecha_asignacion: document.getElementById('chaleco_fecha_asignacion_field').value,
+                fecha_vencimiento: document.getElementById('chaleco_fecha_vencimiento_field').value,
+                estado: document.getElementById('chaleco_estado_field').value,
+                observaciones: document.getElementById('chaleco_observaciones_field').value
+            };
+            
+            if (!data.numero_serie || !data.fecha_vencimiento) { 
+                showToast('N° Serie y Fecha Vencimiento son requeridos', 'warning'); 
+                return;
+            }
+            
+            const btnGuardar = document.querySelector('#chalecoModal .btn-primary');
+            const textoOriginal = btnGuardar.innerHTML;
+            btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            btnGuardar.disabled = true;
+            
+            try {
+                const token = getToken();
+                const url = id ? `${API_URL}?endpoint=equipamiento_chalecos&id=${id}` : `${API_URL}?endpoint=equipamiento_chalecos`;
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast(`Chaleco ${id ? 'actualizado' : 'registrado'} correctamente`, 'success');
+                    document.getElementById('chalecoModal').style.display = 'none';
+                    await cargarChalecos(data.personal_id);
+                    if (document.querySelector('.equipamiento-tab.active')?.innerText.includes('Chalecos')) {
+                        mostrarChalecos();
+                    } else {
+                        mostrarArmas();
+                    }
+                } else { 
+                    showToast(result.error || 'Error al guardar', 'error'); 
+                }
+            } catch(e) { 
+                console.error(e);
+                showToast('Error de conexión: ' + e.message, 'error'); 
+            } finally {
+                btnGuardar.innerHTML = textoOriginal;
+                btnGuardar.disabled = false;
+            }
+        }
+        
+        async function eliminarChaleco(id) {
+            if (!confirm('¿Eliminar este chaleco?')) return;
+            try {
+                const token = getToken();
+                await fetch(`${API_URL}?endpoint=equipamiento_chalecos&id=${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                showToast('Chaleco eliminado', 'success');
+                const personalId = document.getElementById('personalId').value;
+                await cargarChalecos(personalId);
+                mostrarChalecos();
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        // ==================== PDF INDIVIDUAL ====================
+        async function generarPDFIndividual(id) {
+            showToast('Generando PDF individual...', 'info');
+            try {
+                const token = getToken();
+                const [personalRes, docsRes, armasRes, chalecosRes] = await Promise.all([
+                    fetch(`${API_URL}?endpoint=personal&id=${id}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_URL}?endpoint=personal_documentos_base64&personal_id=${id}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_URL}?endpoint=equipamiento_armas&personal_id=${id}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_URL}?endpoint=equipamiento_chalecos&personal_id=${id}`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                const p = await personalRes.json();
+                const documentosBase64 = await docsRes.json();
+                const armas = await armasRes.json();
+                const chalecos = await chalecosRes.json();
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('portrait', 'mm', 'a4');
+                let y = 20;
+                
+                doc.setFontSize(18);
+                doc.setTextColor(29, 78, 216);
+                doc.text('FICHA PERSONAL DE AGENTE', 14, y);
+                y += 10;
+                
+                doc.setFontSize(11);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Legajo: ${p.legajo || '-'}`, 14, y); y += 7;
+                doc.text(`Nombre: ${p.apellido || ''}, ${p.nombre || ''}`, 14, y); y += 7;
+                doc.text(`DNI: ${p.dni || '-'}`, 14, y); y += 7;
+                doc.text(`Jerarquía: ${p.jerarquia || '-'}`, 14, y); y += 7;
+                doc.text(`Sexo: ${p.sexo || '-'}`, 14, y); y += 7;
+                doc.text(`Fecha Nacimiento: ${p.fecha_nacimiento || '-'} (${calcularEdad(p.fecha_nacimiento)} años)`, 14, y); y += 7;
+                doc.text(`Teléfono: ${p.telefono || '-'}`, 14, y); y += 7;
+                doc.text(`Email: ${p.email || '-'}`, 14, y); y += 7;
+                doc.text(`Oficina: ${p.oficina || '-'}`, 14, y); y += 7;
+                doc.text(`Dependencia: ${p.dependencia_nombre || '-'}`, 14, y); y += 7;
+                doc.text(`Sección Guardia: ${p.seccion_guardia_nombre || '-'}`, 14, y); y += 7;
+                doc.text(`Dirección: ${p.direccion || '-'}`, 14, y); y += 10;
+                
+                doc.setFontSize(12);
+                doc.setTextColor(29, 78, 216);
+                doc.text('TENENCIA DE ARMA', 14, y); y += 7;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                if (p.tiene_arma == 1) {
+                    doc.text(`✓ Posee arma reglamentaria`, 14, y); y += 5;
+                } else {
+                    doc.text(`✗ No posee arma reglamentaria`, 14, y); y += 5;
+                    if (p.sin_arma_motivo) doc.text(`  Motivo: ${p.sin_arma_motivo}`, 18, y); y += 5;
+                }
+                y += 10;
+                
+                if (armas && armas.length > 0) {
+                    doc.setFontSize(12);
+                    doc.setTextColor(29, 78, 216);
+                    doc.text('ARMAS REGISTRADAS', 14, y); y += 7;
+                    doc.setFontSize(9);
+                    doc.setTextColor(0, 0, 0);
+                    for (const arma of armas) {
+                        doc.text(`• ${arma.marca || ''} ${arma.modelo || ''} (Serie: ${arma.serie || '-'})`, 18, y); y += 5;
+                        if (y > 270) { doc.addPage(); y = 20; }
+                    }
+                    y += 5;
+                }
+                
+                if (chalecos && chalecos.length > 0) {
+                    doc.setFontSize(12);
+                    doc.setTextColor(29, 78, 216);
+                    doc.text('CHALECOS ANTIBALAS', 14, y); y += 7;
+                    doc.setFontSize(9);
+                    doc.setTextColor(0, 0, 0);
+                    for (const chaleco of chalecos) {
+                        doc.text(`• N° Serie: ${chaleco.numero_serie || '-'} - Vence: ${chaleco.fecha_vencimiento || '-'}`, 18, y); y += 5;
+                        if (y > 270) { doc.addPage(); y = 20; }
+                    }
+                    y += 5;
+                }
+                
+                doc.setFontSize(12);
+                doc.setTextColor(29, 78, 216);
+                doc.text('LICENCIA DE CONDUCIR', 14, y); y += 7;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`N° Licencia: ${p.nro_licencia_conducir || '-'}`, 14, y); y += 5;
+                doc.text(`Categoría: ${p.licencia_categoria || '-'}`, 14, y); y += 5;
+                doc.text(`Vencimiento: ${p.fecha_vencimiento_licencia || '-'}`, 14, y); y += 5;
+                doc.text(`Es Chofer: ${p.es_chofer == 1 ? 'Sí' : 'No'}`, 14, y); y += 10;
+                
+                doc.setFontSize(12);
+                doc.setTextColor(29, 78, 216);
+                doc.text('OBRA SOCIAL', 14, y); y += 7;
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text(`Obra Social: ${p.obra_social || '-'}`, 14, y); y += 5;
+                doc.text(`N° Afiliado: ${p.obra_social_numero || '-'}`, 14, y); y += 10;
+                
+                if (documentosBase64 && documentosBase64.length > 0) {
+                    doc.setFontSize(12);
+                    doc.setTextColor(29, 78, 216);
+                    doc.text('DOCUMENTOS ADJUNTOS', 14, y); y += 7;
+                    doc.setFontSize(9);
+                    doc.setTextColor(0, 0, 0);
+                    for (const docu of documentosBase64) {
+                        doc.text(`• ${docu.titulo || 'Documento'}`, 14, y); y += 5;
+                        if (y > 250 && docu.base64) {
+                            doc.addPage();
+                            y = 20;
+                            try {
+                                const imgData = docu.base64;
+                                doc.addImage(imgData, 'JPEG', 10, y, 180, 120);
+                                y += 130;
+                            } catch(e) { console.error('Error adding image:', e); }
+                        } else if (docu.base64 && docu.tipo_archivo !== 'pdf') {
+                            try {
+                                const imgData = docu.base64;
+                                doc.addImage(imgData, 'JPEG', 10, y, 180, 100);
+                                y += 110;
+                            } catch(e) { console.error('Error adding image:', e); }
+                        }
+                    }
+                }
+                
+                doc.save(`ficha_${p.legajo}_${p.apellido}_${p.nombre}.pdf`);
+                showToast('PDF generado correctamente', 'success');
+            } catch(e) { console.error(e); showToast('Error generando PDF: ' + e.message, 'error'); }
+        }
+        
+        // ==================== RENDER TABLA ====================
+        function renderTable() {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('personalTableBody');
+            if (!thead || !tbody) return;
+            
+            thead.innerHTML = '<tr>' + activeColumns.map(col => `
+                <th class="draggable" data-col="${col}" draggable="true">
+                    <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> 
+                    ${allColumnsInfo[col] || col}
+                </th>
+            `).join('') + '<th>Acciones</th></tr>';
+            
+            initHeaderDragDrop();
+            
+            const datosValidos = personalData.filter(item => item.legajo && item.legajo.trim() !== '');
+            
+            if (!datosValidos || datosValidos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay registros</tr>';
+                return;
+            }
+            
+            tbody.innerHTML = datosValidos.map(item => {
+                const cantDocs = (documentosPorAgente[item.id] || []).length;
+                let row = '<tr>';
+                for (const col of activeColumns) {
+                    if (col === 'apellido_nombre') {
+                        row += '<td>' + escapeHtml(item.apellido || '') + ', ' + escapeHtml(item.nombre || '') + '<\/td>';
+                    } else if (col === 'edad') {
+                        row += '<td>' + calcularEdad(item.fecha_nacimiento) + ' años<\/td>';
+                    } else if (col === 'fecha_nacimiento') {
+                        row += '<td>' + escapeHtml(item.fecha_nacimiento || '-') + '<\/td>';
+                    } else if (col === 'dependencia') {
+                        row += '<td>' + escapeHtml(item.dependencia_nombre || '-') + '<\/td>';
+                    } else if (col === 'seccion_guardia') {
+                        row += '<td>' + escapeHtml(item.seccion_guardia_nombre || '-') + '<\/td>';
+                    } else if (col === 'tiene_arma') {
+                        const tieneArma = item.tiene_arma == 1;
+                        row += '<td><span class="' + (tieneArma ? 'badge-arma-si' : 'badge-arma-no') + '"><i class="fas ' + (tieneArma ? 'fa-gun' : 'fa-ban') + '"></i> ' + (tieneArma ? 'Sí' : 'No') + '<\/span><\/td>';
+                    } else if (col === 'es_chofer') {
+                        const esChofer = item.es_chofer == 1;
+                        row += '<td><span class="' + (esChofer ? 'badge-chofer-si' : 'badge-chofer-no') + '"><i class="fas ' + (esChofer ? 'fa-truck' : 'fa-times') + '"></i> ' + (esChofer ? 'Sí' : 'No') + '<\/span><\/td>';
+                    } else if (col === 'sexo') {
+                        const sexoIcon = item.sexo === 'Masculino' ? 'fa-mars' : (item.sexo === 'Femenino' ? 'fa-venus' : 'fa-genderless');
+                        row += '<td><i class="fas ' + sexoIcon + '"><\/i> ' + escapeHtml(item[col] || '-') + '<\/td>';
+                    } else if (col === 'documentos') {
+                        row += '<td><span class="badge-doc-count" onclick="verDocumentosAgente(' + item.id + ')" style="cursor:pointer;"><i class="fas fa-paperclip"><\/i> ' + cantDocs + ' documento(s)<\/span><\/td>';
+                    } else {
+                        row += '<td>' + escapeHtml(item[col] || '-') + '<\/td>';
+                    }
+                }
+                row += `<td class="acciones-cell">
+                    <div class="acciones-buttons">
+                        <button type="button" class="btn-accion btn-editar" onclick="editPersonal(${item.id})" title="Editar">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button type="button" class="btn-accion btn-eliminar" onclick="deletePersonal(${item.id})" title="Eliminar">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                        <button type="button" class="btn-accion btn-pdf" onclick="generarPDFIndividual(${item.id})" title="Generar PDF">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                    </div>
+                `;
+                row += '<\/tr>';
+                return row;
+            }).join('');
+        }
+        
+        function initHeaderDragDrop() {
+            const headers = document.querySelectorAll('#tableHeader th.draggable');
+            let dragSrc = null;
+            headers.forEach(header => {
+                header.setAttribute('draggable', 'true');
+                header.addEventListener('dragstart', (e) => { 
+                    dragSrc = header; 
+                    e.dataTransfer.setData('text/plain', header.getAttribute('data-col')); 
+                    header.style.opacity = '0.5'; 
+                });
+                header.addEventListener('dragend', (e) => { 
+                    if (dragSrc) dragSrc.style.opacity = ''; 
+                    dragSrc = null; 
+                    headers.forEach(h => h.classList.remove('drag-over')); 
+                });
+                header.addEventListener('dragover', (e) => { 
+                    e.preventDefault(); 
+                    header.classList.add('drag-over'); 
+                });
+                header.addEventListener('dragleave', (e) => { 
+                    header.classList.remove('drag-over'); 
+                });
+                header.addEventListener('drop', (e) => {
+                    e.preventDefault(); 
+                    header.classList.remove('drag-over');
+                    const fromCol = e.dataTransfer.getData('text/plain');
+                    const toCol = header.getAttribute('data-col');
+                    if (fromCol !== toCol) {
+                        const fromIndex = activeColumns.indexOf(fromCol);
+                        const toIndex = activeColumns.indexOf(toCol);
+                        if (fromIndex !== -1 && toIndex !== -1) {
+                            const moved = activeColumns.splice(fromIndex, 1)[0];
+                            activeColumns.splice(toIndex, 0, moved);
+                            renderTable(); 
+                            saveColumnOrder();
+                        }
+                    }
+                });
+            });
+        }
+        
+        async function saveColumnOrder() {
+            try { 
+                const token = getToken(); 
+                await fetch(`${API_URL}?endpoint=table_config&tabla=personal`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify({ columnas: activeColumns }) 
+                }); 
+            } catch(e) { console.error(e); }
+        }
+        
+        function openConfigModal() { 
+            document.getElementById('configPanel').style.display = 'block'; 
+            renderOrderList(); 
+        }
+        
+        function renderOrderList() {
+            const container = document.getElementById('columnOrderList');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const orderedColumns = [...activeColumns];
+            Object.keys(allColumnsInfo).forEach(col => {
+                if (!orderedColumns.includes(col)) orderedColumns.push(col);
+            });
+            
+            orderedColumns.forEach(col => {
+                const isVisible = activeColumns.includes(col);
+                const item = document.createElement('div');
+                item.className = 'column-order-item';
+                item.setAttribute('data-col', col);
+                item.setAttribute('draggable', 'true');
+                item.innerHTML = `
+                    <i class="fas fa-grip-vertical drag-icon"></i>
+                    <span class="col-name">${allColumnsInfo[col] || col}</span>
+                    <input type="checkbox" class="col-toggle" ${isVisible ? 'checked' : ''}>
+                `;
+                item.addEventListener('dragstart', (e) => { 
+                    e.dataTransfer.setData('text/plain', col); 
+                    item.classList.add('dragging'); 
+                });
+                item.addEventListener('dragend', (e) => { 
+                    item.classList.remove('dragging'); 
+                });
+                item.addEventListener('dragover', (e) => { 
+                    e.preventDefault(); 
+                });
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const fromCol = e.dataTransfer.getData('text/plain');
+                    const toCol = col;
+                    if (fromCol !== toCol) {
+                        const fromIndex = orderedColumns.indexOf(fromCol);
+                        const toIndex = orderedColumns.indexOf(toCol);
+                        if (fromIndex !== -1 && toIndex !== -1) {
+                            const moved = orderedColumns.splice(fromIndex, 1)[0];
+                            orderedColumns.splice(toIndex, 0, moved);
+                            activeColumns = orderedColumns.filter(c => activeColumns.includes(c));
+                            renderOrderList();
+                        }
+                    }
+                });
+                const checkbox = item.querySelector('.col-toggle');
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) { 
+                        if (!activeColumns.includes(col)) activeColumns.push(col); 
+                    } else { 
+                        const idx = activeColumns.indexOf(col); 
+                        if (idx !== -1) activeColumns.splice(idx, 1); 
+                    }
+                    renderOrderList();
+                });
+                container.appendChild(item);
+            });
+        }
+        
+        // ==================== EXPORTACIONES ====================
+        function exportarPDFCategoria(categoria) { 
+            if (!personalData.length) { showToast('No hay datos para exportar', 'warning'); return; } 
+            showToast(`Generando PDF por categoría...`, 'info'); 
+            try { 
+                const { jsPDF } = window.jspdf; 
+                const doc = new jsPDF('portrait', 'mm', 'a4'); 
+                let y = 20; 
+                let titulo = ''; 
+                let agrupados = {}; 
+                
+                const datosValidos = personalData.filter(p => p.legajo && p.legajo.trim() !== '');
+                
+                if (categoria === 'jerarquia') { 
+                    titulo = 'Personal por Jerarquia'; 
+                    agrupados = datosValidos.reduce((acc, p) => { const key = p.jerarquia || 'Sin especificar'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); 
+                } else if (categoria === 'sexo') { 
+                    titulo = 'Personal por Sexo'; 
+                    agrupados = datosValidos.reduce((acc, p) => { const key = p.sexo || 'No especificado'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); 
+                } else if (categoria === 'mes_cumple') { 
+                    titulo = 'Personal por Mes de Cumpleaños'; 
+                    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; 
+                    agrupados = datosValidos.reduce((acc, p) => { if (p.fecha_nacimiento) { const mes = new Date(p.fecha_nacimiento).getMonth(); const key = meses[mes]; if (!acc[key]) acc[key] = []; acc[key].push(p); } else { if (!acc['Sin fecha']) acc['Sin fecha'] = []; acc['Sin fecha'].push(p); } return acc; }, {}); 
+                } else if (categoria === 'tiene_arma') { 
+                    titulo = 'Personal por Tenencia de Arma'; 
+                    agrupados = datosValidos.reduce((acc, p) => { const key = p.tiene_arma == 1 ? 'Con Arma' : 'Sin Arma'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); 
+                } else if (categoria === 'es_chofer') { 
+                    titulo = 'Personal por Chofer'; 
+                    agrupados = datosValidos.reduce((acc, p) => { const key = p.es_chofer == 1 ? 'Es Chofer' : 'No Chofer'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); 
+                } else if (categoria === 'dependencia') { 
+                    titulo = 'Personal por Dependencia'; 
+                    agrupados = datosValidos.reduce((acc, p) => { const key = p.dependencia_nombre || 'Sin dependencia'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); 
+                } else if (categoria === 'oficina') { 
+                    titulo = 'Personal por Oficina'; 
+                    agrupados = datosValidos.reduce((acc, p) => { const key = p.oficina || 'Sin oficina'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); 
+                } else if (categoria === 'edad_rango') { 
+                    titulo = 'Personal por Rango de Edad'; 
+                    agrupados = datosValidos.reduce((acc, p) => { const edad = calcularEdad(p.fecha_nacimiento); const rango = getRangoEdad(edad); if (!acc[rango]) acc[rango] = []; acc[rango].push(p); return acc; }, {}); 
+                } else if (categoria === 'seccion_guardia') { 
+                    titulo = 'Personal por Sección de Guardia'; 
+                    agrupados = datosValidos.reduce((acc, p) => { const key = p.seccion_guardia_nombre || 'Sin sección'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); 
+                } else { return; }
+                
+                doc.setFontSize(18); doc.setTextColor(29,78,216); doc.text(titulo, 14, y); y += 10;
+                doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text(`Generado: ${new Date().toLocaleString()}`, 14, y); y += 8;
+                doc.text(`Total de agentes: ${datosValidos.length}`, 14, y); y += 15;
+                for (const [catNombre, items] of Object.entries(agrupados)) { 
+                    if (y > 250) { doc.addPage(); y = 20; } 
+                    doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text(`${catNombre} (${items.length} agentes)`, 14, y); y += 8; 
+                    const headers = [['Legajo','Apellido','Nombre','DNI','Jerarquía','Sexo','Edad','Tiene Arma','Es Chofer']]; 
+                    const data = items.slice(0,15).map(p => [p.legajo||'-', p.apellido||'-', p.nombre||'-', p.dni||'-', p.jerarquia||'-', p.sexo||'-', calcularEdad(p.fecha_nacimiento).toString(), p.tiene_arma==1?'Sí':'No', p.es_chofer==1?'Sí':'No']); 
+                    doc.autoTable({ head: headers, body: data, startY: y, theme: 'grid', headStyles: { fillColor: [29,78,216], textColor: [255,255,255], fontSize: 8 }, bodyStyles: { fontSize: 7, textColor: [50,50,50] }, margin: { left: 14, right: 14 } }); 
+                    y = doc.lastAutoTable.finalY + 10; 
+                    if (items.length > 15) { doc.setFontSize(8); doc.text(`... y ${items.length - 15} agentes más.`, 14, y); y += 10; } 
+                }
+                doc.save(`${titulo.toLowerCase().replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`); 
+                showToast('PDF generado correctamente', 'success');
+            } catch(e) { console.error('Error:', e); showToast('Error generando PDF: ' + e.message, 'error'); } 
+        }
+        
+        function exportarPDFCompleto() { 
+            if (!personalData.length) { showToast('No hay datos para exportar', 'warning'); return; } 
+            showToast('Generando PDF completo...', 'info'); 
+            try { 
+                const { jsPDF } = window.jspdf; 
+                const doc = new jsPDF('landscape', 'mm', 'a4'); 
+                doc.setFontSize(18); doc.setTextColor(29,78,216); doc.text('REPORTE COMPLETO DE PERSONAL', 14,20); 
+                doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text(`Generado: ${new Date().toLocaleString()}`, 14,30); 
+                doc.text(`Total de agentes: ${personalData.length}`, 14,37); 
+                
+                const datosValidos = personalData.filter(p => p.legajo && p.legajo.trim() !== '');
+                const headers = [['Legajo','Apellido','Nombre','DNI','Jerarquía','Sexo','Edad','Teléfono','Email','Tiene Arma','Es Chofer','Oficina','Dependencia','Sección Guardia']]; 
+                const data = datosValidos.map(p => [p.legajo||'-', p.apellido||'-', p.nombre||'-', p.dni||'-', p.jerarquia||'-', p.sexo||'-', calcularEdad(p.fecha_nacimiento).toString(), p.telefono||'-', p.email||'-', p.tiene_arma==1?'Sí':'No', p.es_chofer==1?'Sí':'No', p.oficina||'-', p.dependencia_nombre||'-', p.seccion_guardia_nombre||'-']); 
+                doc.autoTable({ head: headers, body: data, startY: 45, theme: 'grid', headStyles: { fillColor: [29,78,216], textColor: [255,255,255], fontSize: 8 }, bodyStyles: { fontSize: 7, textColor: [50,50,50] }, alternateRowStyles: { fillColor: [240,240,240] }, margin: { left: 8, right: 8 } }); 
+                doc.save(`reporte_personal_completo_${new Date().toISOString().split('T')[0]}.pdf`); 
+                showToast('PDF completo generado correctamente', 'success'); 
+            } catch(e) { console.error('Error:', e); showToast('Error generando PDF: ' + e.message, 'error'); } 
+        }
+        
+        function exportarPDFResumen() { 
+            if (!personalData.length) { showToast('No hay datos para exportar', 'warning'); return; } 
+            showToast('Generando PDF resumen...', 'info'); 
+            try { 
+                const { jsPDF } = window.jspdf; 
+                const doc = new jsPDF('portrait', 'mm', 'a4'); 
+                let y = 20; 
+                doc.setFontSize(18); doc.setTextColor(29,78,216); doc.text('RESUMEN DE PERSONAL', 14, y); y += 10; 
+                doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text(`Generado: ${new Date().toLocaleString()}`, 14, y); y += 8; 
+                
+                const datosValidos = personalData.filter(p => p.legajo && p.legajo.trim() !== '');
+                doc.text(`Total de agentes: ${datosValidos.length}`, 14, y); y += 15; 
+                
+                const porJerarquia = {}; 
+                datosValidos.forEach(p => { const k = p.jerarquia || 'Sin especificar'; porJerarquia[k] = (porJerarquia[k] || 0) + 1; }); 
+                doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text('1. Distribución por Jerarquía', 14, y); y += 8; 
+                doc.setFontSize(9); for (const [k,v] of Object.entries(porJerarquia)) { doc.text(`• ${k}: ${v} agente(s)`, 20, y); y += 5; if (y > 270) { doc.addPage(); y = 20; } } y += 10;
+                
+                const porSexo = { Masculino:0, Femenino:0, Otro:0 }; 
+                datosValidos.forEach(p => { if (p.sexo === 'Masculino') porSexo.Masculino++; else if (p.sexo === 'Femenino') porSexo.Femenino++; else if (p.sexo === 'Otro') porSexo.Otro++; }); 
+                doc.setFontSize(12); doc.text('2. Distribución por Sexo', 14, y); y += 8; 
+                doc.setFontSize(9); doc.text(`• Hombres: ${porSexo.Masculino}`, 20, y); y += 5; doc.text(`• Mujeres: ${porSexo.Femenino}`, 20, y); y += 5; doc.text(`• Otros: ${porSexo.Otro}`, 20, y); y += 10;
+                
+                const conArma = datosValidos.filter(p => p.tiene_arma == 1).length; 
+                doc.setFontSize(12); doc.text('3. Tenencia de Arma', 14, y); y += 8; 
+                doc.setFontSize(9); doc.text(`• Con arma: ${conArma}`, 20, y); y += 5; doc.text(`• Sin arma: ${datosValidos.length - conArma}`, 20, y); y += 10;
+                
+                const esChofer = datosValidos.filter(p => p.es_chofer == 1).length; 
+                doc.setFontSize(12); doc.text('4. Es Chofer', 14, y); y += 8; 
+                doc.setFontSize(9); doc.text(`• Es chofer: ${esChofer}`, 20, y); y += 5; doc.text(`• No es chofer: ${datosValidos.length - esChofer}`, 20, y); y += 10;
+                
+                const porSeccion = {}; 
+                datosValidos.forEach(p => { const k = p.seccion_guardia_nombre || 'Sin sección'; porSeccion[k] = (porSeccion[k] || 0) + 1; }); 
+                doc.setFontSize(12); doc.text('5. Por Sección de Guardia', 14, y); y += 8; 
+                doc.setFontSize(9); for (const [k,v] of Object.entries(porSeccion)) { doc.text(`• ${k}: ${v}`, 20, y); y += 5; }
+                
+                const rangos = { 'Menos de 25 años':0, '25-34 años':0, '35-44 años':0, '45-54 años':0, '55+ años':0 }; 
+                datosValidos.forEach(p => { const edad = calcularEdad(p.fecha_nacimiento); if (edad !== '-') { if (edad < 25) rangos['Menos de 25 años']++; else if (edad < 35) rangos['25-34 años']++; else if (edad < 45) rangos['35-44 años']++; else if (edad < 55) rangos['45-54 años']++; else rangos['55+ años']++; } }); 
+                doc.setFontSize(12); doc.text('6. Distribución por Edad', 14, y); y += 8; 
+                doc.setFontSize(9); for (const [k,v] of Object.entries(rangos)) { if (v > 0) { doc.text(`• ${k}: ${v}`, 20, y); y += 5; } }
+                
+                doc.save(`reporte_personal_resumen_${new Date().toISOString().split('T')[0]}.pdf`); 
+                showToast('PDF resumen generado correctamente', 'success'); 
+            } catch(e) { console.error('Error:', e); showToast('Error generando PDF resumen: ' + e.message, 'error'); } 
+        }
+        
+        // ==================== CRUD PERSONAL ====================
+        async function loadPersonal() {
+            const tbody = document.getElementById('personalTableBody');
+            if (tbody) tbody.innerHTML = '';
+            try {
+                const token = getToken();
+                if (!token) { window.location.href = 'index.html'; return; }
+                const response = await fetch(`${API_URL}?endpoint=personal`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    personalData = data.filter(item => item.legajo && item.legajo.trim() !== '');
+                    for (const p of personalData) { await cargarDocumentosPorAgente(p.id); }
+                    
+                    await loadColumnConfig();
+                    
+                    renderTable();
+                    const jerarquias = [...new Set(personalData.map(p => p.jerarquia).filter(j => j))];
+                    const filtroJerarquia = document.getElementById('filtro_jerarquia');
+                    if (filtroJerarquia) filtroJerarquia.innerHTML = '<option value="">Todas</option>' + jerarquias.map(j => `<option value="${escapeHtml(j)}">${escapeHtml(j)}</option>`).join('');
+                    showToast(`✅ ${personalData.length} agentes cargados`, 'success');
+                } else { 
+                    personalData = []; 
+                    renderTable(); 
+                    showToast('No hay datos de personal', 'warning'); 
+                }
+            } catch (error) { 
+                console.error('Error:', error); 
+                renderTable(); 
+                showToast('Error cargando personal', 'error'); 
+            }
+        }
+        
+        async function loadDependencias() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=dependencias`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                const select = document.getElementById('dependencia_id');
+                if (select && Array.isArray(data)) select.innerHTML = '<option value="">Seleccionar...</option>' + data.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+            } catch(e) { console.error(e); }
+        }
+        
+        async function loadColumnConfig() {
+            try { 
+                const token = getToken(); 
+                const response = await fetch(`${API_URL}?endpoint=table_config&tabla=personal`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                }); 
+                const config = await response.json(); 
+                if (config && Array.isArray(config) && config.length > 0) { 
+                    activeColumns = config; 
+                } else {
+                    activeColumns = ['legajo', 'jerarquia', 'apellido_nombre', 'dni', 'sexo', 'fecha_nacimiento', 'edad', 'tiene_arma', 'oficina', 'dependencia'];
+                }
+                renderOrderList(); 
+            } catch(e) { console.error(e); } 
+        }
+        
+        async function saveColumnConfig() {
+            try { 
+                const token = getToken(); 
+                await fetch(`${API_URL}?endpoint=table_config&tabla=personal`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify({ columnas: activeColumns }) 
+                }); 
+                showToast('Configuración guardada', 'success'); 
+                document.getElementById('configPanel').style.display = 'none'; 
+                renderTable(); 
+            } catch(e) { showToast('Error', 'error'); } 
+        }
+        
+        function resetColumns() { 
+            activeColumns = ['legajo', 'jerarquia', 'apellido_nombre', 'dni', 'sexo', 'fecha_nacimiento', 'edad', 'tiene_arma', 'oficina', 'dependencia']; 
+            renderOrderList(); 
+            renderTable(); 
+            saveColumnConfig();
+        }
+        
+        function aplicarFiltros() {
+            let filtrados = [...personalData];
+            const legajo = document.getElementById('filtro_legajo')?.value.toLowerCase().trim();
+            if (legajo) filtrados = filtrados.filter(p => (p.legajo || '').toLowerCase().includes(legajo));
+            const apellido = document.getElementById('filtro_apellido')?.value.toLowerCase().trim();
+            if (apellido) filtrados = filtrados.filter(p => (p.apellido || '').toLowerCase().includes(apellido));
+            const nombre = document.getElementById('filtro_nombre')?.value.toLowerCase().trim();
+            if (nombre) filtrados = filtrados.filter(p => (p.nombre || '').toLowerCase().includes(nombre));
+            const dni = document.getElementById('filtro_dni')?.value.toLowerCase().trim();
+            if (dni) filtrados = filtrados.filter(p => (p.dni || '').includes(dni));
+            const jerarquia = document.getElementById('filtro_jerarquia')?.value;
+            if (jerarquia && jerarquia !== '') filtrados = filtrados.filter(p => p.jerarquia === jerarquia);
+            const sexo = document.getElementById('filtro_sexo')?.value;
+            if (sexo && sexo !== '') filtrados = filtrados.filter(p => p.sexo === sexo);
+            const arma = document.getElementById('filtro_arma')?.value;
+            if (arma !== '') filtrados = filtrados.filter(p => p.tiene_arma == arma);
+            const chofer = document.getElementById('filtro_chofer')?.value;
+            if (chofer !== '') filtrados = filtrados.filter(p => p.es_chofer == chofer);
+            const seccion = document.getElementById('filtro_seccion')?.value;
+            if (seccion && seccion !== '') filtrados = filtrados.filter(p => p.seccion_guardia_id == seccion);
+            personalData = filtrados; renderTable();
+            showToast(`Encontrados ${filtrados.length} agentes`, 'info');
+        }
+        
+        function limpiarFiltros() {
+            document.getElementById('filtro_legajo').value = '';
+            document.getElementById('filtro_apellido').value = '';
+            document.getElementById('filtro_nombre').value = '';
+            document.getElementById('filtro_dni').value = '';
+            document.getElementById('filtro_jerarquia').value = '';
+            document.getElementById('filtro_sexo').value = '';
+            document.getElementById('filtro_arma').value = '';
+            document.getElementById('filtro_chofer').value = '';
+            document.getElementById('filtro_seccion').value = '';
+            loadPersonal();
+        }
+        
+        function openPersonalModal(data = null) {
+            const modal = document.getElementById('personalModal');
+            if (!modal) return;
+            
+            if (data) {
+                document.getElementById('personalId').value = data.id;
+                document.getElementById('legajo').value = data.legajo || '';
+                document.getElementById('jerarquia').value = data.jerarquia || '';
+                document.getElementById('apellido').value = data.apellido || '';
+                document.getElementById('nombre').value = data.nombre || '';
+                document.getElementById('dni').value = data.dni || '';
+                document.getElementById('sexo').value = data.sexo || '';
+                document.getElementById('fecha_nacimiento').value = data.fecha_nacimiento || '';
+                document.getElementById('telefono').value = data.telefono || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('oficina').value = data.oficina || '';
+                document.getElementById('dependencia_id').value = data.dependencia_id || '';
+                document.getElementById('seccion_guardia_id').value = data.seccion_guardia_id || '';
+                document.getElementById('direccion').value = data.direccion || '';
+                document.getElementById('tiene_arma').value = data.tiene_arma == 1 ? '1' : '0';
+                document.getElementById('sin_arma_motivo').value = data.sin_arma_motivo || '';
+                document.getElementById('nro_licencia_conducir').value = data.nro_licencia_conducir || '';
+                document.getElementById('licencia_categoria').value = data.licencia_categoria || '';
+                document.getElementById('fecha_vencimiento_licencia').value = data.fecha_vencimiento_licencia || '';
+                document.getElementById('es_chofer').value = data.es_chofer == 1 ? '1' : '0';
+                document.getElementById('obra_social').value = data.obra_social || '';
+                document.getElementById('obra_social_numero').value = data.obra_social_numero || '';
+                document.getElementById('modalTitle').textContent = 'Editar Personal';
+                
+                cargarDocumentos(data.id);
+                cargarArmas(data.id).then(() => mostrarArmas());
+                cargarChalecos(data.id);
+            } else {
+                document.getElementById('personalForm').reset();
+                document.getElementById('personalId').value = '';
+                document.getElementById('tiene_arma').value = '0';
+                document.getElementById('es_chofer').value = '0';
+                document.getElementById('modalTitle').textContent = 'Nuevo Personal';
+                documentosActuales = [];
+                armasActuales = [];
+                chalecosActuales = [];
+                renderDocumentosList();
+                mostrarArmas();
+            }
+            
+            toggleArmamentoFields();
+            modal.style.display = 'flex';
+        }
+        
+        async function savePersonal() {
+            const id = document.getElementById('personalId').value;
+            const data = {
+                legajo: document.getElementById('legajo').value,
+                jerarquia: document.getElementById('jerarquia').value,
+                apellido: document.getElementById('apellido').value,
+                nombre: document.getElementById('nombre').value,
+                dni: document.getElementById('dni').value,
+                sexo: document.getElementById('sexo').value,
+                fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
+                telefono: document.getElementById('telefono').value,
+                email: document.getElementById('email').value,
+                oficina: document.getElementById('oficina').value,
+                dependencia_id: document.getElementById('dependencia_id').value,
+                seccion_guardia_id: document.getElementById('seccion_guardia_id').value || null,
+                direccion: document.getElementById('direccion').value,
+                tiene_arma: parseInt(document.getElementById('tiene_arma').value),
+                sin_arma_motivo: document.getElementById('sin_arma_motivo').value,
+                nro_licencia_conducir: document.getElementById('nro_licencia_conducir').value,
+                licencia_categoria: document.getElementById('licencia_categoria').value,
+                fecha_vencimiento_licencia: document.getElementById('fecha_vencimiento_licencia').value,
+                es_chofer: parseInt(document.getElementById('es_chofer').value),
+                obra_social: document.getElementById('obra_social').value,
+                obra_social_numero: document.getElementById('obra_social_numero').value
+            };
+            
+            if (!data.legajo || !data.apellido || !data.nombre || !data.dni) { 
+                showToast('Complete campos requeridos', 'warning'); 
+                return; 
+            }
+            
+            try {
+                const token = getToken();
+                const url = id ? `${API_URL}?endpoint=personal&id=${id}` : `${API_URL}?endpoint=personal`;
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(url, { 
+                    method: method, 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify(data) 
+                });
+                const result = await response.json();
+                if (result.success) { 
+                    showToast(`Personal ${id ? 'actualizado' : 'creado'} correctamente`, 'success'); 
+                    closeModal(); 
+                    loadPersonal(); 
+                } else { 
+                    showToast('Error al guardar', 'error'); 
+                }
+            } catch(e) { 
+                showToast('Error de conexión', 'error'); 
+            }
+        }
+        
+        async function editPersonal(id) {
+            try { 
+                const token = getToken(); 
+                const response = await fetch(`${API_URL}?endpoint=personal&id=${id}`, { headers: { 'Authorization': `Bearer ${token}` } }); 
+                const data = await response.json(); 
+                if (data && data.id) openPersonalModal(data); 
+                else showToast('No se encontraron datos', 'error'); 
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        async function deletePersonal(id) {
+            if (confirm('¿Eliminar este registro?')) {
+                try { 
+                    const token = getToken(); 
+                    await fetch(`${API_URL}?endpoint=personal&id=${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } }); 
+                    showToast('Registro eliminado', 'success'); 
+                    loadPersonal(); 
+                } catch(e) { showToast('Error', 'error'); }
+            }
+        }
+        
+        function closeModal() { 
+            document.getElementById('personalModal').style.display = 'none'; 
+        }
+        
+        function checkAuth() {
+            const user = localStorage.getItem('current_user');
+            if (!user) { window.location.href = 'index.html'; return false; }
+            const userData = JSON.parse(user);
+            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            return true;
+        }
+        
+        // Event Listeners
+        document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => { openConfigModal(); loadColumnConfig(); });
+        document.getElementById('btnCerrarConfig')?.addEventListener('click', () => { document.getElementById('configPanel').style.display = 'none'; });
+        document.getElementById('btnGuardarConfig')?.addEventListener('click', saveColumnConfig);
+        document.getElementById('btnResetColumns')?.addEventListener('click', resetColumns);
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
+        document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+        
+        document.addEventListener('DOMContentLoaded', () => { if (checkAuth()) { loadPersonal(); loadDependencias(); cargarCategoriasLicencia(); cargarSeccionesGuardia(); } });
+        
+        // Exponer funciones globales
+        window.openPersonalModal = openPersonalModal;
+        window.savePersonal = savePersonal;
+        window.editPersonal = editPersonal;
+        window.deletePersonal = deletePersonal;
+        window.closeModal = closeModal;
+        window.aplicarFiltros = aplicarFiltros;
+        window.limpiarFiltros = limpiarFiltros;
+        window.exportarPDFCompleto = exportarPDFCompleto;
+        window.exportarPDFResumen = exportarPDFResumen;
+        window.exportarPDFCategoria = exportarPDFCategoria;
+        window.toggleArmamentoFields = toggleArmamentoFields;
+        window.generarPDFIndividual = generarPDFIndividual;
+        window.subirDocumento = subirDocumento;
+        window.verDocumento = verDocumento;
+        window.cerrarDocumentoModal = cerrarDocumentoModal;
+        window.eliminarDocumento = eliminarDocumento;
+        window.verDocumentosAgente = verDocumentosAgente;
+        window.mostrarArmas = mostrarArmas;
+        window.mostrarChalecos = mostrarChalecos;
+        window.agregarArma = agregarArma;
+        window.agregarChaleco = agregarChaleco;
+        window.editarArma = editarArma;
+        window.editarChaleco = editarChaleco;
+        window.eliminarArma = eliminarArma;
+        window.eliminarChaleco = eliminarChaleco;
+        window.guardarArma = guardarArma;
+        window.guardarChaleco = guardarChaleco;
+        window.cerrarModalArma = cerrarModalArma;
+        window.cerrarModalChaleco = cerrarModalChaleco;
     </script>
+    <script src="theme.js"></script>
 </body>
 </html>

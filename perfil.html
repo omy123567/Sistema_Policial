@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Mi Perfil - Sistema de Gestión Policial</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .perfil-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        .perfil-sidebar {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .perfil-avatar {
+            width: 120px;
+            height: 120px;
+            background-color: var(--accent-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+        .perfil-avatar i {
+            font-size: 4rem;
+            color: white;
+        }
+        .perfil-nombre {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        .perfil-rol {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background-color: rgba(29, 78, 216, 0.2);
+            color: var(--accent-primary);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .perfil-dependencia {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        .perfil-content {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        .info-row {
+            display: flex;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .info-label {
+            width: 120px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .info-value {
+            flex: 1;
+            color: var(--text-primary);
+        }
+        .password-requirements {
+            background-color: var(--bg-surface);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+        }
+        .password-requirements ul {
+            margin-left: 1rem;
+            margin-top: 0.25rem;
+        }
+        .password-requirements li {
+            color: var(--text-secondary);
+        }
+        .password-requirements li.valid {
+            color: var(--accent-success);
+        }
+        @media (max-width: 768px) {
+            .perfil-container {
+                grid-template-columns: 1fr;
+            }
+            .info-row {
+                flex-direction: column;
+            }
+            .info-label {
+                width: 100%;
+                margin-bottom: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <nav class="navbar">
+            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="personal.html" class="nav-link"><i class="fas fa-users"></i> Personal</a></li>
+                <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
+                <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
+                <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
+                <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+            </ul>
+            <div class="user-info">
+                <span id="userInfo"></span>
+                <button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </div>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+        <p class="text-secondary">Gestione su información personal y contraseña</p>
+        
+        <div class="perfil-container">
+            <div class="perfil-sidebar">
+                <div class="perfil-avatar"><i class="fas fa-user-shield"></i></div>
+                <div class="perfil-nombre" id="perfilNombre">Cargando...</div>
+                <div class="perfil-rol" id="perfilRol"></div>
+                <div class="perfil-dependencia" id="perfilDependencia"></div>
+                <div class="perfil-dependencia" id="perfilUsuario"></div>
+            </div>
+            
+            <div class="perfil-content">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab('datos')">Datos Personales</button>
+                    <button class="tab-btn" onclick="showTab('password')">Cambiar Contraseña</button>
+                    <button class="tab-btn" onclick="showTab('actividad')">Actividad Reciente</button>
+                </div>
+                
+                <div id="tabDatos" class="tab-panel active">
+                    <form id="formDatosPersonales">
+                        <div class="form-group"><label>Nombre Completo</label><input type="text" id="perfil_nombre_completo" class="form-control" required></div>
+                        <div class="form-group"><label>Email</label><input type="email" id="perfil_email" class="form-control" required></div>
+                        <div class="form-group"><label>Usuario</label><input type="text" id="perfil_username" class="form-control" disabled></div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Actualizar Datos</button>
+                    </form>
+                </div>
+                
+                <div id="tabPassword" class="tab-panel">
+                    <form id="formCambiarPassword">
+                        <div class="form-group"><label>Contraseña Actual *</label><input type="password" id="password_actual" class="form-control" required></div>
+                        <div class="form-group"><label>Nueva Contraseña *</label><input type="password" id="nueva_password" class="form-control" required onkeyup="validarPassword()"></div>
+                        <div class="form-group"><label>Confirmar Nueva Contraseña *</label><input type="password" id="confirmar_password" class="form-control" required onkeyup="validarPassword()"></div>
+                        <div class="password-requirements" id="passwordRequirements">
+                            <strong>Requisitos de contraseña:</strong>
+                            <ul>
+                                <li id="req-length">✓ Mínimo 6 caracteres</li>
+                                <li id="req-mayus">✓ Al menos una mayúscula</li>
+                                <li id="req-minus">✓ Al menos una minúscula</li>
+                                <li id="req-num">✓ Al menos un número</li>
+                                <li id="req-match">✓ Las contraseñas coinciden</li>
+                            </ul>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btnCambiarPassword" disabled><i class="fas fa-key"></i> Cambiar Contraseña</button>
+                    </form>
+                </div>
+                
+                <div id="tabActividad" class="tab-panel">
+                    <div id="actividadList" class="actividad-container"><div class="text-center">Cargando actividad...</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast-container" class="toast-container"></div>
+    
+    <script>
+        const API_URL = 'backend/api.php';
+        
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<div>${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        
+        async function apiRequest(endpoint, method = 'GET', data = null) {
+            const token = getToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            const options = { method, headers };
+            if (data && (method === 'POST' || method === 'PUT')) options.body = JSON.stringify(data);
+            try {
+                const response = await fetch(`${API_URL}?endpoint=${endpoint}`, options);
+                const result = await response.json();
+                if (response.status === 401) { window.location.href = 'index.html'; throw new Error('Sesión expirada'); }
+                return result;
+            } catch (error) { console.error('API Error:', error); showToast('Error de conexión', 'error'); return null; }
+        }
+        
+        async function cargarPerfil() {
+            try {
+                const data = await apiRequest('perfil');
+                if (data) {
+                    document.getElementById('perfilNombre').textContent = data.nombre_completo;
+                    document.getElementById('perfilRol').textContent = data.rol_nombre || 'Sin rol';
+                    document.getElementById('perfilDependencia').innerHTML = `<i class="fas fa-building"></i> ${escapeHtml(data.dependencia_nombre || 'Sin dependencia')}`;
+                    document.getElementById('perfilUsuario').innerHTML = `<i class="fas fa-user"></i> @${escapeHtml(data.username)}`;
+                    document.getElementById('perfil_nombre_completo').value = data.nombre_completo;
+                    document.getElementById('perfil_email').value = data.email;
+                    document.getElementById('perfil_username').value = data.username;
+                }
+            } catch (error) { showToast('Error cargando perfil', 'error'); }
+        }
+        
+        function validarPassword() {
+            const nuevaPass = document.getElementById('nueva_password').value;
+            const confirmarPass = document.getElementById('confirmar_password').value;
+            let isValid = true;
+            const reqs = [
+                { id: 'req-length', cond: nuevaPass.length >= 6, msg: 'Mínimo 6 caracteres' },
+                { id: 'req-mayus', cond: /[A-Z]/.test(nuevaPass), msg: 'Al menos una mayúscula' },
+                { id: 'req-minus', cond: /[a-z]/.test(nuevaPass), msg: 'Al menos una minúscula' },
+                { id: 'req-num', cond: /[0-9]/.test(nuevaPass), msg: 'Al menos un número' },
+                { id: 'req-match', cond: nuevaPass === confirmarPass && nuevaPass !== '', msg: 'Las contraseñas coinciden' }
+            ];
+            reqs.forEach(req => {
+                const el = document.getElementById(req.id);
+                if (req.cond) { el.style.color = '#16a34a'; el.innerHTML = `✓ ${req.msg}`; } 
+                else { el.style.color = '#dc2626'; el.innerHTML = `✗ ${req.msg}`; isValid = false; }
+            });
+            document.getElementById('btnCambiarPassword').disabled = !isValid;
+            return isValid;
+        }
+        
+        async function actualizarDatos(event) {
+            event.preventDefault();
+            const result = await apiRequest('perfil', 'PUT', {
+                nombre_completo: document.getElementById('perfil_nombre_completo').value,
+                email: document.getElementById('perfil_email').value
+            });
+            if (result && result.success) {
+                showToast('Datos actualizados correctamente', 'success');
+                cargarPerfil();
+                const user = JSON.parse(localStorage.getItem('current_user'));
+                user.nombre = document.getElementById('perfil_nombre_completo').value;
+                localStorage.setItem('current_user', JSON.stringify(user));
+            } else showToast(result?.error || 'Error al actualizar', 'error');
+        }
+        
+        async function cambiarPassword(event) {
+            event.preventDefault();
+            if (!validarPassword()) { showToast('La contraseña no cumple los requisitos', 'warning'); return; }
+            const result = await apiRequest('perfil', 'PUT', {
+                password_actual: document.getElementById('password_actual').value,
+                nueva_password: document.getElementById('nueva_password').value
+            });
+            if (result && result.success) {
+                showToast('Contraseña cambiada correctamente', 'success');
+                document.getElementById('formCambiarPassword').reset();
+                validarPassword();
+            } else showToast(result?.error || 'Error al cambiar contraseña', 'error');
+        }
+        
+        async function cargarActividad() {
+            const container = document.getElementById('actividadList');
+            container.innerHTML = '<div class="text-center">Cargando actividad...</div>';
+            try {
+                const data = await apiRequest('bitacora&limit=10');
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(item => `<div class="info-row"><div class="info-label">${escapeHtml(item.created_at?.split(' ')[0] || '-')}</div><div class="info-value"><strong>${escapeHtml(item.accion)}</strong>${item.detalles ? `<br><small class="text-secondary">${escapeHtml(item.detalles)}</small>` : ''}</div></div>`).join('');
+                } else container.innerHTML = '<div class="text-center">No hay actividad registrada</div>';
+            } catch (error) { container.innerHTML = '<div class="text-center">No hay actividad registrada</div>'; }
+        }
+        
+        function showTab(tab) {
+            document.getElementById('tabDatos').classList.remove('active');
+            document.getElementById('tabPassword').classList.remove('active');
+            document.getElementById('tabActividad').classList.remove('active');
+            document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (tab === 'actividad') cargarActividad();
+        }
+        
+        function checkAuth() {
+            const user = localStorage.getItem('current_user');
+            if (!user) { window.location.href = 'index.html'; return false; }
+            const userData = JSON.parse(user);
+            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            return true;
+        }
+        
+        function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function toggleMobileMenu() { document.querySelector('.nav-menu')?.classList.toggle('active'); }
+        
+        document.addEventListener('DOMContentLoaded', () => { if (checkAuth()) cargarPerfil(); document.getElementById('formDatosPersonales')?.addEventListener('submit', actualizarDatos); document.getElementById('formCambiarPassword')?.addEventListener('submit', cambiarPassword); document.getElementById('logoutBtn')?.addEventListener('click', handleLogout); document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu); });
+        window.showTab = showTab; window.validarPassword = validarPassword;
+    </script>
+</body>
+</html>

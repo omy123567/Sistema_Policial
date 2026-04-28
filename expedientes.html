@@ -2,31 +2,194 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expedientes - Sistema de Gestión Policial</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
-        input[list], select { width: 100%; padding: 0.5rem 0.75rem; background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); }
-        .filtros-container { background-color: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
-        .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .elevacion-item { background-color: var(--bg-surface); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
-        .elevacion-imagen { max-width: 150px; max-height: 150px; border-radius: 8px; cursor: pointer; margin-top: 0.5rem; }
-        .badge-estado { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
-        .badge-finalizado { background-color: rgba(22,163,74,0.2); color:#16a34a; border:1px solid rgba(22,163,74,0.3); }
-        .badge-tramite { background-color: rgba(217,119,6,0.2); color:#d97706; border:1px solid rgba(217,119,6,0.3); }
-        .badge-vencido { background-color: rgba(220,38,38,0.2); color:#dc2626; border:1px solid rgba(220,38,38,0.3); }
-        .badge-pendiente { background-color: rgba(107,114,128,0.2); color:#9ca3af; border:1px solid rgba(107,114,128,0.3); }
-        .btn-accion { padding: 0.25rem 0.5rem; margin:0 0.25rem; border-radius:6px; font-size:0.7rem; cursor:pointer; }
-        .btn-ver { background-color: rgba(29,78,216,0.2); color:#1d4ed8; border:none; }
-        .btn-ver:hover { background-color:#1d4ed8; color:white; }
-        .btn-eliminar { background-color: rgba(220,38,38,0.2); color:#dc2626; border:none; }
-        .btn-eliminar:hover { background-color:#dc2626; color:white; }
-        @media (max-width:768px){ .filtros-grid { grid-template-columns:1fr; } }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+        .documentos-container {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            background-color: var(--bg-surface);
+            margin-top: 0.5rem;
+        }
+        .documento-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .documento-item:last-child {
+            border-bottom: none;
+        }
+        .btn-doc {
+            padding: 0.2rem 0.4rem;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        .filtros-container {
+            background-color: var(--bg-surface);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-pendiente { background: rgba(245,158,11,0.2); color: #f59e0b; }
+        .badge-resuelto { background: rgba(16,185,129,0.2); color: #10b981; }
+        .badge-derivado { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .badge-archivado { background: rgba(107,114,128,0.2); color: #6b7280; }
+        .badge-elevado { background: rgba(139,92,246,0.2); color: #8b5cf6; }
+        .badge-en-tramite { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .btn-accion {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-editar {
+            background-color: rgba(29, 78, 216, 0.15);
+            color: #3b82f6;
+        }
+        .btn-editar:hover {
+            background-color: #1d4ed8;
+            color: white;
+        }
+        .btn-eliminar {
+            background-color: rgba(220, 38, 38, 0.15);
+            color: #ef4444;
+        }
+        .btn-eliminar:hover {
+            background-color: #dc2626;
+            color: white;
+        }
+        .btn-elevar {
+            background: #8b5cf6;
+            color: white;
+        }
+        .btn-elevar:hover {
+            background: #7c3aed;
+        }
+        .acciones-cell {
+            white-space: nowrap;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-body {
+            padding: 1rem;
+        }
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        .conditional-fields {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg-surface);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-primary);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--bg-surface);
+            font-weight: 600;
+        }
+        input.list-input, select.form-control, input.form-control, textarea.form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        input.list-input:focus, select.form-control:focus, input.form-control:focus, textarea.form-control:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .filtros-grid {
+                grid-template-columns: 1fr;
+            }
+            .table-container {
+                overflow-x: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -41,6 +204,7 @@
                 <li><a href="expedientes.html" class="nav-link active"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
                 <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
                 <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
             <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
@@ -50,86 +214,277 @@
     <div class="container">
         <div class="card-header">
             <h1><i class="fas fa-folder-open"></i> Gestión de Expedientes</h1>
-            <div>
-                <button id="btnNuevoExpediente" class="btn btn-primary" onclick="openExpedienteModal()"><i class="fas fa-plus"></i> Nuevo Expediente</button>
-                <button id="btnReportePDF" class="btn btn-secondary" onclick="generarPDFExpedientes()"><i class="fas fa-file-pdf"></i> Reporte PDF</button>
-            </div>
+            <button id="btnNuevoExpediente" class="btn btn-primary" onclick="openExpedienteModal()"><i class="fas fa-plus"></i> Nuevo Expediente</button>
         </div>
         
         <div class="filtros-container">
-            <h3><i class="fas fa-filter"></i> Filtros</h3>
+            <h3><i class="fas fa-filter"></i> Filtros de Búsqueda</h3>
             <div class="filtros-grid">
-                <div><label>N° Expediente</label><input type="text" id="filtro_nro" class="form-control"></div>
-                <div><label>Fecha Desde</label><input type="date" id="filtro_fecha_desde" class="form-control"></div>
-                <div><label>Fecha Hasta</label><input type="date" id="filtro_fecha_hasta" class="form-control"></div>
-                <div><label>Tipo Oficio</label><select id="filtro_tipo_oficio" class="form-control"><option value="">Todos</option></select></div>
-                <div><label>Juzgado</label><select id="filtro_juzgado" class="form-control"><option value="">Todos</option></select></div>
-                <div><label>Estado</label><select id="filtro_estado" class="form-control"><option value="">Todos</option><option>Pendiente</option><option>En Trámite</option><option>Finalizado</option><option>Vencido</option></select></div>
-                <div><label>Contenido</label><input type="text" id="filtro_contenido" class="form-control"></div>
-                <div id="filtroDependenciaContainer" style="display:none;"><label>Dependencia</label><select id="filtro_dependencia" class="form-control" data-dependencia><option value="">Todas</option></select></div>
+                <div class="form-group">
+                    <label>N° Expediente</label>
+                    <input type="text" id="filtro_nro" class="form-control" placeholder="Buscar...">
+                </div>
+                <div class="form-group">
+                    <label>Año</label>
+                    <input type="text" id="filtro_anio" class="form-control" placeholder="Ej: 2024">
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Oficio</label>
+                    <input type="text" id="filtro_tipo" class="form-control" list="listaTiposOficio" placeholder="Escriba para buscar...">
+                    <datalist id="listaTiposOficio"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>Juzgado Origen</label>
+                    <input type="text" id="filtro_juzgado" class="form-control" list="listaJuzgados" placeholder="Escriba para buscar...">
+                    <datalist id="listaJuzgados"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select id="filtro_estado" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En trámite">En trámite</option>
+                        <option value="Derivado">Derivado</option>
+                        <option value="Resuelto">Resuelto</option>
+                        <option value="Elevado">Elevado</option>
+                        <option value="Archivado">Archivado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Responsable</label>
+                    <input type="text" id="filtro_responsable" class="form-control" list="listaResponsables" placeholder="Escriba para buscar...">
+                    <datalist id="listaResponsables"></datalist>
+                </div>
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem;">
                 <button class="btn btn-primary" onclick="aplicarFiltros()"><i class="fas fa-search"></i> Buscar</button>
                 <button class="btn btn-secondary" onclick="limpiarFiltros()"><i class="fas fa-eraser"></i> Limpiar</button>
-                <button class="btn btn-secondary" onclick="exportarFiltradosCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
             </div>
         </div>
         
         <div class="table-container">
             <table id="expedientesTable">
-                <thead><tr><th>N° Expediente</th><th>Origen</th><th>Fecha</th><th>Vencimiento</th><th>Tipo Oficio</th><th>Juzgado</th><th>Estado</th><th>Acciones</th></tr></thead>
-                <tbody id="expedientesTableBody"><tr><td colspan="8" class="text-center">Cargando...</td></tr></tbody>
+                <thead>
+                    <tr>
+                        <th>N° Expediente</th>
+                        <th>Año</th>
+                        <th>Expediente Origen</th>
+                        <th>Fecha</th>
+                        <th>Tipo Oficio</th>
+                        <th>Juzgado</th>
+                        <th>Responsable</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="expedientesTableBody">
+                    <tr><td colspan="9" class="text-center">Cargando expedientes...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
     
-    <div id="expedienteModal" class="modal"><div class="modal-content" style="max-width:1000px;max-height:90vh;overflow-y:auto;">
-        <div class="modal-header"><h3 id="modalTitle">Nuevo Expediente</h3><span class="close-modal">&times;</span></div>
-        <div class="modal-body">
-            <form id="expedienteForm">
-                <input type="hidden" id="expedienteId">
-                <input type="hidden" id="expediente_tipo_oficio">
-                <input type="hidden" id="expediente_juzgado">
-                <input type="hidden" id="expediente_dependencia">
-                <input type="hidden" id="expediente_tipo_requerimiento">
-                <input type="hidden" id="expediente_dependencia_id">
-                
-                <div class="form-row"><div><label>N° Expediente *</label><input type="text" id="expediente_nro" class="form-control" required></div><div><label>Expediente Origen</label><input type="text" id="expediente_origen" class="form-control"></div></div>
-                <div class="form-row"><div><label>Fecha *</label><input type="date" id="expediente_fecha" class="form-control" required></div><div><label>Estado</label><select id="expediente_estado" class="form-control"><option>Pendiente</option><option>En Trámite</option><option>Finalizado</option><option>Vencido</option></select></div></div>
-                <div><label>Tipo de Oficio *</label><input type="text" id="expediente_tipo_oficio_input" class="form-control" list="tiposOficioList" placeholder="Buscar..." autocomplete="off" required><datalist id="tiposOficioList"></datalist></div>
-                <div><label>Juzgado/Origen *</label><input type="text" id="expediente_juzgado_input" class="form-control" list="juzgadosList" placeholder="Buscar..." autocomplete="off" required><datalist id="juzgadosList"></datalist></div>
-                <div><label>Dependencia</label><select id="expediente_dependencia_select" class="form-control" data-dependencia><option value="">Seleccionar</option></select></div>
-                <div><label>Tipo Requerimiento *</label><input type="text" id="expediente_tipo_requerimiento_input" class="form-control" list="tiposRequerimientoList" placeholder="Buscar..." autocomplete="off" required><datalist id="tiposRequerimientoList"></datalist></div>
-                <div><label>Resumen</label><textarea id="expediente_resumen" class="form-control" rows="3"></textarea></div>
-                <div><label>N° Informe Técnico</label><input type="text" id="expediente_informe" class="form-control"></div>
-                <div><label><i class="fas fa-history"></i> Elevaciones</label><div id="elevacionesList"></div><button type="button" class="btn-sm btn-secondary mt-1" onclick="addElevacion()"><i class="fas fa-plus"></i> Agregar</button></div>
-            </form>
+    <!-- Modal Expediente -->
+    <div id="expedienteModal" class="modal">
+        <div class="modal-content" style="max-width:800px; max-height:90vh; overflow-y:auto;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nuevo Expediente</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="expedienteForm">
+                    <input type="hidden" id="expedienteId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>N° Expediente *</label>
+                            <input type="text" id="nro_expediente" class="form-control" required placeholder="Ej: 12345">
+                        </div>
+                        <div class="form-group">
+                            <label>Año *</label>
+                            <input type="text" id="anio" class="form-control" required placeholder="Ej: 2024" value="2024">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Expediente Origen</label>
+                            <input type="text" id="expediente_origen" class="form-control" placeholder="Ej: 123">
+                        </div>
+                        <div class="form-group">
+                            <label>Año Origen</label>
+                            <input type="text" id="anio_origen" class="form-control" placeholder="Ej: 2023">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha *</label>
+                            <input type="date" id="fecha" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Oficio *</label>
+                            <input type="text" id="tipo_oficio" class="form-control" list="listaTiposOficioModal" required placeholder="Escriba para buscar...">
+                            <datalist id="listaTiposOficioModal"></datalist>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Juzgado Origen *</label>
+                            <input type="text" id="juzgado_origen" class="form-control" list="listaJuzgadosModal" required placeholder="Escriba para buscar...">
+                            <datalist id="listaJuzgadosModal"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Dependencia</label>
+                            <input type="text" id="dependencia_id" class="form-control" list="listaDependencias" placeholder="Escriba para buscar...">
+                            <datalist id="listaDependencias"></datalist>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo de Requerimiento</label>
+                            <input type="text" id="tipo_requerimiento" class="form-control" list="listaTiposRequerimiento" placeholder="Escriba para buscar...">
+                            <datalist id="listaTiposRequerimiento"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado *</label>
+                            <select id="estado" class="form-control" required>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En trámite">En trámite</option>
+                                <option value="Derivado">Derivado</option>
+                                <option value="Resuelto">Resuelto</option>
+                                <option value="Archivado">Archivado</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Responsable del Diligenciamiento</label>
+                        <input type="text" id="responsable_id" class="form-control" list="listaResponsablesModal" placeholder="Escriba para buscar por legajo o nombre...">
+                        <datalist id="listaResponsablesModal"></datalist>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>N° Informe Técnico</label>
+                        <input type="text" id="nro_informe_tecnico" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Resumen</label>
+                        <textarea id="resumen" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea id="observaciones" class="form-control" rows="2"></textarea>
+                    </div>
+                    
+                    <!-- Documentos Adjuntos -->
+                    <div class="conditional-fields">
+                        <h4><i class="fas fa-paperclip"></i> Documentos Adjuntos</h4>
+                        <div id="documentosList" class="documentos-container"></div>
+                        <div class="form-row mt-2">
+                            <div><label>Título</label><input type="text" id="doc_titulo" class="form-control" placeholder="Ej: Oficio, Nota, Resolución"></div>
+                            <div><label>Descripción</label><input type="text" id="doc_descripcion" class="form-control" placeholder="Descripción opcional"></div>
+                        </div>
+                        <div class="form-row">
+                            <div><label>Archivo</label><input type="file" id="doc_archivo" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf"></div>
+                            <div><button type="button" class="btn btn-primary" onclick="subirDocumento()"><i class="fas fa-upload"></i> Subir Documento</button></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sección de Elevación -->
+                    <div class="conditional-fields" style="border-left-color: #8b5cf6;">
+                        <h4><i class="fas fa-arrow-up"></i> Elevación del Expediente</h4>
+                        <p class="text-secondary">Complete esta sección cuando el expediente sea elevado a instancia superior.</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Fecha de Elevación</label>
+                                <input type="date" id="fecha_elevacion" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Hora de Elevación</label>
+                                <input type="time" id="hora_elevacion" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Persona que Recibió</label>
+                                <input type="text" id="persona_recibio" class="form-control" placeholder="Nombre y cargo">
+                            </div>
+                            <div class="form-group">
+                                <label>Instancia Destino</label>
+                                <input type="text" id="instancia_destino" class="form-control" placeholder="Ej: Superior Tribunal">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Adjunto Recibo (Imagen)</label>
+                            <input type="file" id="recibo_archivo" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf">
+                            <div id="reciboExistente" style="display:none; margin-top:0.5rem;">
+                                <span class="badge badge-info"><i class="fas fa-file"></i> Recibo actual:</span>
+                                <a id="reciboLink" href="#" target="_blank" style="margin-left:0.5rem;">Ver recibo</a>
+                                <button type="button" class="btn-doc btn-eliminar" onclick="eliminarRecibo()" style="margin-left:0.5rem;">Eliminar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Observaciones de Elevación</label>
+                            <textarea id="observaciones_elevacion" class="form-control" rows="2"></textarea>
+                        </div>
+                        
+                        <button type="button" class="btn btn-elevar" onclick="elevarExpediente()" style="margin-top:0.5rem;">
+                            <i class="fas fa-arrow-up"></i> Marcar como Elevado
+                        </button>
+                    </div>
+                    
+                    <!-- Historial de Elevaciones -->
+                    <div class="conditional-fields" id="historialElevaciones" style="display:none;">
+                        <h4><i class="fas fa-history"></i> Historial de Elevaciones</h4>
+                        <div id="historialList" class="timeline"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveExpediente()">Guardar</button>
+            </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveExpediente()">Guardar</button></div>
-    </div></div>
+    </div>
     
-    <div id="imagenModal" class="modal"><div class="modal-content" style="max-width:600px;text-align:center;"><div class="modal-header"><h3>Imagen</h3><span class="close-modal" onclick="closeModal()">&times;</span></div><div class="modal-body"><img id="imagenPreview" src="" style="max-width:100%;border-radius:8px;"></div></div></div>
+    <!-- Modal Ver Documento -->
+    <div id="documentoModal" class="modal">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-header"><h3>Documento</h3><span class="close-modal" onclick="cerrarDocumentoModal()">&times;</span></div>
+            <div class="modal-body" style="text-align:center;">
+                <img id="documentoPreview" src="" style="max-width:100%; border-radius:8px; display:none;">
+                <iframe id="documentoPdf" src="" style="width:100%; height:500px; display:none;"></iframe>
+            </div>
+        </div>
+    </div>
     
     <div id="toast-container" class="toast-container"></div>
     
-    <datalist id="tiposOficioList"></datalist>
-    <datalist id="juzgadosList"></datalist>
-    <datalist id="tiposRequerimientoList"></datalist>
-    
     <script>
         const API_URL = 'backend/api.php';
-        let elevaciones = [];
-        let datosOriginales = [];
-        let datosFiltrados = [];
+        let expedientesData = [];
+        let documentosActuales = [];
+        let catalogosData = { tiposOficio: [], tiposRequerimiento: [] };
+        let dependenciasData = [];
+        let personalData = [];
+        let juzgadosData = [];
         
-        function showToast(message, type) {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.innerHTML = `<div>${message}</div>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        
+        function showToast(msg, type) {
+            let c = document.getElementById('toast-container');
+            if (!c) { c = document.createElement('div'); c.id = 'toast-container'; c.className = 'toast-container'; document.body.appendChild(c); }
+            const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerHTML = `<div>${msg}</div>`;
+            c.appendChild(t); setTimeout(() => t.remove(), 3000);
         }
         
         function escapeHtml(text) {
@@ -139,321 +494,643 @@
             return div.innerHTML;
         }
         
-        function getToken() { return localStorage.getItem('jwt_token'); }
+        function checkAuth() {
+            const user = localStorage.getItem('current_user');
+            if (!user) { 
+                window.location.href = 'index.html'; 
+                return false; 
+            }
+            const userData = JSON.parse(user);
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) {
+                userInfo.innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            }
+            return true;
+        }
         
-        async function apiRequest(endpoint, method = 'GET', data = null) {
-            const token = getToken();
-            const headers = { 'Content-Type': 'application/json' };
-            if (token) headers['Authorization'] = `Bearer ${token}`;
+        // Cargar juzgados
+        async function loadJuzgados() {
+            try {
+                const token = getToken();
+                if (!token) return;
+                
+                const response = await fetch(`${API_URL}?endpoint=juzgados`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                juzgadosData = await response.json();
+                console.log('Juzgados cargados:', juzgadosData.length);
+                
+                // Actualizar datalists de juzgados
+                const listaJuzgadosFiltro = document.getElementById('listaJuzgados');
+                const listaJuzgadosModal = document.getElementById('listaJuzgadosModal');
+                
+                if (listaJuzgadosFiltro && juzgadosData) {
+                    listaJuzgadosFiltro.innerHTML = juzgadosData.map(j => `<option value="${escapeHtml(j.nombre)}">`).join('');
+                }
+                if (listaJuzgadosModal && juzgadosData) {
+                    listaJuzgadosModal.innerHTML = juzgadosData.map(j => `<option value="${escapeHtml(j.nombre)}">`).join('');
+                }
+            } catch(e) { 
+                console.error('Error cargando juzgados:', e);
+            }
+        }
+        
+        // Cargar todos los catálogos
+        async function loadCatalogos() {
+            try {
+                const token = getToken();
+                if (!token) return;
+                
+                // Cargar tipos de oficio
+                const tiposOficioRes = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipo_oficio`, { headers: { 'Authorization': `Bearer ${token}` } });
+                catalogosData.tiposOficio = await tiposOficioRes.json();
+                
+                // Cargar tipos de requerimiento
+                const tiposRequerimientoRes = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipo_requerimiento`, { headers: { 'Authorization': `Bearer ${token}` } });
+                catalogosData.tiposRequerimiento = await tiposRequerimientoRes.json();
+                
+                // Cargar dependencias
+                const dependenciasRes = await fetch(`${API_URL}?endpoint=dependencias`, { headers: { 'Authorization': `Bearer ${token}` } });
+                dependenciasData = await dependenciasRes.json();
+                
+                // Cargar personal
+                const personalRes = await fetch(`${API_URL}?endpoint=personal`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const personal = await personalRes.json();
+                personalData = Array.isArray(personal) ? personal.filter(p => p.legajo && p.legajo.trim() !== '') : [];
+                
+                // Cargar juzgados
+                await loadJuzgados();
+                
+                console.log('Datos cargados:', {
+                    tiposOficio: catalogosData.tiposOficio.length,
+                    tiposRequerimiento: catalogosData.tiposRequerimiento.length,
+                    dependencias: dependenciasData.length,
+                    personal: personalData.length,
+                    juzgados: juzgadosData.length
+                });
+                
+                // Actualizar datalists
+                actualizarDatalists();
+                
+                showToast('Catálogos cargados correctamente', 'success');
+                
+            } catch(e) { 
+                console.error('Error cargando catálogos:', e);
+                showToast('Error cargando catálogos', 'error');
+            }
+        }
+        
+        // Actualizar todos los datalists
+        function actualizarDatalists() {
+            // Tipos de Oficio - Filtro
+            const listaTiposOficio = document.getElementById('listaTiposOficio');
+            if (listaTiposOficio && catalogosData.tiposOficio) {
+                listaTiposOficio.innerHTML = catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">`).join('');
+            }
             
-            let url = `${API_URL}?endpoint=${endpoint}`;
-            const options = { method, headers };
-            if (data && (method === 'POST' || method === 'PUT')) options.body = JSON.stringify(data);
+            // Tipos de Oficio - Modal
+            const listaTiposOficioModal = document.getElementById('listaTiposOficioModal');
+            if (listaTiposOficioModal && catalogosData.tiposOficio) {
+                listaTiposOficioModal.innerHTML = catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">`).join('');
+            }
             
-            try {
-                const response = await fetch(url, options);
-                const result = await response.json();
-                if (response.status === 401) { window.location.href = 'index.html'; throw new Error('Sesión expirada'); }
-                return result;
-            } catch (error) {
-                console.error('API Error:', error);
-                showToast('Error de conexión', 'error');
-                return [];
+            // Tipos de Requerimiento
+            const listaTiposRequerimiento = document.getElementById('listaTiposRequerimiento');
+            if (listaTiposRequerimiento && catalogosData.tiposRequerimiento) {
+                listaTiposRequerimiento.innerHTML = catalogosData.tiposRequerimiento.map(c => `<option value="${escapeHtml(c.valor)}">`).join('');
+            }
+            
+            // Dependencias
+            const listaDependencias = document.getElementById('listaDependencias');
+            if (listaDependencias && dependenciasData) {
+                listaDependencias.innerHTML = dependenciasData.map(d => `<option value="${escapeHtml(d.nombre)}" data-id="${d.id}">`).join('');
+            }
+            
+            // Responsables - Filtro
+            const listaResponsables = document.getElementById('listaResponsables');
+            if (listaResponsables && personalData) {
+                listaResponsables.innerHTML = personalData.map(p => `<option value="${p.legajo} - ${p.apellido}, ${p.nombre}" data-id="${p.id}">`).join('');
+            }
+            
+            // Responsables - Modal
+            const listaResponsablesModal = document.getElementById('listaResponsablesModal');
+            if (listaResponsablesModal && personalData) {
+                listaResponsablesModal.innerHTML = personalData.map(p => `<option value="${p.legajo} - ${p.apellido}, ${p.nombre}" data-id="${p.id}">`).join('');
             }
         }
         
-        function calcularFechaVencimiento(f) {
-            if (!f) return '';
-            let fecha = new Date(f), dias = 0;
-            while (dias < 3) {
-                fecha.setDate(fecha.getDate() + 1);
-                const dia = fecha.getDay();
-                if (dia !== 0 && dia !== 6) dias++;
-            }
-            return fecha.toISOString().split('T')[0];
+        // Obtener ID de dependencia por nombre
+        function getDependenciaIdByNombre(nombre) {
+            const dep = dependenciasData.find(d => d.nombre === nombre);
+            return dep ? dep.id : null;
         }
         
-        function getEstadoBadge(e) {
-            const c = {'Finalizado':'badge-finalizado','En Trámite':'badge-tramite','Vencido':'badge-vencido','Pendiente':'badge-pendiente'};
-            const i = {'Finalizado':'fa-check-circle','En Trámite':'fa-spinner','Vencido':'fa-exclamation-triangle','Pendiente':'fa-hourglass-half'};
-            return `<span class="badge-estado ${c[e]||'badge-pendiente'}"><i class="fas ${i[e]||'fa-hourglass-half'}"></i> ${e||'Pendiente'}</span>`;
+        // Obtener ID de responsable por texto
+        function getResponsableIdByText(texto) {
+            if (!texto) return null;
+            const match = personalData.find(p => `${p.legajo} - ${p.apellido}, ${p.nombre}` === texto);
+            return match ? match.id : null;
         }
         
-        function renderExpedientesTable(d) {
-            const tbody = document.getElementById('expedientesTableBody');
-            if (!tbody) return;
-            if (!d || d.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay registros</td></tr>';
-                return;
-            }
-            const puedeEditar = true;
-            const puedeEliminar = true;
-            tbody.innerHTML = d.map(i => {
-                let e = i.estado;
-                if (i.elevaciones && i.elevaciones.some(el => el.imagen_ruta)) e = 'Finalizado';
-                else if (i.fecha_vencimiento && new Date(i.fecha_vencimiento) < new Date()) e = 'Vencido';
-                else if (i.fecha_vencimiento) e = 'En Trámite';
-                return `<tr>
-                    <td>${escapeHtml(i.nro_expediente)}</td>
-                    <td>${escapeHtml(i.expediente_origen || '-')}</td>
-                    <td>${escapeHtml(i.fecha)}</td>
-                    <td>${escapeHtml(i.fecha_vencimiento || '-')}</td>
-                    <td>${escapeHtml(i.tipo_oficio || '-')}</td>
-                    <td>${escapeHtml(i.juzgado_origen || '-')}</td>
-                    <td>${getEstadoBadge(e)}</td>
-                    <td>
-                        ${puedeEditar ? `<button class="btn-accion btn-ver" onclick="viewExpediente(${i.id})"><i class="fas fa-eye"></i> Ver</button>` : ''}
-                        ${puedeEliminar ? `<button class="btn-accion btn-eliminar" onclick="deleteExpediente(${i.id})"><i class="fas fa-trash"></i> Eliminar</button>` : ''}
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-        
-        async function cargarCatalogosSelect() {
-            try {
-                const t = await apiRequest('catalogos&tipo=tipos_oficio');
-                const s = document.getElementById('filtro_tipo_oficio');
-                if (s && t) s.innerHTML = '<option value="">Todos</option>' + t.map(t => `<option value="${t.valor}">${t.valor}</option>`).join('');
-                const j = await apiRequest('catalogos&tipo=juzgados');
-                const sj = document.getElementById('filtro_juzgado');
-                if (sj && j) sj.innerHTML = '<option value="">Todos</option>' + j.map(j => `<option value="${j.valor}">${j.valor}</option>`).join('');
-            } catch(e) { console.error(e); }
-        }
-        
-        function aplicarFiltros() {
-            let f = [...datosOriginales];
-            const n = document.getElementById('filtro_nro')?.value.trim().toLowerCase();
-            if (n) f = f.filter(e => (e.nro_expediente || '').toLowerCase().includes(n));
-            const fd = document.getElementById('filtro_fecha_desde')?.value;
-            if (fd) f = f.filter(e => e.fecha >= fd);
-            const fh = document.getElementById('filtro_fecha_hasta')?.value;
-            if (fh) f = f.filter(e => e.fecha <= fh);
-            const to = document.getElementById('filtro_tipo_oficio')?.value;
-            if (to && to !== '') f = f.filter(e => e.tipo_oficio === to);
-            const j = document.getElementById('filtro_juzgado')?.value;
-            if (j && j !== '') f = f.filter(e => (e.juzgado_origen || '') === j);
-            const es = document.getElementById('filtro_estado')?.value;
-            if (es && es !== '') f = f.filter(e => e.estado === es);
-            const c = document.getElementById('filtro_contenido')?.value.trim().toLowerCase();
-            if (c) f = f.filter(e => (e.resumen || '').toLowerCase().includes(c) || (e.nro_informe_tecnico || '').toLowerCase().includes(c));
-            const d = document.getElementById('filtro_dependencia')?.value;
-            if (d) f = f.filter(e => e.dependencia_id == d);
-            datosFiltrados = f;
-            renderExpedientesTable(f);
-            showToast(`Encontrados ${f.length} expedientes`, f.length > 0 ? 'success' : 'warning');
-        }
-        
-        function limpiarFiltros() {
-            ['filtro_nro','filtro_fecha_desde','filtro_fecha_hasta','filtro_tipo_oficio','filtro_juzgado','filtro_estado','filtro_contenido','filtro_dependencia'].forEach(id => {
-                const e = document.getElementById(id);
-                if (e) e.value = '';
-            });
-            renderExpedientesTable(datosOriginales);
-            datosFiltrados = [...datosOriginales];
-            showToast('Filtros limpiados', 'info');
-        }
-        
-        function exportarFiltradosCSV() {
-            const d = datosFiltrados.length > 0 ? datosFiltrados : datosOriginales;
-            if (!d || d.length === 0) { showToast('No hay datos', 'warning'); return; }
-            const headers = ['N° Expediente','Origen','Fecha','Vencimiento','Tipo Oficio','Juzgado','Estado','Resumen'];
-            const csv = [headers.join(',')];
-            d.forEach(i => {
-                let e = i.estado;
-                if (i.elevaciones && i.elevaciones.some(el => el.imagen_ruta)) e = 'Finalizado';
-                else if (i.fecha_vencimiento && new Date(i.fecha_vencimiento) < new Date()) e = 'Vencido';
-                csv.push([`"${i.nro_expediente||''}"`,`"${i.expediente_origen||''}"`,`"${i.fecha||''}"`,`"${i.fecha_vencimiento||''}"`,`"${i.tipo_oficio||''}"`,`"${i.juzgado_origen||''}"`,`"${e}"`,`"${(i.resumen||'').substring(0,100)}"`].join(','));
-            });
-            const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `expedientes_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-            showToast('Exportación completada', 'success');
-        }
-        
-        async function generarPDFExpedientes() {
-            const t = document.getElementById('expedientesTable');
-            if (!t) { showToast('No hay datos', 'warning'); return; }
-            showToast('Generando PDF...', 'info');
-            try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('landscape', 'mm', 'a4');
-                pdf.setFontSize(18);
-                pdf.text('Reporte de Expedientes', 14, 20);
-                pdf.setFontSize(10);
-                pdf.text(`Fecha: ${new Date().toLocaleString()}`, 14, 30);
-                const canvas = await html2canvas(t, { scale: 2, backgroundColor: '#1c2128' });
-                const imgData = canvas.toDataURL('image/png');
-                const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                pdf.addImage(imgData, 'PNG', 10, 40, pdfWidth, pdfHeight);
-                pdf.save(`reporte_expedientes_${new Date().toISOString().split('T')[0]}.pdf`);
-                showToast('PDF generado', 'success');
-            } catch(e) { showToast('Error', 'error'); }
-        }
-        
-        function addElevacion() {
-            elevaciones.push({ fecha_hora: new Date().toISOString().slice(0,16), recibido_por: '', notas: '', imagen_ruta: '', imagen_file: null, imagen_preview: null });
-            renderElevaciones();
-        }
-        
-        function removeElevacion(i) { elevaciones.splice(i,1); renderElevaciones(); }
-        function updateElevacion(i,f,v) { elevaciones[i][f] = v; }
-        
-        function updateElevacionImagen(i, f) {
-            if (!f) return;
-            elevaciones[i].imagen_file = f;
-            const r = new FileReader();
-            r.onload = function(e) { elevaciones[i].imagen_preview = e.target.result; renderElevaciones(); };
-            r.readAsDataURL(f);
-        }
-        
-        function verImagen(s) {
-            document.getElementById('imagenPreview').src = s;
-            document.getElementById('imagenModal').style.display = 'flex';
-        }
-        
-        function renderElevaciones() {
-            const c = document.getElementById('elevacionesList');
-            if (!c) return;
-            if (elevaciones.length === 0) { c.innerHTML = '<p class="text-secondary">No hay elevaciones</p>'; return; }
-            c.innerHTML = elevaciones.map((e, i) => `<div class="elevacion-item">
-                <div class="form-row">
-                    <div><label>Fecha/Hora</label><input type="datetime-local" class="form-control" value="${e.fecha_hora}" onchange="updateElevacion(${i},'fecha_hora',this.value)"></div>
-                    <div><label>Recibido por</label><input type="text" class="form-control" value="${escapeHtml(e.recibido_por)}" onchange="updateElevacion(${i},'recibido_por',this.value)"></div>
-                </div>
-                <div><label>Notas</label><textarea class="form-control" rows="2" onchange="updateElevacion(${i},'notas',this.value)">${escapeHtml(e.notas||'')}</textarea></div>
-                <div><label>Imagen</label><input type="file" class="form-control" accept="image/*" onchange="updateElevacionImagen(${i},this.files[0])">
-                ${e.imagen_preview ? `<img src="${e.imagen_preview}" class="elevacion-imagen" onclick="verImagen('${e.imagen_preview}')">` : ''}</div>
-                <button class="btn-sm btn-danger" onclick="removeElevacion(${i})"><i class="fas fa-trash"></i> Eliminar</button>
-            </div>`).join('');
+        // Obtener texto de responsable por ID
+        function getResponsableTextById(id) {
+            const p = personalData.find(p => p.id == id);
+            return p ? `${p.legajo} - ${p.apellido}, ${p.nombre}` : '';
         }
         
         async function loadExpedientes() {
+            const tbody = document.getElementById('expedientesTableBody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center">Cargando expedientes...</td></tr>';
+            
             try {
-                const data = await apiRequest('expedientes');
-                datosOriginales = data;
-                datosFiltrados = [...data];
-                renderExpedientesTable(data);
-                await cargarCatalogosSelect();
-                showToast('Expedientes cargados', 'success');
-            } catch(e) { showToast('Error', 'error'); }
-        }
-        
-        async function viewExpediente(id) {
-            try {
-                const data = await apiRequest(`expedientes&id=${id}`);
-                if (data) openExpedienteModal(data);
-            } catch(e) { showToast('Error', 'error'); }
-        }
-        
-        async function deleteExpediente(id) {
-            if (confirm('¿Eliminar?')) {
-                try {
-                    const result = await apiRequest(`expedientes&id=${id}`, 'DELETE');
-                    if (result && result.success) {
-                        showToast('Eliminado', 'success');
-                        await loadExpedientes();
-                    }
-                } catch(e) { showToast('Error', 'error'); }
+                const token = getToken();
+                if (!token) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                const response = await fetch(`${API_URL}?endpoint=expedientes`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                expedientesData = Array.isArray(data) ? data : [];
+                renderTable();
+                showToast(`✅ ${expedientesData.length} expedientes cargados`, 'success');
+            } catch(e) {
+                console.error('Error cargando expedientes:', e);
+                if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center">Error cargando datos</td></tr>';
+                showToast('Error cargando expedientes', 'error');
             }
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('expedientesTableBody');
+            if (!tbody) return;
+            
+            if (!expedientesData || expedientesData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay expedientes registrados</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = expedientesData.map(exp => {
+                let estadoClass = '';
+                const estado = exp.estado || 'Pendiente';
+                if (estado === 'Pendiente') estadoClass = 'badge-pendiente';
+                else if (estado === 'Resuelto') estadoClass = 'badge-resuelto';
+                else if (estado === 'Derivado') estadoClass = 'badge-derivado';
+                else if (estado === 'Archivado') estadoClass = 'badge-archivado';
+                else if (estado === 'Elevado') estadoClass = 'badge-elevado';
+                else if (estado === 'En trámite') estadoClass = 'badge-en-tramite';
+                else estadoClass = 'badge-pendiente';
+                
+                const responsable = exp.responsable_legajo ? `${exp.responsable_legajo} - ${exp.responsable_apellido}, ${exp.responsable_nombre}` : '-';
+                const anio = exp.anio || (exp.fecha ? exp.fecha.split('-')[0] : '-');
+                const expedienteOrigen = exp.expediente_origen ? `${exp.expediente_origen}${exp.anio_origen ? `/${exp.anio_origen}` : ''}` : '-';
+                
+                return `
+                    <tr>
+                        <td>${escapeHtml(exp.nro_expediente || '-')}</td>
+                        <td>${escapeHtml(anio)}</td>
+                        <td>${escapeHtml(expedienteOrigen)}</td>
+                        <td>${escapeHtml(exp.fecha || '-')}</td>
+                        <td>${escapeHtml(exp.tipo_oficio || '-')}</td>
+                        <td>${escapeHtml(exp.juzgado_origen || '-')}</td>
+                        <td>${escapeHtml(responsable)}</td>
+                        <td><span class="badge ${estadoClass}">${estado}</span></td>
+                        <td class="acciones-cell">
+                            <button class="btn-accion btn-editar" onclick="editExpediente(${exp.id})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-accion btn-eliminar" onclick="deleteExpediente(${exp.id})" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            ${estado !== 'Elevado' ? `<button class="btn-accion btn-elevar" onclick="abrirElevacion(${exp.id})" title="Elevar Expediente">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function aplicarFiltros() {
+            let filtrados = [...expedientesData];
+            
+            const nro = document.getElementById('filtro_nro')?.value.trim();
+            if (nro) filtrados = filtrados.filter(e => (e.nro_expediente || '').toLowerCase().includes(nro.toLowerCase()));
+            
+            const anio = document.getElementById('filtro_anio')?.value.trim();
+            if (anio) filtrados = filtrados.filter(e => (e.anio || '').includes(anio));
+            
+            const tipo = document.getElementById('filtro_tipo')?.value.trim();
+            if (tipo) filtrados = filtrados.filter(e => (e.tipo_oficio || '').toLowerCase().includes(tipo.toLowerCase()));
+            
+            const juzgado = document.getElementById('filtro_juzgado')?.value.trim();
+            if (juzgado) filtrados = filtrados.filter(e => (e.juzgado_origen || '').toLowerCase().includes(juzgado.toLowerCase()));
+            
+            const estado = document.getElementById('filtro_estado')?.value;
+            if (estado && estado !== '') filtrados = filtrados.filter(e => e.estado === estado);
+            
+            const responsableText = document.getElementById('filtro_responsable')?.value.trim();
+            if (responsableText) {
+                filtrados = filtrados.filter(e => {
+                    const nombreResp = e.responsable_legajo ? `${e.responsable_legajo} - ${e.responsable_apellido}, ${e.responsable_nombre}` : '';
+                    return nombreResp.toLowerCase().includes(responsableText.toLowerCase());
+                });
+            }
+            
+            expedientesData = filtrados;
+            renderTable();
+            showToast(`Encontrados ${filtrados.length} expedientes`, 'info');
+        }
+        
+        function limpiarFiltros() {
+            document.getElementById('filtro_nro').value = '';
+            document.getElementById('filtro_anio').value = '';
+            document.getElementById('filtro_tipo').value = '';
+            document.getElementById('filtro_juzgado').value = '';
+            document.getElementById('filtro_estado').value = '';
+            document.getElementById('filtro_responsable').value = '';
+            loadExpedientes();
+        }
+        
+        async function cargarDocumentos(expedienteId) {
+            if (!expedienteId) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=expediente_documentos&expediente_id=${expedienteId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                documentosActuales = Array.isArray(data) ? data : [];
+                renderDocumentosList();
+            } catch(e) { console.error(e); }
+        }
+        
+        function renderDocumentosList() {
+            const container = document.getElementById('documentosList');
+            if (!container) return;
+            if (documentosActuales.length === 0) {
+                container.innerHTML = '<p class="text-secondary text-center">No hay documentos adjuntos</p>';
+                return;
+            }
+            container.innerHTML = documentosActuales.map(doc => `
+                <div class="documento-item">
+                    <div>
+                        <i class="fas ${doc.tipo_archivo === 'pdf' ? 'fa-file-pdf' : 'fa-image'}"></i>
+                        <strong>${escapeHtml(doc.titulo || 'Documento')}</strong>
+                        ${doc.descripcion ? `<br><small>${escapeHtml(doc.descripcion)}</small>` : ''}
+                    </div>
+                    <div>
+                        <button class="btn-doc btn-editar" onclick="verDocumento('${doc.archivo_ruta}', '${doc.tipo_archivo}')"> Ver</button>
+                        <button class="btn-doc btn-eliminar" onclick="eliminarDocumento(${doc.id})"> Eliminar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function subirDocumento() {
+            const expedienteId = document.getElementById('expedienteId').value;
+            if (!expedienteId) { showToast('Primero guarde el expediente para subir documentos', 'warning'); return; }
+            const titulo = document.getElementById('doc_titulo').value;
+            const descripcion = document.getElementById('doc_descripcion').value;
+            const archivo = document.getElementById('doc_archivo').files[0];
+            
+            if (!titulo || !archivo) { showToast('Complete título y seleccione un archivo', 'warning'); return; }
+            
+            const formData = new FormData();
+            formData.append('expediente_id', expedienteId);
+            formData.append('titulo', titulo);
+            formData.append('descripcion', descripcion);
+            formData.append('archivo', archivo);
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=expediente_documentos`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Documento subido correctamente', 'success');
+                    document.getElementById('doc_titulo').value = '';
+                    document.getElementById('doc_descripcion').value = '';
+                    document.getElementById('doc_archivo').value = '';
+                    await cargarDocumentos(expedienteId);
+                } else { showToast(result.error || 'Error al subir', 'error'); }
+            } catch(e) { showToast('Error de conexión', 'error'); }
+        }
+        
+        async function eliminarDocumento(id) {
+            if (!confirm('¿Eliminar este documento?')) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=expediente_documentos&id=${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Documento eliminado', 'success');
+                    const expedienteId = document.getElementById('expedienteId').value;
+                    await cargarDocumentos(expedienteId);
+                } else { showToast('Error al eliminar', 'error'); }
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        function verDocumento(ruta, tipo) {
+            const modal = document.getElementById('documentoModal');
+            const imgPreview = document.getElementById('documentoPreview');
+            const pdfPreview = document.getElementById('documentoPdf');
+            if (tipo === 'pdf') {
+                imgPreview.style.display = 'none';
+                pdfPreview.style.display = 'block';
+                pdfPreview.src = ruta;
+            } else {
+                imgPreview.style.display = 'block';
+                pdfPreview.style.display = 'none';
+                imgPreview.src = ruta;
+            }
+            modal.style.display = 'flex';
+        }
+        
+        function cerrarDocumentoModal() { document.getElementById('documentoModal').style.display = 'none'; }
+        
+        async function cargarElevacion(expedienteId) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=expediente_elevacion&expediente_id=${expedienteId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data && data.id) {
+                    document.getElementById('fecha_elevacion').value = data.fecha_elevacion || '';
+                    document.getElementById('hora_elevacion').value = data.hora_elevacion || '';
+                    document.getElementById('persona_recibio').value = data.persona_recibio || '';
+                    document.getElementById('instancia_destino').value = data.instancia_destino || '';
+                    document.getElementById('observaciones_elevacion').value = data.observaciones || '';
+                    
+                    if (data.recibo_ruta) {
+                        document.getElementById('reciboExistente').style.display = 'block';
+                        document.getElementById('reciboLink').href = data.recibo_ruta;
+                    } else {
+                        document.getElementById('reciboExistente').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('fecha_elevacion').value = '';
+                    document.getElementById('hora_elevacion').value = '';
+                    document.getElementById('persona_recibio').value = '';
+                    document.getElementById('instancia_destino').value = '';
+                    document.getElementById('observaciones_elevacion').value = '';
+                    document.getElementById('reciboExistente').style.display = 'none';
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        async function cargarHistorialElevaciones(expedienteId) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=expediente_historial_elevaciones&expediente_id=${expedienteId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                const historialDiv = document.getElementById('historialElevaciones');
+                const historialList = document.getElementById('historialList');
+                
+                if (data && data.length > 0) {
+                    historialDiv.style.display = 'block';
+                    historialList.innerHTML = data.map(e => `
+                        <div class="timeline-item">
+                            <div class="timeline-date">${e.fecha_elevacion} ${e.hora_elevacion ? `- ${e.hora_elevacion}` : ''}</div>
+                            <div><strong>Recibió:</strong> ${escapeHtml(e.persona_recibio || '-')}</div>
+                            <div><strong>Destino:</strong> ${escapeHtml(e.instancia_destino || '-')}</div>
+                            ${e.observaciones ? `<div><strong>Obs:</strong> ${escapeHtml(e.observaciones)}</div>` : ''}
+                            ${e.recibo_ruta ? `<div><a href="${e.recibo_ruta}" target="_blank"><i class="fas fa-file-pdf"></i> Ver recibo</a></div>` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    historialDiv.style.display = 'none';
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        async function elevarExpediente() {
+            const expedienteId = document.getElementById('expedienteId').value;
+            if (!expedienteId) { showToast('Primero guarde el expediente', 'warning'); return; }
+            
+            const fechaElevacion = document.getElementById('fecha_elevacion').value;
+            if (!fechaElevacion) { showToast('La fecha de elevación es requerida', 'warning'); return; }
+            
+            const formData = new FormData();
+            formData.append('expediente_id', expedienteId);
+            formData.append('fecha_elevacion', fechaElevacion);
+            formData.append('hora_elevacion', document.getElementById('hora_elevacion').value);
+            formData.append('persona_recibio', document.getElementById('persona_recibio').value);
+            formData.append('instancia_destino', document.getElementById('instancia_destino').value);
+            formData.append('observaciones', document.getElementById('observaciones_elevacion').value);
+            
+            const reciboArchivo = document.getElementById('recibo_archivo').files[0];
+            if (reciboArchivo) {
+                formData.append('recibo_archivo', reciboArchivo);
+            }
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=expediente_elevar`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Expediente elevado correctamente', 'success');
+                    await loadExpedientes();
+                    await cargarHistorialElevaciones(expedienteId);
+                    document.getElementById('estado').value = 'Elevado';
+                } else { showToast(result.error || 'Error al elevar', 'error'); }
+            } catch(e) { showToast('Error de conexión', 'error'); }
+        }
+        
+        async function eliminarRecibo() {
+            const expedienteId = document.getElementById('expedienteId').value;
+            if (!confirm('¿Eliminar el recibo de elevación?')) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=expediente_elevacion_recibo&expediente_id=${expedienteId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Recibo eliminado', 'success');
+                    document.getElementById('reciboExistente').style.display = 'none';
+                } else { showToast('Error', 'error'); }
+            } catch(e) { showToast('Error', 'error'); }
         }
         
         function openExpedienteModal(data = null) {
             const modal = document.getElementById('expedienteModal');
-            if (!modal) return;
+            const anioActual = new Date().getFullYear().toString();
+            
             if (data) {
                 document.getElementById('expedienteId').value = data.id;
-                document.getElementById('expediente_nro').value = data.nro_expediente;
+                document.getElementById('nro_expediente').value = data.nro_expediente || '';
+                document.getElementById('anio').value = data.anio || anioActual;
                 document.getElementById('expediente_origen').value = data.expediente_origen || '';
-                document.getElementById('expediente_fecha').value = data.fecha;
-                document.getElementById('expediente_tipo_oficio_input').value = data.tipo_oficio || '';
-                document.getElementById('expediente_tipo_oficio').value = data.tipo_oficio || '';
-                document.getElementById('expediente_juzgado_input').value = data.juzgado_origen || '';
-                document.getElementById('expediente_juzgado').value = data.juzgado_origen || '';
-                document.getElementById('expediente_dependencia_select').value = data.dependencia_id || '';
-                document.getElementById('expediente_dependencia_id').value = data.dependencia_id || '';
-                document.getElementById('expediente_tipo_requerimiento_input').value = data.tipo_requerimiento || '';
-                document.getElementById('expediente_tipo_requerimiento').value = data.tipo_requerimiento || '';
-                document.getElementById('expediente_resumen').value = data.resumen || '';
-                document.getElementById('expediente_informe').value = data.nro_informe_tecnico || '';
-                document.getElementById('expediente_estado').value = data.estado || 'Pendiente';
-                if (data.elevaciones) elevaciones = data.elevaciones.map(e => ({ ...e, imagen_preview: e.imagen_ruta ? e.imagen_ruta : null }));
-                else elevaciones = [];
+                document.getElementById('anio_origen').value = data.anio_origen || '';
+                document.getElementById('fecha').value = data.fecha || '';
+                document.getElementById('tipo_oficio').value = data.tipo_oficio || '';
+                document.getElementById('juzgado_origen').value = data.juzgado_origen || '';
+                
+                const dependencia = dependenciasData.find(d => d.id == data.dependencia_id);
+                document.getElementById('dependencia_id').value = dependencia ? dependencia.nombre : '';
+                
+                document.getElementById('tipo_requerimiento').value = data.tipo_requerimiento || '';
+                document.getElementById('estado').value = data.estado || 'Pendiente';
+                document.getElementById('responsable_id').value = getResponsableTextById(data.responsable_id);
+                document.getElementById('nro_informe_tecnico').value = data.nro_informe_tecnico || '';
+                document.getElementById('resumen').value = data.resumen || '';
+                document.getElementById('observaciones').value = data.observaciones || '';
                 document.getElementById('modalTitle').textContent = 'Editar Expediente';
+                
+                cargarDocumentos(data.id);
+                cargarElevacion(data.id);
+                cargarHistorialElevaciones(data.id);
             } else {
                 document.getElementById('expedienteForm').reset();
                 document.getElementById('expedienteId').value = '';
-                document.getElementById('expediente_fecha').value = new Date().toISOString().split('T')[0];
-                elevaciones = [];
+                document.getElementById('anio').value = anioActual;
+                document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+                document.getElementById('estado').value = 'Pendiente';
                 document.getElementById('modalTitle').textContent = 'Nuevo Expediente';
+                documentosActuales = [];
+                renderDocumentosList();
+                document.getElementById('reciboExistente').style.display = 'none';
+                document.getElementById('historialElevaciones').style.display = 'none';
             }
-            renderElevaciones();
             modal.style.display = 'flex';
         }
         
         async function saveExpediente() {
-            const id = document.getElementById('expedienteId')?.value;
-            const fecha = document.getElementById('expediente_fecha')?.value;
-            const fechaVencimiento = calcularFechaVencimiento(fecha);
-            let estado = document.getElementById('expediente_estado')?.value;
-            const tieneElevacionFinalizada = elevaciones.some(e => e.imagen_preview);
-            if (tieneElevacionFinalizada) estado = 'Finalizado';
-            else if (fechaVencimiento && new Date(fechaVencimiento) < new Date()) estado = 'Vencido';
-            else if (fechaVencimiento) estado = 'En Trámite';
+            const id = document.getElementById('expedienteId').value;
+            
+            const dependenciaNombre = document.getElementById('dependencia_id').value;
+            const dependenciaId = getDependenciaIdByNombre(dependenciaNombre);
+            
+            const responsableText = document.getElementById('responsable_id').value;
+            const responsableId = getResponsableIdByText(responsableText);
             
             const data = {
-                nro_expediente: document.getElementById('expediente_nro')?.value,
-                expediente_origen: document.getElementById('expediente_origen')?.value,
-                fecha: fecha,
-                fecha_vencimiento: fechaVencimiento,
-                tipo_oficio: document.getElementById('expediente_tipo_oficio')?.value,
-                juzgado_origen: document.getElementById('expediente_juzgado')?.value,
-                dependencia: document.getElementById('expediente_dependencia_select')?.options[document.getElementById('expediente_dependencia_select')?.selectedIndex]?.text || '',
-                dependencia_id: document.getElementById('expediente_dependencia_select')?.value,
-                tipo_requerimiento: document.getElementById('expediente_tipo_requerimiento')?.value,
-                resumen: document.getElementById('expediente_resumen')?.value,
-                nro_informe_tecnico: document.getElementById('expediente_informe')?.value,
-                estado: estado,
-                elevaciones: elevaciones.map(e => ({ fecha_hora: e.fecha_hora, recibido_por: e.recibido_por, notas: e.notas, imagen_ruta: e.imagen_preview || null }))
+                nro_expediente: document.getElementById('nro_expediente').value,
+                anio: document.getElementById('anio').value,
+                expediente_origen: document.getElementById('expediente_origen').value,
+                anio_origen: document.getElementById('anio_origen').value,
+                fecha: document.getElementById('fecha').value,
+                tipo_oficio: document.getElementById('tipo_oficio').value,
+                juzgado_origen: document.getElementById('juzgado_origen').value,
+                dependencia_id: dependenciaId,
+                tipo_requerimiento: document.getElementById('tipo_requerimiento').value,
+                estado: document.getElementById('estado').value,
+                responsable_id: responsableId,
+                nro_informe_tecnico: document.getElementById('nro_informe_tecnico').value,
+                resumen: document.getElementById('resumen').value,
+                observaciones: document.getElementById('observaciones').value
             };
-            if (!data.nro_expediente || !data.fecha) { showToast('Complete campos requeridos', 'warning'); return; }
+            
+            if (!data.nro_expediente || !data.anio || !data.fecha || !data.tipo_oficio || !data.juzgado_origen) {
+                showToast('Complete campos requeridos (N° Expediente, Año, Fecha, Tipo de Oficio, Juzgado Origen)', 'warning');
+                return;
+            }
+            
             try {
-                let result;
-                if (id) result = await apiRequest(`expedientes&id=${id}`, 'PUT', data);
-                else result = await apiRequest('expedientes', 'POST', data);
-                if (result && result.success) {
+                const token = getToken();
+                const url = id ? `${API_URL}?endpoint=expedientes&id=${id}` : `${API_URL}?endpoint=expedientes`;
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
                     showToast(`Expediente ${id ? 'actualizado' : 'creado'} correctamente`, 'success');
                     closeModal();
-                    await loadExpedientes();
-                    elevaciones = [];
-                } else showToast('Error al guardar', 'error');
+                    loadExpedientes();
+                } else {
+                    showToast('Error al guardar: ' + (result.error || 'Desconocido'), 'error');
+                }
+            } catch(e) { showToast('Error de conexión', 'error'); }
+        }
+        
+        async function editExpediente(id) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=expedientes&id=${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data && data.id) openExpedienteModal(data);
+                else showToast('No se encontraron datos', 'error');
             } catch(e) { showToast('Error', 'error'); }
         }
         
-        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+        async function deleteExpediente(id) {
+            if (confirm('¿Eliminar este expediente?')) {
+                try {
+                    const token = getToken();
+                    await fetch(`${API_URL}?endpoint=expedientes&id=${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    showToast('Expediente eliminado', 'success');
+                    loadExpedientes();
+                } catch(e) { showToast('Error', 'error'); }
+            }
+        }
         
-        document.addEventListener('DOMContentLoaded', () => {
-            loadExpedientes();
-            document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
+        function abrirElevacion(id) {
+            editExpediente(id);
+            setTimeout(() => {
+                document.getElementById('fecha_elevacion').focus();
+            }, 500);
+        }
+        
+        function closeModal() { document.getElementById('expedienteModal').style.display = 'none'; }
+        
+        // Event Listeners
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
+        document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (checkAuth()) {
+                await loadCatalogos();
+                await loadExpedientes();
+            }
         });
         
-        window.aplicarFiltros = aplicarFiltros;
-        window.limpiarFiltros = limpiarFiltros;
-        window.exportarFiltradosCSV = exportarFiltradosCSV;
-        window.generarPDFExpedientes = generarPDFExpedientes;
-        window.addElevacion = addElevacion;
-        window.removeElevacion = removeElevacion;
-        window.updateElevacion = updateElevacion;
-        window.updateElevacionImagen = updateElevacionImagen;
-        window.verImagen = verImagen;
-        window.viewExpediente = viewExpediente;
-        window.deleteExpediente = deleteExpediente;
+        // Exponer funciones globales
         window.openExpedienteModal = openExpedienteModal;
         window.saveExpediente = saveExpediente;
+        window.editExpediente = editExpediente;
+        window.deleteExpediente = deleteExpediente;
         window.closeModal = closeModal;
+        window.subirDocumento = subirDocumento;
+        window.verDocumento = verDocumento;
+        window.cerrarDocumentoModal = cerrarDocumentoModal;
+        window.eliminarDocumento = eliminarDocumento;
+        window.elevarExpediente = elevarExpediente;
+        window.eliminarRecibo = eliminarRecibo;
+        window.abrirElevacion = abrirElevacion;
+        window.aplicarFiltros = aplicarFiltros;
+        window.limpiarFiltros = limpiarFiltros;
     </script>
+    <script src="theme.js"></script>
 </body>
 </html>

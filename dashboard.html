@@ -2,11 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistema de Gestión Policial</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
         .dashboard-grid {
             display: grid;
@@ -15,7 +17,7 @@
             margin-top: 1.5rem;
         }
         .widget {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 1.5rem;
@@ -38,11 +40,12 @@
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .widget-value {
             font-size: 2rem;
             font-weight: bold;
-            color: var(--accent-primary);
+            color: #1d4ed8;
         }
         .widget-remove {
             background: none;
@@ -53,10 +56,10 @@
             transition: all 0.2s;
         }
         .widget-remove:hover {
-            color: var(--accent-danger);
+            color: #dc2626;
         }
         .config-panel {
-            background-color: var(--bg-surface);
+            background: var(--bg-surface);
             border-radius: 12px;
             padding: 1rem;
             margin-bottom: 1.5rem;
@@ -64,8 +67,8 @@
         }
         .config-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 0.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.75rem;
             margin-top: 1rem;
         }
         .config-item {
@@ -75,17 +78,112 @@
             padding: 0.5rem;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
         }
         .config-item:hover {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
         }
         .config-item input {
             cursor: pointer;
+            width: 18px;
+            height: 18px;
         }
         .config-item label {
             cursor: pointer;
             flex: 1;
+            font-size: 0.9rem;
+        }
+        .btn-config {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-config:hover {
+            background: var(--bg-card);
+            border-color: #1d4ed8;
+        }
+        .list-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        .progress-bar {
+            background: var(--bg-surface);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 20px;
+            margin-top: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #16a34a;
+            transition: width 0.5s;
+        }
+        .bar-chart {
+            margin-top: 1rem;
+        }
+        .bar-item {
+            margin-bottom: 0.75rem;
+        }
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .bar {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            background: #1d4ed8;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            text-align: center;
+        }
+        .stat-card {
+            background: var(--bg-surface);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        .cumple-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .cumple-fecha {
+            background: #1d4ed8;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            min-width: 45px;
+            text-align: center;
+        }
+        .cumple-hoy {
+            background: rgba(29, 78, 216, 0.2);
+            border-left: 3px solid #1d4ed8;
+            padding-left: 0.5rem;
         }
         .periodo-selector {
             display: flex;
@@ -96,103 +194,39 @@
             padding-top: 1rem;
             border-top: 1px solid var(--border);
         }
-        .kpi-success { color: #16a34a; }
-        .kpi-warning { color: #d97706; }
-        .kpi-danger { color: #dc2626; }
-        .kpi-info { color: #1d4ed8; }
-        .bar-chart { margin-top: 1rem; }
-        .bar-item { margin-bottom: 0.75rem; }
-        .bar-label {
+        .text-center { text-align: center; }
+        .text-secondary { color: var(--text-secondary); }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 1rem; }
+        .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .badge-success { background: rgba(22,163,74,0.2); color: #16a34a; }
+        .badge-warning { background: rgba(217,119,6,0.2); color: #d97706; }
+        .badge-info { background: rgba(29,78,216,0.2); color: #1d4ed8; }
+        .pie-chart-container { height: 200px; position: relative; margin: 0.5rem 0; }
+        canvas { max-height: 200px; width: 100% !important; }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .card-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.25rem;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-        .bar {
-            background-color: var(--bg-surface);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .bar-fill {
-            background-color: var(--accent-primary);
-            height: 28px;
-            border-radius: 8px;
-            transition: width 0.5s ease;
-            display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding-right: 8px;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        .list-item {
-            padding: 0.5rem 0;
+            padding: 1rem 1.5rem;
             border-bottom: 1px solid var(--border);
-        }
-        .list-item:last-child { border-bottom: none; }
-        .progress-bar {
-            background-color: var(--bg-surface);
-            border-radius: 10px;
-            overflow: hidden;
-            height: 20px;
-            margin-top: 0.5rem;
-        }
-        .progress-fill {
-            height: 100%;
-            background-color: var(--accent-success);
-            transition: width 0.5s;
-        }
-        .cumple-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .cumple-fecha {
-            background-color: var(--accent-primary);
-            color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            min-width: 45px;
-            text-align: center;
-        }
-        .cumple-hoy {
-            background-color: rgba(29, 78, 216, 0.2);
-            border-left: 3px solid var(--accent-primary);
-            padding-left: 0.5rem;
-        }
-        .btn-config {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 0.5rem;
         }
-        .btn-config:hover {
-            background-color: var(--bg-card);
-            border-color: var(--accent-primary);
-        }
-        .btn-config.active {
-            background-color: var(--accent-primary);
-            color: white;
-            border-color: var(--accent-primary);
-        }
-        .error-message {
-            color: var(--accent-danger);
-            text-align: center;
-            padding: 2rem;
+        .card-body {
+            padding: 1.5rem;
         }
         @media (max-width: 768px) {
             .dashboard-grid { grid-template-columns: 1fr; }
             .config-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -208,6 +242,7 @@
                 <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
                 <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
                 <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
             <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
@@ -217,48 +252,62 @@
     <div class="container">
         <div class="card-header">
             <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
-            <div>
-                <button id="btnConfigurar" class="btn-config"><i class="fas fa-cog"></i> Configurar Dashboard</button>
+            <button id="btnConfigurar" class="btn-config"><i class="fas fa-cog"></i> Personalizar Dashboard</button>
+        </div>
+        
+        <!-- Panel de Control Avanzado -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-line"></i> Panel de Control Avanzado</h3>
+                <button id="exportarDashboardPDF" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Exportar Dashboard a PDF</button>
+            </div>
+            <div class="card-body" id="dashboardResumen">
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                    <div class="stat-card"><div class="widget-value" id="statsPersonal">0</div><div class="text-secondary">Personal</div></div>
+                    <div class="stat-card"><div class="widget-value" id="statsRecargos">0</div><div class="text-secondary">Recargos</div></div>
+                    <div class="stat-card"><div class="widget-value" id="statsExpedientes">0</div><div class="text-secondary">Expedientes</div></div>
+                    <div class="stat-card"><div class="widget-value" id="statsLicencias">0</div><div class="text-secondary">Licencias</div></div>
+                    <div class="stat-card"><div class="widget-value" id="statsArmas">0</div><div class="text-secondary">Armas</div></div>
+                    <div class="stat-card"><div class="widget-value" id="statsChalecos">0</div><div class="text-secondary">Chalecos</div></div>
+                </div>
             </div>
         </div>
         
-        <!-- Panel de Configuración -->
         <div id="configPanel" class="config-panel" style="display: none;">
             <h3><i class="fas fa-sliders-h"></i> Personalizar Dashboard</h3>
-            <p class="text-secondary">Seleccione los widgets que desea mostrar</p>
+            <p class="text-secondary">Seleccione los widgets que desea mostrar en su dashboard</p>
             
             <div class="config-grid" id="widgetsList">
-                <div class="config-item"><input type="checkbox" value="stats"> <label>📊 Estadísticas Generales</label></div>
-                <div class="config-item"><input type="checkbox" value="jerarquias"> <label>📈 Distribución por Jerarquía</label></div>
-                <div class="config-item"><input type="checkbox" value="recargos"> <label>⚠️ Últimos Recargos</label></div>
-                <div class="config-item"><input type="checkbox" value="expedientes"> <label>📁 Expedientes Recientes</label></div>
-                <div class="config-item"><input type="checkbox" value="licencias"> <label>📅 Licencias Activas</label></div>
-                <div class="config-item"><input type="checkbox" value="tipos_requerimiento"> <label>🏷️ Tipos de Requerimiento</label></div>
-                <div class="config-item"><input type="checkbox" value="juzgados"> <label>⚖️ Por Juzgado</label></div>
-                <div class="config-item"><input type="checkbox" value="dependencias"> <label>🏢 Por Dependencia</label></div>
-                <div class="config-item"><input type="checkbox" value="cumpleanos"> <label>🎂 Cumpleaños del Mes</label></div>
+                <div class="config-item"><input type="checkbox" value="stats" id="w_stats" checked> <label for="w_stats">📊 Estadísticas Generales</label></div>
+                <div class="config-item"><input type="checkbox" value="jerarquias" id="w_jerarquias" checked> <label for="w_jerarquias">📈 Distribución por Jerarquía</label></div>
+                <div class="config-item"><input type="checkbox" value="personal_sexo" id="w_sexo" checked> <label for="w_sexo">👥 Personal por Sexo</label></div>
+                <div class="config-item"><input type="checkbox" value="secciones_guardia" id="w_secciones" checked> <label for="w_secciones">📋 Secciones de Guardia</label></div>
+                <div class="config-item"><input type="checkbox" value="recargos" id="w_recargos" checked> <label for="w_recargos">⚠️ Últimos Recargos</label></div>
+                <div class="config-item"><input type="checkbox" value="expedientes" id="w_expedientes" checked> <label for="w_expedientes">📁 Expedientes Recientes</label></div>
+                <div class="config-item"><input type="checkbox" value="licencias" id="w_licencias" checked> <label for="w_licencias">📅 Licencias Activas</label></div>
+                <div class="config-item"><input type="checkbox" value="tipos_requerimiento" id="w_tipos" checked> <label for="w_tipos">🏷️ Tipos de Requerimiento</label></div>
+                <div class="config-item"><input type="checkbox" value="juzgados" id="w_juzgados" checked> <label for="w_juzgados">⚖️ Por Juzgado</label></div>
+                <div class="config-item"><input type="checkbox" value="cumpleanos" id="w_cumpleanos" checked> <label for="w_cumpleanos">🎂 Cumpleaños del Mes</label></div>
             </div>
             
             <div class="periodo-selector">
                 <label>Período para reportes:</label>
                 <select id="periodoReporte" class="form-control" style="width: auto;">
                     <option value="semanal">Última semana</option>
-                    <option value="mensual">Último mes</option>
+                    <option value="mensual" selected>Último mes</option>
                     <option value="trimestral">Último trimestre</option>
                     <option value="anual">Último año</option>
-                    <option value="personalizado">Personalizado</option>
                 </select>
-                <div id="fechasPersonalizadas" style="display: none;">
-                    <input type="date" id="fecha_desde" class="form-control" style="width: auto; display: inline-block;">
-                    <input type="date" id="fecha_hasta" class="form-control" style="width: auto; display: inline-block;">
-                </div>
-                <button id="btnGuardarConfig" class="btn btn-primary">Guardar Configuración</button>
-                <button id="btnCerrarConfig" class="btn btn-secondary">Cerrar</button>
+            </div>
+            
+            <div class="mt-3">
+                <button id="btnGuardarConfig" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Configuración</button>
+                <button id="btnCerrarConfig" class="btn btn-secondary"><i class="fas fa-times"></i> Cerrar</button>
             </div>
         </div>
         
         <div id="dashboardWidgets" class="dashboard-grid">
-            <div class="text-center">Cargando datos...</div>
+            <div class="text-center">Cargando dashboard...</div>
         </div>
     </div>
     
@@ -266,13 +315,18 @@
     
     <script>
         const API_URL = 'backend/api.php';
-        let activeWidgets = ['stats', 'jerarquias', 'recargos', 'expedientes', 'licencias'];
+        let activeWidgets = ['stats', 'jerarquias', 'personal_sexo', 'secciones_guardia', 'recargos', 'expedientes', 'licencias', 'tipos_requerimiento', 'juzgados', 'cumpleanos'];
+        let dashboardData = {};
         let charts = {};
-        let datosGenerales = {};
         
         function showToast(message, type) {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `<div>${message}</div>`;
@@ -291,34 +345,17 @@
             return localStorage.getItem('jwt_token');
         }
         
-        async function apiRequest(endpoint) {
-            const token = getToken();
-            const headers = {};
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-            
+        async function loadConfig() {
             try {
-                const response = await fetch(`${API_URL}?endpoint=${endpoint}`, { headers });
-                const text = await response.text();
-                try {
-                    return JSON.parse(text);
-                } catch(e) {
-                    console.error('Error parsing JSON:', text.substring(0, 200));
-                    return null;
-                }
-            } catch (error) {
-                console.error('API Error:', error);
-                return null;
-            }
-        }
-        
-        async function cargarConfiguracion() {
-            try {
-                const config = await apiRequest('dashboard_config');
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=dashboard_config`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const config = await response.json();
                 if (config && Array.isArray(config) && config.length > 0) {
                     activeWidgets = config;
                 }
-                // Marcar checkboxes
-                document.querySelectorAll('#widgetsList input').forEach(cb => {
+                document.querySelectorAll('#widgetsList input[type="checkbox"]').forEach(cb => {
                     cb.checked = activeWidgets.includes(cb.value);
                 });
             } catch (error) {
@@ -326,27 +363,31 @@
             }
         }
         
-        async function guardarConfiguracion() {
-            const selectedWidgets = Array.from(document.querySelectorAll('#widgetsList input:checked')).map(cb => cb.value);
+        async function saveConfig() {
+            const selectedWidgets = Array.from(document.querySelectorAll('#widgetsList input[type="checkbox"]:checked')).map(cb => cb.value);
             activeWidgets = selectedWidgets;
             
             try {
+                const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=dashboard_config`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getToken()}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ widgets: selectedWidgets })
                 });
                 const result = await response.json();
                 if (result.success) {
-                    showToast('Configuración guardada', 'success');
+                    showToast('Configuración guardada correctamente', 'success');
                     document.getElementById('configPanel').style.display = 'none';
-                    cargarDashboard();
+                    loadDashboard();
+                } else {
+                    showToast('Error al guardar configuración', 'error');
                 }
             } catch (error) {
-                showToast('Error guardando configuración', 'error');
+                console.error('Error:', error);
+                showToast('Error de conexión', 'error');
             }
         }
         
@@ -354,140 +395,130 @@
             const periodo = document.getElementById('periodoReporte').value;
             const hoy = new Date();
             let fechaDesde, fechaHasta;
-            
             fechaHasta = hoy.toISOString().split('T')[0];
-            
             switch(periodo) {
-                case 'semanal':
-                    fechaDesde = new Date(hoy.setDate(hoy.getDate() - 7)).toISOString().split('T')[0];
-                    break;
-                case 'mensual':
-                    fechaDesde = new Date(hoy.setMonth(hoy.getMonth() - 1)).toISOString().split('T')[0];
-                    break;
-                case 'trimestral':
-                    fechaDesde = new Date(hoy.setMonth(hoy.getMonth() - 3)).toISOString().split('T')[0];
-                    break;
-                case 'anual':
-                    fechaDesde = new Date(hoy.setFullYear(hoy.getFullYear() - 1)).toISOString().split('T')[0];
-                    break;
-                default:
-                    fechaDesde = document.getElementById('fecha_desde').value;
-                    fechaHasta = document.getElementById('fecha_hasta').value;
+                case 'semanal': fechaDesde = new Date(hoy.setDate(hoy.getDate() - 7)).toISOString().split('T')[0]; break;
+                case 'mensual': fechaDesde = new Date(hoy.setMonth(hoy.getMonth() - 1)).toISOString().split('T')[0]; break;
+                case 'trimestral': fechaDesde = new Date(hoy.setMonth(hoy.getMonth() - 3)).toISOString().split('T')[0]; break;
+                case 'anual': fechaDesde = new Date(hoy.setFullYear(hoy.getFullYear() - 1)).toISOString().split('T')[0]; break;
+                default: fechaDesde = ''; fechaHasta = '';
             }
-            
             return { fechaDesde, fechaHasta };
         }
         
-        async function cargarDashboard() {
+        async function loadDashboard() {
             const container = document.getElementById('dashboardWidgets');
             container.innerHTML = '<div class="text-center">Cargando dashboard...</div>';
             
             try {
-                const dashboardData = await apiRequest('dashboard');
-                if (!dashboardData) {
-                    container.innerHTML = '<div class="error-message">Error cargando datos del dashboard</div>';
-                    return;
-                }
+                const token = getToken();
                 
-                datosGenerales = dashboardData;
+                const dashboardResponse = await fetch(`${API_URL}?endpoint=dashboard`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                dashboardData = await dashboardResponse.json();
+                
+                document.getElementById('statsPersonal').textContent = dashboardData.total_personal || 0;
+                document.getElementById('statsRecargos').textContent = dashboardData.ultimos_recargos?.length || 0;
+                document.getElementById('statsExpedientes').textContent = dashboardData.expedientes_recientes?.length || 0;
+                document.getElementById('statsLicencias').textContent = dashboardData.licencias_activas?.length || 0;
+                
+                const seccionesResponse = await fetch(`${API_URL}?endpoint=stats_secciones`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const seccionesData = await seccionesResponse.json();
+                
+                const { fechaDesde, fechaHasta } = getFechasPeriodo();
+                
+                const [tiposOficioRes, tiposRequerimientoRes, juzgadosRes, cumpleanosRes] = await Promise.all([
+                    fetch(`${API_URL}?endpoint=dashboard_stats&tipo=tipos_oficio&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_URL}?endpoint=dashboard_stats&tipo=tipos_requerimiento&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_URL}?endpoint=dashboard_stats&tipo=juzgados&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${API_URL}?endpoint=dashboard_stats&tipo=cumpleanos&mes=${new Date().getMonth() + 1}`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                
+                const tiposOficio = await tiposOficioRes.json();
+                const tiposRequerimiento = await tiposRequerimientoRes.json();
+                const juzgados = await juzgadosRes.json();
+                const cumpleanos = await cumpleanosRes.json();
+                
                 let html = '<div class="dashboard-grid">';
                 let widgetIndex = 0;
                 
                 for (const widget of activeWidgets) {
                     switch(widget) {
-                        case 'stats':
-                            html += await renderStatsWidget(dashboardData, widgetIndex++);
-                            break;
-                        case 'jerarquias':
-                            html += await renderJerarquiasWidget(dashboardData, widgetIndex++);
-                            break;
-                        case 'recargos':
-                            html += await renderRecargosWidget(dashboardData, widgetIndex++);
-                            break;
-                        case 'expedientes':
-                            html += await renderExpedientesWidget(dashboardData, widgetIndex++);
-                            break;
-                        case 'licencias':
-                            html += await renderLicenciasWidget(dashboardData, widgetIndex++);
-                            break;
-                        case 'tipos_requerimiento':
-                            html += await renderTiposRequerimientoWidget(widgetIndex++);
-                            break;
-                        case 'juzgados':
-                            html += await renderJuzgadosWidget(widgetIndex++);
-                            break;
-                        case 'dependencias':
-                            html += await renderDependenciasWidget(widgetIndex++);
-                            break;
-                        case 'cumpleanos':
-                            html += await renderCumpleanosWidget(widgetIndex++);
-                            break;
+                        case 'stats': html += renderStatsWidget(widgetIndex++); break;
+                        case 'jerarquias': html += renderJerarquiasWidget(widgetIndex++); break;
+                        case 'personal_sexo': html += renderPersonalSexoWidget(widgetIndex++); break;
+                        case 'secciones_guardia': html += renderSeccionesGuardiaWidget(widgetIndex++, seccionesData); break;
+                        case 'recargos': html += renderRecargosWidget(widgetIndex++); break;
+                        case 'expedientes': html += renderExpedientesWidget(widgetIndex++); break;
+                        case 'licencias': html += renderLicenciasWidget(widgetIndex++); break;
+                        case 'tipos_requerimiento': html += renderTiposRequerimientoWidget(widgetIndex++, tiposRequerimiento); break;
+                        case 'juzgados': html += renderJuzgadosWidget(widgetIndex++, juzgados); break;
+                        case 'cumpleanos': html += renderCumpleanosWidget(widgetIndex++, cumpleanos); break;
                     }
                 }
                 
                 html += '</div>';
                 container.innerHTML = html;
                 
-                // Inicializar gráficos
-                for (const widget of activeWidgets) {
-                    if (['tipos_requerimiento', 'juzgados', 'dependencias'].includes(widget)) {
-                        await inicializarGrafico(widget);
-                    }
-                }
+                setTimeout(() => {
+                    if (activeWidgets.includes('personal_sexo')) initPieChart('personalSexo', dashboardData.estadisticas_sexo || {});
+                    if (activeWidgets.includes('tipos_requerimiento')) initBarChart('tiposRequerimiento', tiposRequerimiento);
+                    if (activeWidgets.includes('juzgados')) initBarChart('juzgados', juzgados);
+                }, 100);
+                
+                await cargarStatsEquipamiento();
                 
             } catch (error) {
                 console.error('Error loading dashboard:', error);
-                container.innerHTML = `<div class="error-message">Error de conexión: ${error.message}</div>`;
+                container.innerHTML = `<div class="error-message text-center">Error cargando datos: ${error.message}</div>`;
             }
         }
         
-        async function renderStatsWidget(data, index) {
-            const totalExpedientes = data.expedientes_recientes?.length || 0;
-            const resueltos = data.expedientes_recientes?.filter(e => e.estado === 'Finalizado' || e.estado === 'Resuelto').length || 0;
-            const tasaResolucion = totalExpedientes > 0 ? ((resueltos / totalExpedientes) * 100).toFixed(1) : 0;
+        function renderStatsWidget(index) {
+            const totalExp = dashboardData.expedientes_recientes?.length || 0;
+            const resueltos = dashboardData.expedientes_recientes?.filter(e => e.estado === 'Resuelto' || e.estado === 'Finalizado').length || 0;
+            const tasa = totalExp > 0 ? ((resueltos / totalExp) * 100).toFixed(1) : 0;
+            const sexo = dashboardData.estadisticas_sexo || { Masculino: 0, Femenino: 0, Otro: 0 };
             
             return `
                 <div class="widget" data-widget-index="${index}">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fas fa-chart-line"></i> Estadísticas Generales</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})" title="Eliminar widget"><i class="fas fa-times"></i></button>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-                        <div><div class="widget-value kpi-info">${data.total_personal || 0}</div><div class="text-secondary">Personal</div></div>
-                        <div><div class="widget-value kpi-info">${data.ultimos_recargos?.length || 0}</div><div class="text-secondary">Recargos</div></div>
-                        <div><div class="widget-value kpi-info">${totalExpedientes}</div><div class="text-secondary">Expedientes</div></div>
-                        <div><div class="widget-value kpi-info">${data.licencias_activas?.length || 0}</div><div class="text-secondary">Licencias</div></div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="widget-value">${dashboardData.total_personal || 0}</div><div class="text-secondary">Personal</div></div>
+                        <div class="stat-card"><div class="widget-value">${sexo.Masculino || 0}</div><div class="text-secondary">Hombres</div></div>
+                        <div class="stat-card"><div class="widget-value">${sexo.Femenino || 0}</div><div class="text-secondary">Mujeres</div></div>
+                        <div class="stat-card"><div class="widget-value">${dashboardData.ultimos_recargos?.length || 0}</div><div class="text-secondary">Recargos</div></div>
+                        <div class="stat-card"><div class="widget-value">${totalExp}</div><div class="text-secondary">Expedientes</div></div>
+                        <div class="stat-card"><div class="widget-value">${dashboardData.licencias_activas?.length || 0}</div><div class="text-secondary">Licencias Activas</div></div>
                     </div>
                     <div class="mt-2">
-                        <div class="text-secondary" style="font-size: 0.75rem;">Tasa de resolución: ${tasaResolucion}%</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: ${tasaResolucion}%;"></div></div>
+                        <div class="text-secondary">Tasa de resolución: ${tasa}%</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${tasa}%"></div></div>
                     </div>
                 </div>
             `;
         }
         
-        async function renderJerarquiasWidget(data, index) {
-            if (!data.jerarquias || data.jerarquias.length === 0) {
-                return `
-                    <div class="widget" data-widget-index="${index}">
-                        <div class="widget-header">
-                            <span class="widget-title"><i class="fas fa-chart-bar"></i> Distribución por Jerarquía</span>
-                            <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
-                        </div>
-                        <div class="text-center">No hay datos de jerarquías</div>
-                    </div>
-                `;
+        function renderJerarquiasWidget(index) {
+            const jerarquias = dashboardData.jerarquias || [];
+            if (jerarquias.length === 0) {
+                return `<div class="widget" data-widget-index="${index}"><div class="widget-header"><span class="widget-title"><i class="fas fa-chart-bar"></i> Distribución por Jerarquía</span><button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button></div><div class="text-center">No hay datos de jerarquías</div></div>`;
             }
-            
-            const max = Math.max(...data.jerarquias.map(j => j.cantidad), 1);
+            const max = Math.max(...jerarquias.map(j => j.cantidad), 1);
             return `
                 <div class="widget" data-widget-index="${index}">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fas fa-chart-bar"></i> Distribución por Jerarquía</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
                     </div>
                     <div class="bar-chart">
-                        ${data.jerarquias.map(j => `
+                        ${jerarquias.map(j => `
                             <div class="bar-item">
                                 <div class="bar-label">
                                     <span>${escapeHtml(j.jerarquia || 'Sin especificar')}</span>
@@ -503,215 +534,328 @@
             `;
         }
         
-        async function renderRecargosWidget(data, index) {
+        function renderPersonalSexoWidget(index) {
+            const data = dashboardData.estadisticas_sexo || { Masculino: 0, Femenino: 0, Otro: 0 };
+            return `
+                <div class="widget" data-widget-index="${index}">
+                    <div class="widget-header">
+                        <span class="widget-title"><i class="fas fa-venus-mars"></i> Personal por Sexo</span>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="pie-chart-container">
+                        <canvas id="chartPersonalSexo" height="180"></canvas>
+                    </div>
+                    <div class="stats-grid mt-2">
+                        <div class="stat-card"><div class="widget-value" style="font-size:1.2rem">👨 ${data.Masculino || 0}</div><div class="text-secondary">Hombres</div></div>
+                        <div class="stat-card"><div class="widget-value" style="font-size:1.2rem">👩 ${data.Femenino || 0}</div><div class="text-secondary">Mujeres</div></div>
+                        <div class="stat-card"><div class="widget-value" style="font-size:1.2rem">👤 ${data.Otro || 0}</div><div class="text-secondary">Otros</div></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderSeccionesGuardiaWidget(index, data) {
+            if (!data || data.length === 0) {
+                return `<div class="widget" data-widget-index="${index}"><div class="widget-header"><span class="widget-title"><i class="fas fa-layer-group"></i> Secciones de Guardia</span><button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button></div><div class="text-center">No hay secciones de guardia configuradas</div></div>`;
+            }
+            
+            return `
+                <div class="widget" data-widget-index="${index}">
+                    <div class="widget-header">
+                        <span class="widget-title"><i class="fas fa-layer-group"></i> Secciones de Guardia</span>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="stats-grid">
+                        ${data.map(s => `
+                            <div class="stat-card">
+                                <div class="widget-value" style="font-size:1.2rem">${s.total_personal || 0}</div>
+                                <div class="text-secondary">${escapeHtml(s.nombre)}</div>
+                                ${s.descripcion ? `<small class="text-muted">${escapeHtml(s.descripcion)}</small>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <a href="secciones_guardia.html" class="btn btn-sm btn-secondary mt-2" style="width:100%;display:block;text-align:center">Gestionar Secciones</a>
+                </div>
+            `;
+        }
+        
+        function renderRecargosWidget(index) {
+            const recargos = dashboardData.ultimos_recargos || [];
             return `
                 <div class="widget" data-widget-index="${index}">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fas fa-exclamation-triangle"></i> Últimos Recargos</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
                     </div>
-                    ${data.ultimos_recargos && data.ultimos_recargos.length > 0 ? 
-                        data.ultimos_recargos.map(r => `
-                            <div class="list-item">
-                                <div><strong>${escapeHtml(r.fecha)}</strong> - ${escapeHtml(r.tipo_recargo || 'Sin tipo')}</div>
-                                <div class="text-secondary" style="font-size: 0.75rem;">${escapeHtml(r.apellido ? `${r.apellido}, ${r.nombre}` : 'Sin asignar')}</div>
-                            </div>
-                        `).join('') : 
-                        '<div class="text-center">No hay recargos registrados</div>'
-                    }
-                    <a href="recargos.html" class="btn btn-sm btn-secondary mt-2" style="width: 100%; text-align: center; display: block;">Ver todos</a>
+                    ${recargos.length > 0 ? recargos.map(r => `
+                        <div class="list-item">
+                            <div><strong>${escapeHtml(r.fecha)}</strong> - ${escapeHtml(r.tipo_recargo || 'Sin tipo')}</div>
+                            <div class="text-secondary">${escapeHtml(r.apellido ? `${r.apellido}, ${r.nombre}` : 'Sin asignar')}</div>
+                        </div>
+                    `).join('') : '<div class="text-center">No hay recargos registrados</div>'}
+                    <a href="recargos.html" class="btn btn-sm btn-secondary mt-2" style="width:100%;display:block;text-align:center">Ver todos</a>
                 </div>
             `;
         }
         
-        async function renderExpedientesWidget(data, index) {
+        function renderExpedientesWidget(index) {
+            const expedientes = dashboardData.expedientes_recientes || [];
             return `
                 <div class="widget" data-widget-index="${index}">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fas fa-folder-open"></i> Expedientes Recientes</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
                     </div>
-                    ${data.expedientes_recientes && data.expedientes_recientes.length > 0 ? 
-                        data.expedientes_recientes.map(e => `
-                            <div class="list-item">
-                                <div><strong>${escapeHtml(e.nro_expediente)}</strong> - ${escapeHtml(e.fecha)}</div>
-                                <div class="text-secondary" style="font-size: 0.75rem;">${escapeHtml(e.tipo_oficio || 'Sin tipo')}</div>
-                            </div>
-                        `).join('') : 
-                        '<div class="text-center">No hay expedientes registrados</div>'
-                    }
-                    <a href="expedientes.html" class="btn btn-sm btn-secondary mt-2" style="width: 100%; text-align: center; display: block;">Ver todos</a>
+                    ${expedientes.length > 0 ? expedientes.map(e => `
+                        <div class="list-item">
+                            <div><strong>${escapeHtml(e.nro_expediente)}</strong> - ${escapeHtml(e.fecha)}</div>
+                            <div class="text-secondary">${escapeHtml(e.tipo_oficio || 'Sin tipo')}</div>
+                        </div>
+                    `).join('') : '<div class="text-center">No hay expedientes registrados</div>'}
+                    <a href="expedientes.html" class="btn btn-sm btn-secondary mt-2" style="width:100%;display:block;text-align:center">Ver todos</a>
                 </div>
             `;
         }
         
-        async function renderLicenciasWidget(data, index) {
+        function renderLicenciasWidget(index) {
+            const licencias = dashboardData.licencias_activas || [];
             return `
                 <div class="widget" data-widget-index="${index}">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fas fa-calendar-alt"></i> Licencias Activas</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
                     </div>
-                    ${data.licencias_activas && data.licencias_activas.length > 0 ? 
-                        data.licencias_activas.map(l => `
-                            <div class="list-item">
-                                <div><strong>${escapeHtml(l.apellido ? `${l.apellido}, ${l.nombre}` : 'Sin agente')}</strong></div>
-                                <div class="text-secondary" style="font-size: 0.75rem;">${escapeHtml(l.tipo_licencia)} - ${escapeHtml(l.fecha_inicio)}</div>
-                                <span class="badge badge-${l.estado === 'Aprobada' ? 'success' : 'warning'}">${l.estado}</span>
-                            </div>
-                        `).join('') : 
-                        '<div class="text-center">No hay licencias activas</div>'
-                    }
-                    <a href="licencias.html" class="btn btn-sm btn-secondary mt-2" style="width: 100%; text-align: center; display: block;">Ver todas</a>
+                    ${licencias.length > 0 ? licencias.map(l => `
+                        <div class="list-item">
+                            <div><strong>${escapeHtml(l.apellido ? `${l.apellido}, ${l.nombre}` : 'Sin agente')}</strong></div>
+                            <div class="text-secondary">${escapeHtml(l.tipo_licencia)} - ${escapeHtml(l.fecha_inicio)}</div>
+                            <span class="badge badge-${l.estado === 'Aprobada' ? 'success' : 'warning'}">${l.estado}</span>
+                        </div>
+                    `).join('') : '<div class="text-center">No hay licencias activas</div>'}
+                    <a href="licencias.html" class="btn btn-sm btn-secondary mt-2" style="width:100%;display:block;text-align:center">Ver todas</a>
                 </div>
             `;
         }
         
-        async function renderTiposRequerimientoWidget(index) {
-            const { fechaDesde, fechaHasta } = getFechasPeriodo();
-            const data = await apiRequest(`dashboard_stats&tipo=tipos_requerimiento&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`);
-            const hasData = data && data.length > 0;
-            
+        function renderTiposRequerimientoWidget(index, data) {
             return `
                 <div class="widget" data-widget-index="${index}">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fas fa-tags"></i> Tipos de Requerimiento</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
                     </div>
                     <canvas id="chartTiposRequerimiento" height="200"></canvas>
                     <div id="dataTiposRequerimiento" style="display:none;">${JSON.stringify(data || [])}</div>
-                    ${!hasData ? '<div class="text-center">No hay datos en el período seleccionado</div>' : ''}
+                    ${!data || data.length === 0 ? '<div class="text-center mt-2">No hay datos de tipos de requerimiento</div>' : ''}
                 </div>
             `;
         }
         
-        async function renderJuzgadosWidget(index) {
-            const { fechaDesde, fechaHasta } = getFechasPeriodo();
-            const data = await apiRequest(`dashboard_stats&tipo=juzgados&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`);
-            const hasData = data && data.length > 0;
-            
+        function renderJuzgadosWidget(index, data) {
             return `
                 <div class="widget" data-widget-index="${index}">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fas fa-gavel"></i> Por Juzgado</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
                     </div>
                     <canvas id="chartJuzgados" height="200"></canvas>
                     <div id="dataJuzgados" style="display:none;">${JSON.stringify(data || [])}</div>
-                    ${!hasData ? '<div class="text-center">No hay datos en el período seleccionado</div>' : ''}
+                    ${!data || data.length === 0 ? '<div class="text-center mt-2">No hay datos de juzgados</div>' : ''}
                 </div>
             `;
         }
         
-        async function renderDependenciasWidget(index) {
-            const { fechaDesde, fechaHasta } = getFechasPeriodo();
-            const data = await apiRequest(`dashboard_stats&tipo=dependencias&fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`);
-            const hasData = data && data.length > 0;
-            
-            return `
-                <div class="widget" data-widget-index="${index}">
-                    <div class="widget-header">
-                        <span class="widget-title"><i class="fas fa-building"></i> Por Dependencia</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
-                    </div>
-                    <canvas id="chartDependencias" height="200"></canvas>
-                    <div id="dataDependencias" style="display:none;">${JSON.stringify(data || [])}</div>
-                    ${!hasData ? '<div class="text-center">No hay datos en el período seleccionado</div>' : ''}
-                </div>
-            `;
-        }
-        
-        async function renderCumpleanosWidget(index) {
-            const mesActual = new Date().getMonth() + 1;
-            const data = await apiRequest(`dashboard_stats&tipo=cumpleanos&mes=${mesActual}`);
+        function renderCumpleanosWidget(index, data) {
             const hoy = new Date();
-            const hoyMes = hoy.getMonth() + 1;
             const hoyDia = hoy.getDate();
             
             return `
                 <div class="widget" data-widget-index="${index}">
                     <div class="widget-header">
                         <span class="widget-title"><i class="fas fa-birthday-cake"></i> Cumpleaños del Mes</span>
-                        <button class="widget-remove" onclick="removerWidget(${index})"><i class="fas fa-times"></i></button>
+                        <button class="widget-remove" onclick="removeWidget(${index})"><i class="fas fa-times"></i></button>
                     </div>
-                    ${data && data.length > 0 ? 
-                        data.map(p => {
-                            const dia = p.fecha_nacimiento ? parseInt(p.fecha_nacimiento.split('-')[2]) : 0;
-                            const esHoy = (hoyMes === mesActual && hoyDia === dia);
-                            return `
-                                <div class="cumple-item ${esHoy ? 'cumple-hoy' : ''}">
-                                    <div class="cumple-fecha">${dia}</div>
-                                    <div><strong>${escapeHtml(p.apellido)}, ${escapeHtml(p.nombre)}</strong><br><small>Legajo: ${p.legajo}</small></div>
-                                    ${esHoy ? '<i class="fas fa-gift" style="color: var(--accent-primary);"></i>' : ''}
-                                </div>
-                            `;
-                        }).join('') : 
-                        '<div class="text-center">No hay cumpleaños este mes</div>'
-                    }
+                    ${data && data.length > 0 ? data.map(p => {
+                        const dia = p.fecha_nacimiento ? parseInt(p.fecha_nacimiento.split('-')[2]) : 0;
+                        const esHoy = (hoyDia === dia);
+                        return `
+                            <div class="cumple-item ${esHoy ? 'cumple-hoy' : ''}">
+                                <div class="cumple-fecha">${dia}</div>
+                                <div><strong>${escapeHtml(p.apellido)}, ${escapeHtml(p.nombre)}</strong><br><small>Legajo: ${p.legajo}</small></div>
+                                ${esHoy ? '<i class="fas fa-gift" style="color: #1d4ed8;"></i>' : ''}
+                            </div>
+                        `;
+                    }).join('') : '<div class="text-center">No hay cumpleaños este mes</div>'}
                 </div>
             `;
         }
         
-        async function inicializarGrafico(tipo) {
-            const canvasId = tipo === 'tipos_requerimiento' ? 'chartTiposRequerimiento' : (tipo === 'juzgados' ? 'chartJuzgados' : 'chartDependencias');
-            const dataDiv = document.getElementById(`data${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+        function initPieChart(chartId, data) {
+            const canvasId = chartId === 'personalSexo' ? 'chartPersonalSexo' : 'chartExpedientesTipo';
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             
-            if (!dataDiv) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
             
-            try {
-                const data = JSON.parse(dataDiv.innerHTML);
-                if (data && data.length > 0) {
-                    const ctx = document.getElementById(canvasId)?.getContext('2d');
-                    if (ctx) {
-                        if (charts[tipo]) charts[tipo].destroy();
-                        charts[tipo] = new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: data.map(d => d.nombre || 'Sin especificar'),
-                                datasets: [{
-                                    label: 'Cantidad',
-                                    data: data.map(d => d.cantidad),
-                                    backgroundColor: 'rgba(29, 78, 216, 0.6)',
-                                    borderColor: 'rgba(29, 78, 216, 1)',
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: true,
-                                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-                            }
-                        });
+            let labels = [], values = [];
+            if (chartId === 'personalSexo') {
+                labels = Object.keys(data);
+                values = Object.values(data);
+            } else if (Array.isArray(data) && data.length > 0) {
+                labels = data.map(d => d.nombre || 'Sin especificar');
+                values = data.map(d => d.cantidad);
+            } else {
+                return;
+            }
+            
+            if (labels.length === 0 || values.reduce((a,b) => a + b, 0) === 0) return;
+            
+            if (charts[chartId]) charts[chartId].destroy();
+            
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16'];
+            
+            charts[chartId] = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderColor: 'var(--bg-card)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: 'var(--text-primary)', font: { size: 10 } } }
                     }
                 }
-            } catch(e) {
-                console.error('Error inicializando gráfico:', e);
-            }
+            });
         }
         
-        function removerWidget(index) {
+        function initBarChart(chartId, data) {
+            const canvasId = chartId === 'tiposRequerimiento' ? 'chartTiposRequerimiento' : 'chartJuzgados';
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            
+            if (!data || data.length === 0) return;
+            
+            if (charts[chartId]) charts[chartId].destroy();
+            
+            charts[chartId] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.nombre || 'Sin especificar'),
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: data.map(d => d.cantidad),
+                        backgroundColor: 'rgba(29, 78, 216, 0.6)',
+                        borderColor: 'rgba(29, 78, 216, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: 'var(--text-secondary)' } },
+                        x: { ticks: { color: 'var(--text-secondary)', maxRotation: 45, autoSkip: true } }
+                    }
+                }
+            });
+        }
+        
+        function removeWidget(index) {
             const widget = document.querySelector(`.widget[data-widget-index="${index}"]`);
             if (widget) {
                 widget.remove();
-                showToast('Widget eliminado. Guarde la configuración para que el cambio sea permanente.', 'info');
+                showToast('Widget eliminado. Guarde la configuración para aplicar cambios permanentemente.', 'info');
             }
+        }
+        
+        // ==================== EXPORTAR DASHBOARD A PDF ====================
+        async function exportarDashboardPDF() {
+            showToast('Generando PDF del dashboard...', 'info');
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('landscape', 'mm', 'a4');
+                
+                doc.setFontSize(18);
+                doc.setTextColor(29, 78, 216);
+                doc.text('DASHBOARD - SISTEMA DE GESTIÓN POLICIAL', 14, 20);
+                
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Generado: ${new Date().toLocaleString()}`, 14, 30);
+                
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=stats_equipamiento`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const stats = await response.json();
+                
+                let y = 45;
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.text('RESUMEN GENERAL', 14, y);
+                y += 10;
+                
+                const resumen = [
+                    ['Personal', dashboardData.total_personal || 0],
+                    ['Recargos', dashboardData.ultimos_recargos?.length || 0],
+                    ['Expedientes', dashboardData.expedientes_recientes?.length || 0],
+                    ['Licencias Activas', dashboardData.licencias_activas?.length || 0],
+                    ['Armas Registradas', stats.total_armas || 0],
+                    ['Chalecos Registrados', stats.total_chalecos || 0]
+                ];
+                
+                doc.autoTable({
+                    head: [['Indicador', 'Cantidad']],
+                    body: resumen,
+                    startY: y,
+                    theme: 'grid',
+                    headStyles: { fillColor: [29, 78, 216], textColor: [255, 255, 255] },
+                    margin: { left: 14, right: 14 }
+                });
+                
+                doc.save(`dashboard_${new Date().toISOString().split('T')[0]}.pdf`);
+                showToast('PDF generado correctamente', 'success');
+            } catch(e) {
+                console.error(e);
+                showToast('Error generando PDF', 'error');
+            }
+        }
+        
+        // ==================== ESTADÍSTICAS EQUIPAMIENTO ====================
+        async function cargarStatsEquipamiento() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=stats_equipamiento`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const stats = await response.json();
+                const armasEl = document.getElementById('statsArmas');
+                const chalecosEl = document.getElementById('statsChalecos');
+                if (armasEl) armasEl.textContent = stats.total_armas || 0;
+                if (chalecosEl) chalecosEl.textContent = stats.total_chalecos || 0;
+            } catch(e) { console.error(e); }
         }
         
         document.getElementById('btnConfigurar')?.addEventListener('click', () => {
             document.getElementById('configPanel').style.display = 'block';
-            cargarConfiguracion();
+            loadConfig();
         });
-        
         document.getElementById('btnCerrarConfig')?.addEventListener('click', () => {
             document.getElementById('configPanel').style.display = 'none';
         });
-        
-        document.getElementById('btnGuardarConfig')?.addEventListener('click', guardarConfiguracion);
-        
-        document.getElementById('periodoReporte')?.addEventListener('change', function() {
-            const personalizado = document.getElementById('fechasPersonalizadas');
-            personalizado.style.display = this.value === 'personalizado' ? 'block' : 'none';
-        });
+        document.getElementById('btnGuardarConfig')?.addEventListener('click', saveConfig);
+        document.getElementById('exportarDashboardPDF')?.addEventListener('click', exportarDashboardPDF);
         
         function checkAuth() {
             const user = localStorage.getItem('current_user');
@@ -720,10 +864,7 @@
                 return false;
             }
             const userData = JSON.parse(user);
-            const userInfoEl = document.getElementById('userInfo');
-            if (userInfoEl) {
-                userInfoEl.innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
-            }
+            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
             return true;
         }
         
@@ -739,14 +880,14 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             if (checkAuth()) {
-                cargarConfiguracion();
-                cargarDashboard();
+                loadDashboard();
             }
             document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
             document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu);
         });
         
-        window.removerWidget = removerWidget;
+        window.removeWidget = removeWidget;
     </script>
+    <script src="theme.js"></script>
 </body>
 </html>

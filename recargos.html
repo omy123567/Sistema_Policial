@@ -2,25 +2,39 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recargos - Sistema de Gestión Policial</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
         @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
-        input[list], select { width: 100%; padding: 0.5rem 0.75rem; background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); }
         .filtros-container { background-color: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
         .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .badge-estado { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 8px; font-size: 0.7rem; font-weight: bold; }
-        .badge-pendiente { background-color: rgba(217,119,6,0.2); color:#d97706; }
-        .badge-resuelto { background-color: rgba(22,163,74,0.2); color:#16a34a; }
-        .badge-rechazado { background-color: rgba(220,38,38,0.2); color:#dc2626; }
-        .btn-accion { padding: 0.25rem 0.5rem; margin:0 0.25rem; border-radius:6px; font-size:0.7rem; cursor:pointer; }
-        .btn-ver { background-color: rgba(29,78,216,0.2); color:#1d4ed8; border:none; }
-        .btn-ver:hover { background-color:#1d4ed8; color:white; }
-        .btn-eliminar { background-color: rgba(220,38,38,0.2); color:#dc2626; border:none; }
+        .btn-accion { padding: 0.25rem 0.5rem; margin: 0 0.25rem; border-radius: 6px; font-size: 0.7rem; cursor: pointer; border: none; transition: all 0.2s; }
+        .btn-editar { background-color: rgba(29,78,216,0.2); color:#1d4ed8; }
+        .btn-editar:hover { background-color:#1d4ed8; color:white; }
+        .btn-eliminar { background-color: rgba(220,38,38,0.2); color:#dc2626; }
         .btn-eliminar:hover { background-color:#dc2626; color:white; }
+        .config-columnas { background: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 1rem; }
+        .config-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 8px; cursor: pointer; }
+        .config-item:hover { background: var(--bg-card); }
+        .btn-config { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
+        
+        th.draggable { cursor: move; user-select: none; position: relative; }
+        th.draggable:active { cursor: grabbing; }
+        th .drag-handle { display: inline-block; margin-right: 5px; opacity: 0.5; cursor: move; }
+        th:hover .drag-handle { opacity: 1; }
+        th.drag-over { background-color: var(--accent-primary); color: white; }
+        .column-order-list { background: var(--bg-surface); border-radius: 8px; padding: 0.5rem; max-height: 300px; overflow-y: auto; }
+        .column-order-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; margin: 0.25rem 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: move; transition: all 0.2s; }
+        .column-order-item:hover { background: var(--bg-surface); border-color: var(--accent-primary); }
+        .column-order-item.dragging { opacity: 0.5; }
+        .column-order-item .drag-icon { color: var(--text-secondary); cursor: grab; }
+        .column-order-item .drag-icon:active { cursor: grabbing; }
+        .column-order-item .col-name { flex: 1; }
+        
         @media (max-width:768px){ .filtros-grid { grid-template-columns:1fr; } }
     </style>
 </head>
@@ -36,6 +50,7 @@
                 <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
                 <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
                 <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
             <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
@@ -46,32 +61,43 @@
         <div class="card-header">
             <h1><i class="fas fa-exclamation-triangle"></i> Gestión de Recargos</h1>
             <div>
+                <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar</button>
                 <button id="btnNuevoRecargo" class="btn btn-primary" onclick="openRecargoModal()"><i class="fas fa-plus"></i> Nuevo Recargo</button>
-                <button id="btnReportePDF" class="btn btn-secondary" onclick="generarPDFRecargos()"><i class="fas fa-file-pdf"></i> Reporte PDF</button>
+                <button class="btn btn-secondary" onclick="exportarCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+            </div>
+        </div>
+        
+        <div id="configPanel" class="config-columnas" style="display: none;">
+            <h3>Personalizar Columnas</h3>
+            <p class="text-secondary">Arrastre para reordenar. Marque/desmarque para mostrar/ocultar.</p>
+            <div id="columnOrderList" class="column-order-list"></div>
+            <div class="mt-2">
+                <button id="btnResetColumns" class="btn btn-secondary btn-sm">Restablecer</button>
+                <button id="btnGuardarConfig" class="btn btn-primary">Guardar</button>
+                <button id="btnCerrarConfig" class="btn btn-secondary">Cancelar</button>
             </div>
         </div>
         
         <div class="filtros-container">
-            <h3><i class="fas fa-filter"></i> Filtros</h3>
+            <h3>Filtros</h3>
             <div class="filtros-grid">
                 <div><label>Fecha Desde</label><input type="date" id="filtro_fecha_desde" class="form-control"></div>
                 <div><label>Fecha Hasta</label><input type="date" id="filtro_fecha_hasta" class="form-control"></div>
                 <div><label>Tipo</label><select id="filtro_tipo" class="form-control"><option value="">Todos</option></select></div>
-                <div><label>Estado</label><select id="filtro_estado" class="form-control"><option value="">Todos</option><option>Pendiente</option><option>Resuelto</option><option>Rechazado</option></select></div>
-                <div><label>Personal</label><input type="text" id="filtro_personal" class="form-control" placeholder="Nombre"></div>
-                <div id="filtroDependenciaContainer" style="display:none;"><label>Dependencia</label><select id="filtro_dependencia" class="form-control" data-dependencia><option value="">Todas</option></select></div>
+                <div><label>Sección</label><select id="filtro_seccion" class="form-control"><option value="">Todas</option></select></div>
+                <div><label>Personal</label><input type="text" id="filtro_personal" class="form-control" placeholder="Buscar por nombre o legajo"></div>
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem;">
-                <button class="btn btn-primary" onclick="aplicarFiltros()"><i class="fas fa-search"></i> Buscar</button>
-                <button class="btn btn-secondary" onclick="limpiarFiltros()"><i class="fas fa-eraser"></i> Limpiar</button>
-                <button class="btn btn-secondary" onclick="exportarFiltradosCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+                <button class="btn btn-primary" onclick="aplicarFiltros()">Buscar</button>
+                <button class="btn btn-secondary" onclick="limpiarFiltros()">Limpiar</button>
             </div>
         </div>
         
         <div class="table-container">
             <table id="recargosTable">
-                <thead><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Oficina</th><th>Personal</th><th>Estado</th><th>Acciones</th></tr></thead>
-                <tbody id="recargosTableBody"><tr><td colspan="7" class="text-center">Cargando...<\/td></tr></tbody>
+                <thead id="tableHeader"></thead>
+                <tbody id="recargosTableBody">
+                    <tr><td colspan="10" class="text-center">Cargando...穷穷</tbody>
             </table>
         </div>
     </div>
@@ -80,33 +106,531 @@
         <div class="modal-header"><h3 id="modalTitle">Nuevo Recargo</h3><span class="close-modal">&times;</span></div>
         <div class="modal-body">
             <form id="recargoForm">
-                <input type="hidden" id="recargoId"><input type="hidden" id="recargo_tipo"><input type="hidden" id="recargo_oficina"><input type="hidden" id="recargo_personal"><input type="hidden" id="recargo_dependencia">
-                <div class="form-row"><div><label>Fecha *</label><input type="date" id="recargo_fecha" class="form-control" required></div><div><label>Hora *</label><input type="time" id="recargo_hora" class="form-control" required></div></div>
-                <div><label>Tipo *</label><input type="text" id="recargo_tipo_input" class="form-control" list="tiposRecargoList" placeholder="Buscar..." autocomplete="off" required><datalist id="tiposRecargoList"></datalist></div>
-                <div><label>Oficina *</label><input type="text" id="recargo_oficina_input" class="form-control" list="oficinasList" placeholder="Buscar..." autocomplete="off" required><datalist id="oficinasList"></datalist></div>
-                <div><label>Personal *</label><input type="text" id="recargo_personal_input" class="form-control" list="personalList" placeholder="Buscar..." autocomplete="off" required><datalist id="personalList"></datalist></div>
-                <div><label>Dependencia</label><select id="recargo_dependencia_select" class="form-control" data-dependencia><option value="">Seleccionar</option></select></div>
-                <div><label>Estado</label><select id="recargo_estado" class="form-control"><option>Pendiente</option><option>Resuelto</option><option>Rechazado</option></select></div>
-                <div><label>Observaciones</label><textarea id="recargo_observaciones" class="form-control" rows="3"></textarea></div>
+                <input type="hidden" id="recargoId">
+                <input type="hidden" id="recargo_personal_id">
+                
+                <div class="form-row">
+                    <div><label>Fecha *</label><input type="date" id="recargo_fecha" class="form-control" required></div>
+                    <div><label>Hora *</label><input type="time" id="recargo_hora" class="form-control" required></div>
+                </div>
+                
+                <div><label>Tipo de Recargo *</label>
+                    <input type="text" id="recargo_tipo" class="form-control" list="tiposRecargoList" placeholder="Buscar..." autocomplete="off" required>
+                    <datalist id="tiposRecargoList"></datalist>
+                </div>
+                
+                <div><label>Sección de Guardia *</label>
+                    <select id="recargo_seccion" class="form-control" required>
+                        <option value="">Seleccionar sección...</option>
+                    </select>
+                </div>
+                
+                <div><label>Personal *</label>
+                    <input type="text" id="recargo_personal_buscar" class="form-control" list="personalList" placeholder="Buscar por legajo o nombre..." autocomplete="off" required disabled>
+                    <datalist id="personalList"></datalist>
+                </div>
+                
+                <div><label>Observaciones</label>
+                    <textarea id="recargo_observaciones" class="form-control" rows="3"></textarea>
+                </div>
             </form>
         </div>
         <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveRecargo()">Guardar</button></div>
     </div></div>
     
     <div id="toast-container" class="toast-container"></div>
-    <datalist id="tiposRecargoList"></datalist><datalist id="oficinasList"></datalist><datalist id="personalList"></datalist>
-    <script src="main.js"></script>
+    
     <script>
-        let datosOriginales=[],datosFiltrados=[];
-        function getEstadoBadge(e){const c={'Pendiente':'badge-pendiente','Resuelto':'badge-resuelto','Rechazado':'badge-rechazado'},i={'Pendiente':'fa-hourglass-half','Resuelto':'fa-check-circle','Rechazado':'fa-times-circle'};return `<span class="badge-estado ${c[e]||'badge-pendiente'}"><i class="fas ${i[e]||'fa-hourglass-half'}"></i> ${e||'Pendiente'}</span>`;}
-        function renderRecargosTable(d){const t=document.getElementById('recargosTableBody');if(!t)return;if(!d||d.length===0){t.innerHTML='<tr><td colspan="7" class="text-center">No hay registros</td></tr>';return;}const puedeEditar=window.canEdit&&window.canEdit('recargos'),puedeEliminar=window.canDelete&&window.canDelete('recargos');t.innerHTML=d.map(i=>`<tr><td>${escapeHtml(i.fecha)}</td><td>${escapeHtml(i.hora)}</td><td>${escapeHtml(i.tipo_recargo||'-')}</td><td>${escapeHtml(i.oficina||'-')}</td><td>${escapeHtml(i.apellido?`${i.apellido}, ${i.nombre}`:'-')}</td><td>${getEstadoBadge(i.estado)}</td><td>${puedeEditar?`<button class="btn-accion btn-ver" onclick="editRecargo(${i.id})"><i class="fas fa-edit"></i></button>`:''}${puedeEliminar?`<button class="btn-accion btn-eliminar" onclick="deleteRecargo(${i.id})"><i class="fas fa-trash"></i></button>`:''}</td></tr>`).join('');}
-        async function cargarTiposSelect(){try{const t=await apiRequest('catalogos&tipo=tipos_recargo');const s=document.getElementById('filtro_tipo');if(s&&t)s.innerHTML='<option value="">Todos</option>'+t.map(t=>`<option value="${t.valor}">${t.valor}</option>`).join('');}catch(e){}}
-        function aplicarFiltros(){let f=[...datosOriginales];const fd=document.getElementById('filtro_fecha_desde')?.value;if(fd)f=f.filter(r=>r.fecha>=fd);const fh=document.getElementById('filtro_fecha_hasta')?.value;if(fh)f=f.filter(r=>r.fecha<=fh);const t=document.getElementById('filtro_tipo')?.value;if(t&&t!=='')f=f.filter(r=>r.tipo_recargo===t);const e=document.getElementById('filtro_estado')?.value;if(e&&e!=='')f=f.filter(r=>r.estado===e);const p=document.getElementById('filtro_personal')?.value.trim().toLowerCase();if(p)f=f.filter(r=>(r.apellido||'').toLowerCase().includes(p)||(r.nombre||'').toLowerCase().includes(p));const d=document.getElementById('filtro_dependencia')?.value;if(d)f=f.filter(r=>r.dependencia_id==d);datosFiltrados=f;renderRecargosTable(f);showToast(`Encontrados ${f.length} recargos`,f.length>0?'success':'warning');}
-        function limpiarFiltros(){['filtro_fecha_desde','filtro_fecha_hasta','filtro_tipo','filtro_estado','filtro_personal','filtro_dependencia'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderRecargosTable(datosOriginales);datosFiltrados=[...datosOriginales];showToast('Filtros limpiados','info');}
-        function exportarFiltradosCSV(){const d=datosFiltrados.length>0?datosFiltrados:datosOriginales;if(!d||d.length===0){showToast('No hay datos','warning');return;}const headers=['Fecha','Hora','Tipo','Oficina','Personal','Estado','Observaciones'];const csv=[headers.join(',')];d.forEach(i=>{csv.push([`"${i.fecha||''}"`,`"${i.hora||''}"`,`"${i.tipo_recargo||''}"`,`"${i.oficina||''}"`,`"${i.apellido?`${i.apellido}, ${i.nombre}`:''}"`,`"${i.estado||'Pendiente'}"`,`"${(i.observaciones||'').substring(0,100)}"`].join(','));});const blob=new Blob([csv.join('\n')],{type:'text/csv'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`recargos_${new Date().toISOString().split('T')[0]}.csv`;link.click();URL.revokeObjectURL(link.href);showToast('Exportación completada','success');}
-        async function generarPDFRecargos(){const t=document.getElementById('recargosTable');if(!t){showToast('No hay datos','warning');return;}showToast('Generando PDF...','info');try{const{jsPDF}=window.jspdf;const pdf=new jsPDF('landscape','mm','a4');pdf.setFontSize(18);pdf.text('Reporte de Recargos',14,20);pdf.setFontSize(10);pdf.text(`Fecha: ${new Date().toLocaleString()}`,14,30);const canvas=await html2canvas(t,{scale:2,backgroundColor:'#1c2128'});const imgData=canvas.toDataURL('image/png');const pdfWidth=pdf.internal.pageSize.getWidth()-20;const pdfHeight=(canvas.height*pdfWidth)/canvas.width;pdf.addImage(imgData,'PNG',10,40,pdfWidth,pdfHeight);pdf.save(`reporte_recargos_${new Date().toISOString().split('T')[0]}.pdf`);showToast('PDF generado','success');}catch(e){showToast('Error','error');}}
-        const originalLoadRecargos=window.loadRecargos;window.loadRecargos=async function(){try{const data=await apiRequest('recargos');datosOriginales=data;datosFiltrados=[...data];renderRecargosTable(data);await cargarTiposSelect();showToast('Recargos cargados','success');}catch(e){showToast('Error','error');}};
-        window.generarPDFRecargos=generarPDFRecargos;window.aplicarFiltros=aplicarFiltros;window.limpiarFiltros=limpiarFiltros;window.exportarFiltradosCSV=exportarFiltradosCSV;
+        const API_URL = 'backend/api.php';
+        let recargosData = [];
+        let seccionesData = [];
+        let personalData = [];
+        let activeColumns = ['fecha', 'hora', 'tipo_recargo', 'seccion', 'personal'];
+        
+        const columnLabels = {
+            'fecha': 'Fecha', 'hora': 'Hora', 'tipo_recargo': 'Tipo',
+            'seccion': 'Sección Guardia', 'personal': 'Personal', 'observaciones': 'Observaciones'
+        };
+        
+        const allColumns = ['fecha', 'hora', 'tipo_recargo', 'seccion', 'personal', 'observaciones'];
+        
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        
+        function showToast(msg, type) {
+            let c = document.getElementById('toast-container');
+            if (!c) { c = document.createElement('div'); c.id = 'toast-container'; c.className = 'toast-container'; document.body.appendChild(c); }
+            const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerHTML = `<div>${msg}</div>`;
+            c.appendChild(t); setTimeout(() => t.remove(), 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function renderTable() {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('recargosTableBody');
+            if (!thead || !tbody) return;
+            
+            thead.innerHTML = '<tr>' + activeColumns.map(col => `
+                <th class="draggable" data-col="${col}" draggable="true">
+                    <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> 
+                    ${columnLabels[col] || col}
+                </th>
+            `).join('') + '<th>Acciones</th></tr>';
+            
+            initHeaderDragDrop();
+            
+            if (!recargosData || recargosData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay registros</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = recargosData.map(item => {
+                let row = '<tr>';
+                for (const col of activeColumns) {
+                    if (col === 'personal') {
+                        row += '<td>' + escapeHtml(item.apellido ? `${item.apellido}, ${item.nombre}` : '-') + '</td>';
+                    } else if (col === 'seccion') {
+                        row += '<td>' + escapeHtml(item.seccion_nombre || '-') + '</td>';
+                    } else {
+                        row += '<td>' + escapeHtml(item[col] || '-') + '</td>';
+                    }
+                }
+                row += `<td>
+                    <button class="btn-accion btn-editar" onclick="editRecargo(${item.id})"><i class="fas fa-edit"></i> Editar</button>
+                    <button class="btn-accion btn-eliminar" onclick="deleteRecargo(${item.id})"><i class="fas fa-trash"></i> Eliminar</button>
+                </td></tr>`;
+                return row;
+            }).join('');
+        }
+        
+        function initHeaderDragDrop() {
+            const headers = document.querySelectorAll('#tableHeader th.draggable');
+            let dragSrc = null;
+            headers.forEach(header => {
+                header.addEventListener('dragstart', (e) => { dragSrc = header; e.dataTransfer.setData('text/plain', header.getAttribute('data-col')); header.style.opacity = '0.5'; });
+                header.addEventListener('dragend', (e) => { if (dragSrc) dragSrc.style.opacity = ''; dragSrc = null; headers.forEach(h => h.classList.remove('drag-over')); });
+                header.addEventListener('dragover', (e) => { e.preventDefault(); header.classList.add('drag-over'); });
+                header.addEventListener('dragleave', (e) => { header.classList.remove('drag-over'); });
+                header.addEventListener('drop', (e) => {
+                    e.preventDefault(); header.classList.remove('drag-over');
+                    const fromCol = e.dataTransfer.getData('text/plain');
+                    const toCol = header.getAttribute('data-col');
+                    if (fromCol !== toCol) {
+                        const fromIndex = activeColumns.indexOf(fromCol);
+                        const toIndex = activeColumns.indexOf(toCol);
+                        if (fromIndex !== -1 && toIndex !== -1) {
+                            const moved = activeColumns.splice(fromIndex, 1)[0];
+                            activeColumns.splice(toIndex, 0, moved);
+                            renderTable(); saveColumnOrder();
+                        }
+                    }
+                });
+            });
+        }
+        
+        async function saveColumnOrder() {
+            try { const token = getToken(); await fetch(`${API_URL}?endpoint=table_config&tabla=recargos`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ columnas: activeColumns }) }); } catch(e) { console.error(e); }
+        }
+        
+        function openConfigModal() { document.getElementById('configPanel').style.display = 'block'; renderOrderList(); }
+        
+        function renderOrderList() {
+            const container = document.getElementById('columnOrderList');
+            if (!container) return;
+            container.innerHTML = '';
+            const orderedColumns = [...activeColumns];
+            allColumns.forEach(col => { if (!orderedColumns.includes(col)) orderedColumns.push(col); });
+            orderedColumns.forEach(col => {
+                const isVisible = activeColumns.includes(col);
+                const item = document.createElement('div');
+                item.className = 'column-order-item';
+                item.setAttribute('data-col', col);
+                item.setAttribute('draggable', 'true');
+                item.innerHTML = `<i class="fas fa-grip-vertical drag-icon"></i><span class="col-name">${columnLabels[col] || col}</span><input type="checkbox" class="col-toggle" ${isVisible ? 'checked' : ''}>`;
+                item.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', col); item.classList.add('dragging'); });
+                item.addEventListener('dragend', (e) => { item.classList.remove('dragging'); });
+                item.addEventListener('dragover', (e) => { e.preventDefault(); });
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const fromCol = e.dataTransfer.getData('text/plain');
+                    const toCol = col;
+                    if (fromCol !== toCol) {
+                        const fromIndex = orderedColumns.indexOf(fromCol);
+                        const toIndex = orderedColumns.indexOf(toCol);
+                        if (fromIndex !== -1 && toIndex !== -1) {
+                            const moved = orderedColumns.splice(fromIndex, 1)[0];
+                            orderedColumns.splice(toIndex, 0, moved);
+                            activeColumns = orderedColumns.filter(c => activeColumns.includes(c));
+                            renderOrderList();
+                        }
+                    }
+                });
+                const checkbox = item.querySelector('.col-toggle');
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) { if (!activeColumns.includes(col)) activeColumns.push(col); }
+                    else { const idx = activeColumns.indexOf(col); if (idx !== -1) activeColumns.splice(idx, 1); }
+                    renderOrderList();
+                });
+                container.appendChild(item);
+            });
+        }
+        
+        async function loadCatalogos() {
+            try {
+                const token = getToken();
+                const tiposResp = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipos_recargo`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const tipos = await tiposResp.json();
+                const tiposList = document.getElementById('tiposRecargoList');
+                if (tiposList && Array.isArray(tipos)) tiposList.innerHTML = tipos.map(t => `<option value="${escapeHtml(t.valor)}">`).join('');
+                
+                const filtroTipo = document.getElementById('filtro_tipo');
+                if (filtroTipo && Array.isArray(tipos)) filtroTipo.innerHTML = '<option value="">Todos</option>' + tipos.map(t => `<option value="${escapeHtml(t.valor)}">${escapeHtml(t.valor)}</option>`).join('');
+            } catch(e) { console.error(e); }
+        }
+        
+        async function loadSecciones() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=secciones_guardia`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                console.log('Secciones cargadas:', data);
+                if (Array.isArray(data)) {
+                    seccionesData = data;
+                    const selectSeccion = document.getElementById('recargo_seccion');
+                    const filtroSeccion = document.getElementById('filtro_seccion');
+                    
+                    if (selectSeccion) {
+                        selectSeccion.innerHTML = '<option value="">Seleccionar sección...</option>' + 
+                            data.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+                    }
+                    if (filtroSeccion) {
+                        filtroSeccion.innerHTML = '<option value="">Todas</option>' + 
+                            data.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+                    }
+                }
+            } catch(e) { console.error('Error cargando secciones:', e); }
+        }
+        
+        async function loadPersonalList(seccionId = null) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=personal`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                console.log('Personal cargado:', data.length);
+                if (Array.isArray(data)) {
+                    personalData = data;
+                    actualizarPersonalList(seccionId);
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        function actualizarPersonalList(seccionId) {
+            const personalList = document.getElementById('personalList');
+            const searchInput = document.getElementById('recargo_personal_buscar');
+            
+            if (!personalList) return;
+            
+            let personalFiltrado = personalData;
+            if (seccionId && seccionId !== '') {
+                personalFiltrado = personalData.filter(p => p.seccion_guardia_id == seccionId);
+                console.log('Personal filtrado por seccion', seccionId, personalFiltrado.length);
+            }
+            
+            if (personalFiltrado.length === 0) {
+                personalList.innerHTML = '<option value="">No hay agentes en esta sección</option>';
+                if (searchInput) searchInput.disabled = true;
+            } else {
+                personalList.innerHTML = personalFiltrado.map(p => 
+                    `<option value="${p.id}|${p.legajo} - ${p.apellido}, ${p.nombre} (${p.jerarquia || ''})">`
+                ).join('');
+                if (searchInput) searchInput.disabled = false;
+            }
+        }
+        
+        async function loadRecargos() {
+            const tbody = document.getElementById('recargosTableBody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Cargando...</td></tr>';
+            try {
+                const token = getToken();
+                if (!token) { window.location.href = 'index.html'; return; }
+                const response = await fetch(`${API_URL}?endpoint=recargos`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                console.log('Recargos cargados:', data);
+                if (Array.isArray(data)) { 
+                    recargosData = data; 
+                    renderTable(); 
+                    showToast(`✅ ${data.length} recargos cargados`, 'success');
+                } else { 
+                    recargosData = []; 
+                    renderTable(); 
+                    showToast('No hay datos', 'warning'); 
+                }
+            } catch(e) { 
+                console.error('Error:', e);
+                renderTable(); 
+                showToast('Error cargando recargos', 'error'); 
+            }
+        }
+        
+        function aplicarFiltros() {
+            let filtrados = [...recargosData];
+            const fd = document.getElementById('filtro_fecha_desde')?.value; if (fd) filtrados = filtrados.filter(r => r.fecha >= fd);
+            const fh = document.getElementById('filtro_fecha_hasta')?.value; if (fh) filtrados = filtrados.filter(r => r.fecha <= fh);
+            const tipo = document.getElementById('filtro_tipo')?.value; if (tipo && tipo !== '') filtrados = filtrados.filter(r => r.tipo_recargo === tipo);
+            const seccion = document.getElementById('filtro_seccion')?.value; if (seccion && seccion !== '') filtrados = filtrados.filter(r => r.seccion_guardia_id == seccion);
+            const personal = document.getElementById('filtro_personal')?.value.toLowerCase(); if (personal) filtrados = filtrados.filter(r => (r.apellido || '').toLowerCase().includes(personal) || (r.nombre || '').toLowerCase().includes(personal) || (r.legajo || '').toLowerCase().includes(personal));
+            recargosData = filtrados; renderTable();
+            showToast(`Encontrados ${filtrados.length} recargos`, 'info');
+        }
+        
+        function limpiarFiltros() {
+            document.getElementById('filtro_fecha_desde').value = '';
+            document.getElementById('filtro_fecha_hasta').value = '';
+            document.getElementById('filtro_tipo').value = '';
+            document.getElementById('filtro_seccion').value = '';
+            document.getElementById('filtro_personal').value = '';
+            loadRecargos();
+        }
+        
+        function exportarCSV() {
+            if (!recargosData.length) { showToast('No hay datos', 'warning'); return; }
+            const headers = activeColumns.map(c => columnLabels[c] || c);
+            const csv = [headers.join(',')];
+            recargosData.forEach(item => { 
+                csv.push(activeColumns.map(col => `"${item[col] || ''}"`).join(',')); 
+            });
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const link = document.createElement('a'); 
+            link.href = URL.createObjectURL(blob); 
+            link.download = `recargos_${new Date().toISOString().split('T')[0]}.csv`; 
+            link.click();
+            showToast('Exportación completada', 'success');
+        }
+        
+        function openRecargoModal(data = null) {
+            const modal = document.getElementById('recargoModal');
+            if (data) {
+                document.getElementById('recargoId').value = data.id;
+                document.getElementById('recargo_fecha').value = data.fecha;
+                document.getElementById('recargo_hora').value = data.hora;
+                document.getElementById('recargo_tipo').value = data.tipo_recargo || '';
+                document.getElementById('recargo_seccion').value = data.seccion_guardia_id || '';
+                document.getElementById('recargo_personal_buscar').value = data.personal_id ? `${data.personal_id}|${data.legajo} - ${data.apellido}, ${data.nombre}` : '';
+                document.getElementById('recargo_personal_id').value = data.personal_id || '';
+                document.getElementById('recargo_observaciones').value = data.observaciones || '';
+                document.getElementById('modalTitle').textContent = 'Editar Recargo';
+                if (data.seccion_guardia_id) {
+                    actualizarPersonalList(data.seccion_guardia_id);
+                }
+            } else {
+                document.getElementById('recargoForm').reset();
+                document.getElementById('recargoId').value = '';
+                document.getElementById('recargo_fecha').value = new Date().toISOString().split('T')[0];
+                document.getElementById('recargo_hora').value = new Date().toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'});
+                document.getElementById('modalTitle').textContent = 'Nuevo Recargo';
+                document.getElementById('recargo_personal_buscar').disabled = true;
+            }
+            modal.style.display = 'flex';
+        }
+        
+        async function saveRecargo() {
+            const id = document.getElementById('recargoId').value;
+            const personalInput = document.getElementById('recargo_personal_buscar').value;
+            let personalId = document.getElementById('recargo_personal_id').value;
+            
+            if (!personalId && personalInput) {
+                const parts = personalInput.split('|');
+                if (parts.length > 0 && !isNaN(parseInt(parts[0]))) {
+                    personalId = parts[0];
+                }
+            }
+            
+            const data = {
+                fecha: document.getElementById('recargo_fecha').value,
+                hora: document.getElementById('recargo_hora').value,
+                tipo_recargo: document.getElementById('recargo_tipo').value,
+                seccion_guardia_id: document.getElementById('recargo_seccion').value,
+                personal_id: personalId,
+                observaciones: document.getElementById('recargo_observaciones').value
+            };
+            
+            if (!data.fecha || !data.hora || !data.tipo_recargo || !data.seccion_guardia_id || !data.personal_id) {
+                showToast('Complete todos los campos requeridos', 'warning'); 
+                return;
+            }
+            
+            try {
+                const token = getToken();
+                const url = id ? `${API_URL}?endpoint=recargos&id=${id}` : `${API_URL}?endpoint=recargos`;
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(url, { 
+                    method: method, 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify(data) 
+                });
+                const result = await response.json();
+                if (result.success) { 
+                    showToast(`Recargo ${id ? 'actualizado' : 'creado'} correctamente`, 'success'); 
+                    closeModal(); 
+                    loadRecargos(); 
+                } else { 
+                    showToast('Error al guardar', 'error'); 
+                }
+            } catch(e) { 
+                showToast('Error de conexión', 'error'); 
+            }
+        }
+        
+        async function editRecargo(id) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=recargos&id=${id}`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const data = await response.json();
+                if (data && data.id) {
+                    openRecargoModal(data);
+                } else {
+                    showToast('No se encontraron datos', 'error');
+                }
+            } catch(e) { 
+                showToast('Error cargando datos', 'error'); 
+            }
+        }
+        
+        async function deleteRecargo(id) {
+            if (confirm('¿Eliminar este recargo?')) {
+                try { 
+                    const token = getToken(); 
+                    await fetch(`${API_URL}?endpoint=recargos&id=${id}`, { 
+                        method: 'DELETE', 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    }); 
+                    showToast('Eliminado', 'success'); 
+                    loadRecargos(); 
+                } catch(e) { 
+                    showToast('Error', 'error'); 
+                }
+            }
+        }
+        
+        function initPersonalSearchSync() {
+            const searchInput = document.getElementById('recargo_personal_buscar');
+            const hiddenInput = document.getElementById('recargo_personal_id');
+            const seccionSelect = document.getElementById('recargo_seccion');
+            
+            if (searchInput && hiddenInput) {
+                searchInput.addEventListener('change', function() {
+                    const value = this.value;
+                    const parts = value.split('|');
+                    if (parts.length > 0 && !isNaN(parseInt(parts[0]))) {
+                        hiddenInput.value = parts[0];
+                    } else {
+                        hiddenInput.value = '';
+                    }
+                });
+            }
+            
+            if (seccionSelect) {
+                seccionSelect.addEventListener('change', function() {
+                    const seccionId = this.value;
+                    if (seccionId) {
+                        actualizarPersonalList(seccionId);
+                        document.getElementById('recargo_personal_buscar').disabled = false;
+                        document.getElementById('recargo_personal_buscar').value = '';
+                        document.getElementById('recargo_personal_id').value = '';
+                    } else {
+                        document.getElementById('recargo_personal_buscar').disabled = true;
+                        document.getElementById('recargo_personal_buscar').value = '';
+                        document.getElementById('recargo_personal_id').value = '';
+                        const personalList = document.getElementById('personalList');
+                        if (personalList) personalList.innerHTML = '';
+                    }
+                });
+            }
+        }
+        
+        function closeModal() { document.getElementById('recargoModal').style.display = 'none'; }
+        
+        function checkAuth() {
+            const user = localStorage.getItem('current_user');
+            if (!user) { 
+                window.location.href = 'index.html'; 
+                return false; 
+            }
+            const userData = JSON.parse(user);
+            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            return true;
+        }
+        
+        async function loadColumnConfig() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=table_config&tabla=recargos`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const config = await response.json();
+                if (config && Array.isArray(config) && config.length > 0) {
+                    activeColumns = config;
+                }
+                renderOrderList();
+            } catch(e) { console.error(e); }
+        }
+        
+        function resetColumns() {
+            activeColumns = ['fecha', 'hora', 'tipo_recargo', 'seccion', 'personal'];
+            renderOrderList();
+            renderTable();
+            saveColumnConfig();
+        }
+        
+        async function saveColumnConfig() {
+            try {
+                const token = getToken();
+                await fetch(`${API_URL}?endpoint=table_config&tabla=recargos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ columnas: activeColumns })
+                });
+                showToast('Configuración guardada', 'success');
+                document.getElementById('configPanel').style.display = 'none';
+                renderTable();
+            } catch(e) { showToast('Error', 'error'); }
+        }
+        
+        document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => { openConfigModal(); loadColumnConfig(); });
+        document.getElementById('btnCerrarConfig')?.addEventListener('click', () => { document.getElementById('configPanel').style.display = 'none'; });
+        document.getElementById('btnGuardarConfig')?.addEventListener('click', saveColumnConfig);
+        document.getElementById('btnResetColumns')?.addEventListener('click', resetColumns);
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
+        document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+        
+        document.addEventListener('DOMContentLoaded', () => { 
+            if (checkAuth()) { 
+                loadCatalogos(); 
+                loadSecciones(); 
+                loadPersonalList(); 
+                loadRecargos(); 
+                initPersonalSearchSync();
+            } 
+        });
+        
+        window.openRecargoModal = openRecargoModal; 
+        window.saveRecargo = saveRecargo; 
+        window.editRecargo = editRecargo;
+        window.deleteRecargo = deleteRecargo; 
+        window.closeModal = closeModal; 
+        window.aplicarFiltros = aplicarFiltros;
+        window.limpiarFiltros = limpiarFiltros; 
+        window.exportarCSV = exportarCSV;
     </script>
+           <script src="theme.js"></script>
+
 </body>
 </html>
