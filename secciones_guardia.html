@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secciones de Guardia - Sistema Policial</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .secciones-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .seccion-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .seccion-card:hover {
+            border-color: var(--accent-primary);
+        }
+        .seccion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: var(--bg-surface);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+        .seccion-header:hover {
+            background: var(--bg-card);
+        }
+        .seccion-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .seccion-nombre {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .seccion-badge {
+            background: var(--accent-primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .seccion-descripcion {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        .seccion-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .personal-list {
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .personal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-surface);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .personal-item:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-primary);
+        }
+        .personal-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .personal-legajo {
+            font-family: monospace;
+            background: var(--bg-primary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+        .personal-nombre {
+            font-weight: 500;
+        }
+        .personal-jerarquia {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+        .personal-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .empty-personal {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+        .add-personal-form {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-surface);
+            flex-wrap: wrap;
+        }
+        .add-personal-form select {
+            flex: 2;
+            min-width: 200px;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+        }
+        .seccion-content {
+            display: none;
+        }
+        .seccion-content.open {
+            display: block;
+        }
+        .add-section-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            background: var(--bg-surface);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+        .add-section-form input, .add-section-form textarea {
+            flex: 1;
+            min-width: 200px;
+        }
+        .btn-accion {
+            padding: 0.25rem 0.5rem;
+            margin: 0 0.25rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-editar {
+            background-color: rgba(29,78,216,0.2);
+            color: #1d4ed8;
+        }
+        .btn-editar:hover {
+            background-color: #1d4ed8;
+            color: white;
+        }
+        .btn-eliminar {
+            background-color: rgba(220,38,38,0.2);
+            color: #dc2626;
+        }
+        .btn-eliminar:hover {
+            background-color: #dc2626;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .seccion-header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+            .seccion-header-left { flex-direction: column; align-items: stretch; }
+            .add-personal-form { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <nav class="navbar">
+            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="personal.html" class="nav-link"><i class="fas fa-users"></i> Personal</a></li>
+                <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
+                <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
+                <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
+                <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="secciones_guardia.html" class="nav-link active"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
+                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+            </ul>
+            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <div class="card-header">
+            <h1><i class="fas fa-layer-group"></i> Secciones de Guardia</h1>
+            <button id="btnVolver" class="btn btn-secondary" onclick="window.location.href='personal.html'">
+                <i class="fas fa-arrow-left"></i> Volver a Personal
+            </button>
+        </div>
+        
+        <div class="add-section-form">
+            <input type="text" id="nuevaSeccionNombre" class="form-control" placeholder="Nombre de la sección (ej: 4° Grupo)">
+            <textarea id="nuevaSeccionDescripcion" class="form-control" placeholder="Descripción (opcional)" rows="1"></textarea>
+            <button class="btn btn-primary" onclick="agregarSeccion()"><i class="fas fa-plus"></i> Agregar Sección</button>
+        </div>
+        
+        <div id="seccionesContainer" class="secciones-container">
+            <div class="text-center">Cargando secciones...</div>
+        </div>
+    </div>
+    
+    <!-- Modal Editar Sección -->
+    <div id="editSeccionModal" class="modal">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header">
+                <h3>Editar Sección</h3>
+                <span class="close-modal" onclick="cerrarModalEditar()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editSeccionId">
+                <div><label>Nombre</label><input type="text" id="editSeccionNombre" class="form-control"></div>
+                <div><label>Descripción</label><textarea id="editSeccionDescripcion" class="form-control" rows="2"></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModalEditar()">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarEdicionSeccion()">Guardar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast-container" class="toast-container"></div>
+    
+    <script>
+        const API_URL = 'backend/api.php';
+        let seccionesData = [];
+        let personalData = [];
+        let expandedSections = {};
+        
+        function getToken() { return localStorage.getItem('jwt_token'); }
+        
+        function showToast(msg, type) {
+            let c = document.getElementById('toast-container');
+            if (!c) { c = document.createElement('div'); c.id = 'toast-container'; c.className = 'toast-container'; document.body.appendChild(c); }
+            const t = document.createElement('div'); t.className = `toast toast-${type}`; t.innerHTML = `<div>${msg}</div>`;
+            c.appendChild(t); setTimeout(() => t.remove(), 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        async function loadPersonal() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=personal`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    personalData = data;
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        async function loadSecciones() {
+            const container = document.getElementById('seccionesContainer');
+            container.innerHTML = '<div class="text-center">Cargando...</div>';
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=secciones_guardia`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    seccionesData = data;
+                    renderSecciones();
+                }
+            } catch(e) {
+                container.innerHTML = '<div class="text-center error">Error cargando secciones</div>';
+                console.error(e);
+            }
+        }
+        
+        function renderSecciones() {
+            const container = document.getElementById('seccionesContainer');
+            if (!seccionesData || seccionesData.length === 0) {
+                container.innerHTML = '<div class="text-center">No hay secciones de guardia creadas</div>';
+                return;
+            }
+            
+            container.innerHTML = seccionesData.map(seccion => {
+                const personalEnSeccion = personalData.filter(p => p.seccion_guardia_id == seccion.id);
+                const isExpanded = expandedSections[seccion.id] !== false;
+                
+                return `
+                    <div class="seccion-card" data-seccion-id="${seccion.id}">
+                        <div class="seccion-header" onclick="toggleSeccion(${seccion.id})">
+                            <div class="seccion-header-left">
+                                <i class="fas fa-chevron-${isExpanded ? 'down' : 'right'}"></i>
+                                <span class="seccion-nombre"><strong>${escapeHtml(seccion.nombre)}</strong></span>
+                                <span class="seccion-badge">${personalEnSeccion.length} agentes</span>
+                                ${seccion.descripcion ? `<span class="seccion-descripcion">${escapeHtml(seccion.descripcion)}</span>` : ''}
+                            </div>
+                            <div class="seccion-actions" onclick="event.stopPropagation()">
+                                <button class="btn-accion btn-editar" onclick="editarSeccion(${seccion.id}, '${escapeHtml(seccion.nombre)}', '${escapeHtml(seccion.descripcion || '')}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-accion btn-eliminar" onclick="eliminarSeccion(${seccion.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="seccion-content ${isExpanded ? 'open' : ''}" id="seccionContent${seccion.id}">
+                            <div class="personal-list" id="personalList${seccion.id}">
+                                ${renderPersonalList(seccion.id, personalEnSeccion)}
+                            </div>
+                            <div class="add-personal-form">
+                                <select id="selectPersonal${seccion.id}" class="form-control">
+                                    <option value="">Seleccionar agente...</option>
+                                    ${personalData.filter(p => p.seccion_guardia_id != seccion.id).map(p => `
+                                        <option value="${p.id}">${escapeHtml(p.legajo)} - ${escapeHtml(p.apellido)}, ${escapeHtml(p.nombre)} (${escapeHtml(p.jerarquia || 'Sin jerarquía')})</option>
+                                    `).join('')}
+                                </select>
+                                <button class="btn btn-primary btn-sm" onclick="asignarPersonal(${seccion.id})">
+                                    <i class="fas fa-user-plus"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderPersonalList(seccionId, personalEnSeccion) {
+            if (!personalEnSeccion || personalEnSeccion.length === 0) {
+                return '<div class="empty-personal">No hay personal asignado a esta sección</div>';
+            }
+            
+            return personalEnSeccion.map(p => `
+                <div class="personal-item" data-personal-id="${p.id}" data-seccion-id="${seccionId}">
+                    <div class="personal-info">
+                        <span class="personal-legajo">${escapeHtml(p.legajo)}</span>
+                        <span class="personal-nombre"><strong>${escapeHtml(p.apellido)}, ${escapeHtml(p.nombre)}</strong></span>
+                        <span class="personal-jerarquia">${escapeHtml(p.jerarquia || '-')}</span>
+                    </div>
+                    <div class="personal-actions">
+                        <button class="btn-accion btn-eliminar" onclick="quitarPersonal(${p.id}, ${seccionId})" title="Quitar de sección">
+                            <i class="fas fa-user-minus"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function toggleSeccion(seccionId) {
+            const content = document.getElementById(`seccionContent${seccionId}`);
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.fa-chevron-right, .fa-chevron-down');
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.className = 'fas fa-chevron-right';
+                expandedSections[seccionId] = false;
+            } else {
+                content.classList.add('open');
+                icon.className = 'fas fa-chevron-down';
+                expandedSections[seccionId] = true;
+            }
+        }
+        
+        async function asignarPersonal(seccionId) {
+            const select = document.getElementById(`selectPersonal${seccionId}`);
+            const personalId = select.value;
+            
+            if (!personalId) {
+                showToast('Seleccione un agente', 'warning');
+                return;
+            }
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=personal&id=${personalId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ seccion_guardia_id: seccionId })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Agente asignado correctamente', 'success');
+                    await loadPersonal();
+                    renderSecciones();
+                } else {
+                    showToast('Error al asignar', 'error');
+                }
+            } catch(e) {
+                console.error(e);
+                showToast('Error de conexión', 'error');
+            }
+        }
+        
+        async function quitarPersonal(personalId, seccionId) {
+            if (!confirm('¿Quitar este agente de la sección?')) return;
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=personal&id=${personalId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ seccion_guardia_id: null })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Agente removido de la sección', 'success');
+                    await loadPersonal();
+                    renderSecciones();
+                } else {
+                    showToast('Error al remover', 'error');
+                }
+            } catch(e) {
+                console.error(e);
+                showToast('Error de conexión', 'error');
+            }
+        }
+        
+        async function agregarSeccion() {
+            const nombre = document.getElementById('nuevaSeccionNombre').value.trim();
+            const descripcion = document.getElementById('nuevaSeccionDescripcion').value.trim();
+            
+            if (!nombre) {
+                showToast('Ingrese un nombre para la sección', 'warning');
+                return;
+            }
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=secciones_guardia`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ nombre, descripcion })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Sección agregada correctamente', 'success');
+                    document.getElementById('nuevaSeccionNombre').value = '';
+                    document.getElementById('nuevaSeccionDescripcion').value = '';
+                    await loadPersonal();
+                    await loadSecciones();
+                } else {
+                    showToast(result.error || 'Error al agregar', 'error');
+                }
+            } catch(e) { 
+                console.error(e);
+                showToast('Error de conexión', 'error'); 
+            }
+        }
+        
+        function editarSeccion(id, nombre, descripcion) {
+            document.getElementById('editSeccionId').value = id;
+            document.getElementById('editSeccionNombre').value = nombre;
+            document.getElementById('editSeccionDescripcion').value = descripcion;
+            document.getElementById('editSeccionModal').style.display = 'flex';
+        }
+        
+        async function guardarEdicionSeccion() {
+            const id = document.getElementById('editSeccionId').value;
+            const nombre = document.getElementById('editSeccionNombre').value.trim();
+            const descripcion = document.getElementById('editSeccionDescripcion').value.trim();
+            
+            if (!nombre) {
+                showToast('El nombre no puede estar vacío', 'warning');
+                return;
+            }
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=secciones_guardia&id=${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ nombre, descripcion })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Sección actualizada', 'success');
+                    cerrarModalEditar();
+                    await loadSecciones();
+                } else {
+                    showToast(result.error || 'Error al actualizar', 'error');
+                }
+            } catch(e) { 
+                console.error(e);
+                showToast('Error de conexión', 'error'); 
+            }
+        }
+        
+        async function eliminarSeccion(id) {
+            const personalAsignado = personalData.filter(p => p.seccion_guardia_id == id).length;
+            let mensaje = '¿Eliminar esta sección?';
+            if (personalAsignado > 0) {
+                mensaje = `Esta sección tiene ${personalAsignado} agentes asignados. ¿Eliminar de todas formas? Se les quitará la asignación.`;
+            }
+            if (!confirm(mensaje)) return;
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=secciones_guardia&id=${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Sección eliminada', 'success');
+                    await loadPersonal();
+                    await loadSecciones();
+                } else {
+                    showToast(result.error || 'Error al eliminar', 'error');
+                }
+            } catch(e) { 
+                console.error(e);
+                showToast('Error de conexión', 'error'); 
+            }
+        }
+        
+        function cerrarModalEditar() {
+            document.getElementById('editSeccionModal').style.display = 'none';
+        }
+        
+        function checkAuth() {
+            const user = localStorage.getItem('current_user');
+            if (!user) { window.location.href = 'index.html'; return false; }
+            const userData = JSON.parse(user);
+            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            return true;
+        }
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
+        document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
+        window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) cerrarModalEditar(); });
+        
+        document.addEventListener('DOMContentLoaded', async () => { 
+            if (checkAuth()) { 
+                await loadPersonal(); 
+                await loadSecciones(); 
+            } 
+        });
+        
+        window.toggleSeccion = toggleSeccion;
+        window.agregarSeccion = agregarSeccion;
+        window.editarSeccion = editarSeccion;
+        window.guardarEdicionSeccion = guardarEdicionSeccion;
+        window.eliminarSeccion = eliminarSeccion;
+        window.asignarPersonal = asignarPersonal;
+        window.quitarPersonal = quitarPersonal;
+        window.cerrarModalEditar = cerrarModalEditar;
+    </script>
+
+       <script src="theme.js"></script>
+</body>
+</html>

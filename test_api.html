@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API - Sistema Policial</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #0d1117; color: #e6edf3; }
+        .success { color: #16a34a; }
+        .error { color: #dc2626; }
+        .warning { color: #d97706; }
+        pre { background: #161b22; padding: 10px; border-radius: 8px; overflow-x: auto; }
+        button { background: #1d4ed8; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin: 5px; }
+        button:hover { background: #1e40af; }
+        .login-box { background: #1c2128; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        input { background: #161b22; border: 1px solid #30363d; padding: 8px 12px; border-radius: 8px; color: white; margin: 5px; }
+        .token-box { background: #161b22; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test de API - Sistema Policial</h1>
+    
+    <div class="login-box">
+        <h3>🔐 Login para obtener token</h3>
+        <input type="text" id="username" placeholder="Usuario" value="admin">
+        <input type="password" id="password" placeholder="Contraseña" value="admin123">
+        <button onclick="doLogin()">Iniciar Sesión</button>
+        
+        <div id="tokenStatus"></div>
+        <div id="tokenDisplay" class="token-box" style="display:none;"></div>
+    </div>
+    
+    <div>
+        <button onclick="testConnection()" id="btn1" disabled>1. Probar conexión básica</button>
+        <button onclick="testCatalogos()" id="btn2" disabled>2. Probar Catálogos</button>
+        <button onclick="testPersonal()" id="btn3" disabled>3. Probar Personal</button>
+        <button onclick="testDashboard()" id="btn4" disabled>4. Probar Dashboard</button>
+        <button onclick="testAll()" id="btn5" disabled>▶️ Probar Todo</button>
+        <button onclick="clearResults()">Limpiar</button>
+    </div>
+    
+    <div id="results">
+        <p>👉 Primero haz clic en "Iniciar Sesión" para obtener un token</p>
+    </div>
+    
+    <script>
+        let currentToken = null;
+        const API_URL = 'backend/api.php';
+        const AUTH_URL = 'backend/auth.php';
+        
+        async function doLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>🔐 Iniciando sesión...</h3>';
+            
+            try {
+                const response = await fetch(`${AUTH_URL}?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentToken = data.token;
+                    localStorage.setItem('jwt_token', currentToken);
+                    localStorage.setItem('current_user', JSON.stringify(data.user));
+                    
+                    document.getElementById('tokenDisplay').style.display = 'block';
+                    document.getElementById('tokenDisplay').innerHTML = `✅ Token obtenido:<br>${currentToken.substring(0, 100)}...`;
+                    document.getElementById('tokenStatus').innerHTML = '<p class="success">✅ Login exitoso! Token guardado.</p>';
+                    
+                    // Habilitar botones
+                    document.getElementById('btn1').disabled = false;
+                    document.getElementById('btn2').disabled = false;
+                    document.getElementById('btn3').disabled = false;
+                    document.getElementById('btn4').disabled = false;
+                    document.getElementById('btn5').disabled = false;
+                    
+                    results.innerHTML += '<p class="success">✅ Token obtenido correctamente. Ahora puedes probar la API.</p>';
+                } else {
+                    results.innerHTML += `<p class="error">❌ Login fallido: ${data.error || 'Credenciales inválidas'}</p>`;
+                }
+            } catch (error) {
+                results.innerHTML += `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        function getToken() {
+            return currentToken || localStorage.getItem('jwt_token');
+        }
+        
+        async function apiCall(endpoint) {
+            const token = getToken();
+            if (!token) {
+                throw new Error('No hay token. Primero inicia sesión.');
+            }
+            
+            const response = await fetch(`${API_URL}?endpoint=${endpoint}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const text = await response.text();
+            return { response, text };
+        }
+        
+        async function testConnection() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>📡 Probando conexión...</h3>';
+            
+            try {
+                const { response, text } = await apiCall('test');
+                results.innerHTML += `<p>Status: ${response.status}</p>`;
+                
+                if (response.ok) {
+                    results.innerHTML += `<p class="success">✅ Conexión exitosa!</p>`;
+                    results.innerHTML += `<pre>${text.substring(0, 500)}</pre>`;
+                } else {
+                    results.innerHTML += `<p class="error">❌ Error HTTP: ${response.status}</p>`;
+                    results.innerHTML += `<pre>${text.substring(0, 500)}</pre>`;
+                }
+            } catch (error) {
+                results.innerHTML += `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testCatalogos() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>📚 Probando Catálogos...</h3>';
+            
+            try {
+                const { response, text } = await apiCall('catalogos&tipo=tipos_recargo');
+                results.innerHTML += `<p>Status: ${response.status}</p>`;
+                results.innerHTML += `<p>Content-Type: ${response.headers.get('content-type')}</p>`;
+                
+                try {
+                    const data = JSON.parse(text);
+                    results.innerHTML += `<p class="success">✅ JSON válido! ${data.length || 0} registros</p>`;
+                    results.innerHTML += `<pre>${JSON.stringify(data, null, 2).substring(0, 500)}</pre>`;
+                } catch(e) {
+                    results.innerHTML += `<p class="error">❌ No es JSON válido</p>`;
+                    results.innerHTML += `<pre>${text.substring(0, 500)}</pre>`;
+                }
+            } catch (error) {
+                results.innerHTML += `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testPersonal() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>👥 Probando Personal...</h3>';
+            
+            try {
+                const { response, text } = await apiCall('personal');
+                results.innerHTML += `<p>Status: ${response.status}</p>`;
+                
+                try {
+                    const data = JSON.parse(text);
+                    results.innerHTML += `<p class="success">✅ JSON válido! ${data.length || 0} registros</p>`;
+                    results.innerHTML += `<pre>${JSON.stringify(data, null, 2).substring(0, 500)}</pre>`;
+                } catch(e) {
+                    results.innerHTML += `<p class="error">❌ No es JSON válido</p>`;
+                    results.innerHTML += `<pre>${text.substring(0, 500)}</pre>`;
+                }
+            } catch (error) {
+                results.innerHTML += `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testDashboard() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>📊 Probando Dashboard...</h3>';
+            
+            try {
+                const { response, text } = await apiCall('dashboard');
+                results.innerHTML += `<p>Status: ${response.status}</p>`;
+                
+                try {
+                    const data = JSON.parse(text);
+                    results.innerHTML += `<p class="success">✅ JSON válido!</p>`;
+                    results.innerHTML += `<pre>${JSON.stringify(data, null, 2).substring(0, 500)}</pre>`;
+                } catch(e) {
+                    results.innerHTML += `<p class="error">❌ No es JSON válido</p>`;
+                    results.innerHTML += `<pre>${text.substring(0, 500)}</pre>`;
+                }
+            } catch (error) {
+                results.innerHTML += `<p class="error">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testAll() {
+            await testConnection();
+            await testCatalogos();
+            await testPersonal();
+            await testDashboard();
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '<p>Resultados limpiados. Haz clic en un botón para probar...</p>';
+        }
+        
+        // Verificar si ya hay un token guardado
+        window.onload = function() {
+            const savedToken = localStorage.getItem('jwt_token');
+            if (savedToken) {
+                currentToken = savedToken;
+                document.getElementById('tokenDisplay').style.display = 'block';
+                document.getElementById('tokenDisplay').innerHTML = `✅ Token existente encontrado: ${savedToken.substring(0, 100)}...`;
+                document.getElementById('tokenStatus').innerHTML = '<p class="success">✅ Token cargado de localStorage.</p>';
+                
+                document.getElementById('btn1').disabled = false;
+                document.getElementById('btn2').disabled = false;
+                document.getElementById('btn3').disabled = false;
+                document.getElementById('btn4').disabled = false;
+                document.getElementById('btn5').disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
