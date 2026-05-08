@@ -15,7 +15,6 @@
             margin-top: 1rem;
         }
         
-        /* Tarjeta de categoría */
         .categoria-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -30,7 +29,6 @@
             border-color: var(--accent-primary);
         }
         
-        /* Cabecera de la tarjeta */
         .categoria-header {
             display: flex;
             justify-content: space-between;
@@ -39,7 +37,6 @@
             background: var(--bg-surface);
             border-bottom: 1px solid var(--border);
             cursor: pointer;
-            transition: background 0.2s;
         }
         
         .categoria-header:hover {
@@ -68,12 +65,6 @@
             font-weight: 600;
         }
         
-        .categoria-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        /* Cuerpo de la tarjeta (items) */
         .categoria-body {
             max-height: 0;
             overflow: hidden;
@@ -95,20 +86,14 @@
             align-items: center;
             padding: 0.7rem 1.25rem;
             border-bottom: 1px solid var(--border);
-            transition: background 0.2s;
         }
         
         .item-row:hover {
             background: var(--bg-surface);
         }
         
-        .item-row:last-child {
-            border-bottom: none;
-        }
-        
         .item-valor {
             font-size: 0.9rem;
-            word-break: break-word;
             flex: 1;
         }
         
@@ -116,7 +101,6 @@
             display: flex;
             gap: 0.3rem;
             opacity: 0.6;
-            transition: opacity 0.2s;
         }
         
         .item-row:hover .item-actions {
@@ -130,7 +114,6 @@
             font-size: 0.85rem;
         }
         
-        /* Formulario para agregar nuevo item */
         .add-item-form {
             display: flex;
             gap: 0.5rem;
@@ -152,17 +135,14 @@
         .add-item-form input:focus {
             outline: none;
             border-color: var(--accent-primary);
-            box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2);
         }
         
-        /* Botones */
         .btn-icon {
             background: none;
             border: none;
             cursor: pointer;
             padding: 0.4rem;
             border-radius: 8px;
-            transition: all 0.2s;
             color: var(--text-secondary);
         }
         
@@ -191,12 +171,10 @@
             color: white;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
         }
         
         .btn-primary:hover {
             background: #1e40af;
-            transform: translateY(-1px);
         }
         
         .btn-secondary {
@@ -204,7 +182,6 @@
             color: var(--text-primary);
             border: 1px solid var(--border);
             cursor: pointer;
-            transition: all 0.2s;
         }
         
         .btn-secondary:hover {
@@ -223,16 +200,6 @@
             color: white;
         }
         
-        /* Flecha de expansión */
-        .expand-icon {
-            transition: transform 0.2s;
-        }
-        
-        .expand-icon.rotated {
-            transform: rotate(90deg);
-        }
-        
-        /* Tabs */
         .tab-buttons {
             display: flex;
             gap: 0.5rem;
@@ -245,8 +212,6 @@
             border-radius: 30px;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
             background: var(--bg-surface);
             color: var(--text-secondary);
             border: 1px solid var(--border);
@@ -255,15 +220,8 @@
         .tab-btn.active {
             background: var(--accent-primary);
             color: white;
-            border-color: var(--accent-primary);
         }
         
-        .tab-btn:hover:not(.active) {
-            background: var(--bg-card);
-            border-color: var(--accent-primary);
-        }
-        
-        /* Panel */
         .tab-panel {
             display: none;
             animation: fadeIn 0.3s ease;
@@ -278,7 +236,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Header del panel de catálogos */
         .panel-header {
             display: flex;
             justify-content: space-between;
@@ -292,7 +249,6 @@
             border: 1px solid var(--border);
         }
         
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -304,7 +260,6 @@
             background-color: rgba(0,0,0,0.6);
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(4px);
         }
         
         .modal-content {
@@ -314,13 +269,6 @@
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            border: 1px solid var(--border);
-            animation: modalIn 0.2s ease;
-        }
-        
-        @keyframes modalIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
         }
         
         .modal-header {
@@ -347,14 +295,12 @@
             cursor: pointer;
             font-size: 1.5rem;
             color: var(--text-secondary);
-            transition: color 0.2s;
         }
         
         .close-modal:hover {
             color: #dc2626;
         }
         
-        /* Formularios */
         .form-group {
             margin-bottom: 1rem;
         }
@@ -382,7 +328,6 @@
             border-color: var(--accent-primary);
         }
         
-        /* Tablas */
         .table-container {
             overflow-x: auto;
             border-radius: 16px;
@@ -405,7 +350,6 @@
             font-weight: 600;
         }
         
-        /* Toast */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -434,17 +378,13 @@
         .toast-warning { border-left-color: #d97706; }
         .toast-info { border-left-color: #1d4ed8; }
         
-        /* Utilidades */
         .text-center { text-align: center; }
         .text-secondary { color: var(--text-secondary); }
-        .text-muted { color: var(--text-muted); }
         .mt-2 { margin-top: 0.5rem; }
         .mt-3 { margin-top: 1rem; }
-        .mb-2 { margin-bottom: 0.5rem; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
         .gap-2 { gap: 0.5rem; }
         
-        /* Logo preview */
         .logo-preview-box {
             display: flex;
             align-items: center;
@@ -461,7 +401,6 @@
             background: white;
         }
         
-        /* Theme options */
         .theme-options {
             display: flex;
             gap: 1rem;
@@ -545,22 +484,22 @@
     
     <div class="container">
         <h1><i class="fas fa-cog"></i> Configuración del Sistema</h1>
-        <p class="text-secondary">Gestione los catálogos de opciones, unidades regionales, feriados y configuración del sistema</p>
+        <p class="text-secondary">Gestione los catálogos de opciones, unidades regionales, subordinados, feriados y configuración del sistema</p>
         
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="showTab('catalogos')" id="tabCatalogosBtn"><i class="fas fa-list"></i> Catálogos</button>
             <button class="tab-btn" onclick="showTab('dependencias')" id="tabDependenciasBtn"><i class="fas fa-building"></i> Unidades Regionales</button>
+            <button class="tab-btn" onclick="showTab('subordinados')" id="tabSubordinadosBtn"><i class="fas fa-sitemap"></i> Subordinados</button>
             <button class="tab-btn" onclick="showTab('feriados')" id="tabFeriadosBtn"><i class="fas fa-calendar"></i> Feriados</button>
             <button class="tab-btn" onclick="showTab('sistema')" id="tabSistemaBtn"><i class="fas fa-server"></i> Sistema</button>
             <button class="tab-btn" onclick="showTab('apariencia')" id="tabAparienciaBtn"><i class="fas fa-palette"></i> Apariencia</button>
         </div>
         
-        <!-- ==================== PANEL CATÁLOGOS ==================== -->
+        <!-- ==================== PANEL CATÁLOGOS (GRID) ==================== -->
         <div id="catalogosPanel" class="tab-panel active">
             <div class="panel-header">
                 <div>
-                    <i class="fas fa-info-circle"></i> 
-                    Los catálogos definen las opciones disponibles en los formularios
+                    <i class="fas fa-info-circle"></i> Los catálogos definen las opciones disponibles en los formularios
                     <span class="categoria-badge" id="totalCatalogosCount" style="margin-left: 0.5rem;">0</span>
                 </div>
                 <div class="gap-2" style="display: flex; gap: 0.5rem;">
@@ -572,7 +511,6 @@
                     </button>
                 </div>
             </div>
-            
             <div id="catalogosContainer" class="catalogos-grid">
                 <div class="text-center" style="padding: 2rem;">Cargando catálogos...</div>
             </div>
@@ -586,8 +524,38 @@
             </div>
             <div class="table-container">
                 <table id="dependenciasTable">
-                    <thead><tr><th>Nombre</th><th>Nivel</th><th>Dependencia Superior</th><th>Código</th><th>Acciones</th></tr></thead>
-                    <tbody id="dependenciasTableBody"><tr><td colspan="5" class="text-center">Cargando...</td></tr></tbody>
+                    <thead>
+                        <tr><th>Nombre</th><th>Nivel</th><th>Dependencia Superior</th><th>Código</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dependenciasTableBody">
+                        <tr><td colspan="5" class="text-center">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- ==================== PANEL SUBORDINADOS ==================== -->
+        <div id="subordinadosPanel" class="tab-panel">
+            <div class="panel-header">
+                <h3 style="margin: 0;"><i class="fas fa-sitemap"></i> Subordinados por Unidad Regional</h3>
+                <button class="btn-primary btn-sm" onclick="openSubordinadoModal()"><i class="fas fa-plus"></i> Agregar Subordinado</button>
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label><i class="fas fa-building"></i> Filtrar por Unidad Regional:</label>
+                <select id="filtro_unidad_subordinados" class="form-control" onchange="cargarSubordinados()">
+                    <option value="">Todas las Unidades</option>
+                </select>
+            </div>
+            <div class="table-container">
+                <table id="subordinadosTable">
+                    <thead>
+                        <tr><th>Subordinado</th><th>Unidad Regional</th><th>Orden</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subordinadosTableBody">
+                        <tr><td colspan="4" class="text-center">Cargando...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -600,8 +568,13 @@
             </div>
             <div class="table-container">
                 <table id="feriadosTable">
-                    <thead><tr><th>Fecha</th><th>Motivo</th><th>Tipo</th><th>Acciones</th></tr></thead>
-                    <tbody id="feriadosTableBody"><tr><td colspan="4" class="text-center">Cargando...</td></tr></tbody>
+                    <thead>
+                        <tr><th>Fecha</th><th>Motivo</th><th>Tipo</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feriadosTableBody">
+                        <tr><td colspan="4" class="text-center">Cargando...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -611,13 +584,11 @@
             <div class="panel-header">
                 <h3 style="margin: 0;"><i class="fas fa-server"></i> Configuración del Sistema</h3>
             </div>
-            
             <div class="form-group">
                 <label>Nombre del Sistema</label>
                 <input type="text" id="config_nombre_sistema" class="form-control" placeholder="Nombre del sistema">
                 <small class="text-secondary">Se muestra en el título de la página y en la barra de navegación</small>
             </div>
-            
             <div class="form-group">
                 <label>Logo del Sistema</label>
                 <div id="logoPreviewContainer" class="logo-preview-box">
@@ -631,7 +602,6 @@
                 </div>
                 <small class="text-secondary">Formatos: JPG, PNG, GIF, WEBP. Tamaño recomendado: 200x80px</small>
             </div>
-            
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                 <button id="btnGuardarConfig" class="btn-primary btn-sm"><i class="fas fa-save"></i> Guardar Configuración</button>
                 <button id="btnRestaurarLogo" class="btn-secondary btn-sm"><i class="fas fa-undo-alt"></i> Restaurar Logo por Defecto</button>
@@ -659,7 +629,7 @@
     
     <!-- ==================== MODALES ==================== -->
     
-    <!-- Modal Editar Item -->
+    <!-- Modal Editar Item Catálogo -->
     <div id="editItemModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -685,7 +655,7 @@
         </div>
     </div>
     
-    <!-- Modal Dependencia -->
+    <!-- Modal Dependencia (Unidad Regional) -->
     <div id="dependenciaModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -736,6 +706,38 @@
         </div>
     </div>
     
+    <!-- Modal Subordinado -->
+    <div id="subordinadoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="subordinadoModalTitle">Agregar Subordinado</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="subordinado_id">
+                <div class="form-group">
+                    <label>Unidad Regional *</label>
+                    <select id="subordinado_dependencia_id" class="form-control" required>
+                        <option value="">Seleccionar Unidad Regional...</option>
+                    </select>
+                    <small class="text-secondary">¿A qué Unidad Regional pertenece este subordinado?</small>
+                </div>
+                <div class="form-group">
+                    <label>Nombre del Subordinado *</label>
+                    <input type="text" id="subordinado_valor" class="form-control" required placeholder="Ej: Delegación Criminalística C-5">
+                </div>
+                <div class="form-group">
+                    <label>Orden</label>
+                    <input type="number" id="subordinado_orden" class="form-control" value="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary btn-sm" onclick="closeModal()">Cancelar</button>
+                <button class="btn-primary btn-sm" onclick="saveSubordinado()">Guardar</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Modal Feriado -->
     <div id="feriadoModal" class="modal">
         <div class="modal-content">
@@ -776,7 +778,9 @@
         let expandedCategories = {};
         
         // ==================== UTILIDADES ====================
-        function getToken() { return localStorage.getItem('jwt_token'); }
+        function getToken() { 
+            return localStorage.getItem('jwt_token'); 
+        }
         
         function showToast(message, type) {
             let container = document.getElementById('toast-container');
@@ -800,25 +804,11 @@
             return div.innerHTML;
         }
         
-        function closeModal() {
-            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        function closeModal() { 
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); 
         }
         
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(`${tabName}Panel`).classList.add('active');
-            const btn = document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Btn`);
-            if (btn) btn.classList.add('active');
-            
-            if (tabName === 'catalogos') cargarCatalogos();
-            if (tabName === 'dependencias') cargarDependencias();
-            if (tabName === 'feriados') cargarFeriados();
-            if (tabName === 'sistema') cargarConfiguracion();
-        }
-        
-        // ==================== NOMBRES DE CATEGORÍAS ====================
+        // ==================== CATÁLOGOS (GRID) ====================
         function getNombreCategoria(tipo) {
             const nombres = {
                 'jerarquias': '👔 Jerarquías',
@@ -849,7 +839,38 @@
             return iconos[tipo] || 'fa-tag';
         }
         
-        // ==================== CARGAR CATÁLOGOS ====================
+        async function cargarItems(tipo) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=${tipo}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                return Array.isArray(data) ? data : [];
+            } catch (error) { 
+                return []; 
+            }
+        }
+        
+        function renderItems(tipo, items) {
+            if (!items || items.length === 0) {
+                return '<div class="empty-items">📭 No hay elementos registrados</div>';
+            }
+            return items.map(item => `
+                <div class="item-row" data-item-id="${item.id}">
+                    <span class="item-valor">${escapeHtml(item.valor)}</span>
+                    <div class="item-actions">
+                        <button class="btn-icon btn-icon-primary" onclick="openEditItemModal(${item.id}, '${tipo}', '${escapeHtml(item.valor)}', ${item.orden || 0})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-icon-danger" onclick="eliminarItem(${item.id}, '${tipo}')" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
         async function cargarCatalogos() {
             const container = document.getElementById('catalogosContainer');
             if (container) container.innerHTML = '<div class="text-center" style="padding: 2rem;">Cargando catálogos...</div>';
@@ -869,7 +890,6 @@
                 document.getElementById('totalCatalogosCount').textContent = tipos.length;
                 
                 let html = '';
-                
                 for (const tipoObj of tipos) {
                     const tipo = tipoObj.tipo;
                     const items = await cargarItems(tipo);
@@ -909,48 +929,13 @@
                         </div>
                     `;
                 }
-                
                 container.innerHTML = html;
                 showToast(`✅ ${tipos.length} categorías cargadas`, 'success');
-                
             } catch (error) {
                 console.error('Error:', error);
                 container.innerHTML = '<div class="text-center" style="padding: 2rem; color: #dc2626;">Error cargando catálogos</div>';
                 showToast('Error cargando catálogos', 'error');
             }
-        }
-        
-        async function cargarItems(tipo) {
-            try {
-                const token = getToken();
-                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=${tipo}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await response.json();
-                return Array.isArray(data) ? data : [];
-            } catch (error) {
-                return [];
-            }
-        }
-        
-        function renderItems(tipo, items) {
-            if (!items || items.length === 0) {
-                return '<div class="empty-items">📭 No hay elementos registrados</div>';
-            }
-            
-            return items.map(item => `
-                <div class="item-row" data-item-id="${item.id}">
-                    <span class="item-valor">${escapeHtml(item.valor)}</span>
-                    <div class="item-actions">
-                        <button class="btn-icon btn-icon-primary" onclick="openEditItemModal(${item.id}, '${tipo}', '${escapeHtml(item.valor)}', ${item.orden || 0})" title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon btn-icon-danger" onclick="eliminarItem(${item.id}, '${tipo}')" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
         }
         
         function toggleCategoria(tipo) {
@@ -961,14 +946,12 @@
             }
         }
         
-        // ==================== CRUD ITEMS ====================
         async function agregarItem(tipo) {
             const input = document.getElementById(`new_${tipo}`);
             const valor = input?.value.trim();
-            
-            if (!valor) {
-                showToast('Ingrese un valor', 'warning');
-                return;
+            if (!valor) { 
+                showToast('Ingrese un valor', 'warning'); 
+                return; 
             }
             
             try {
@@ -979,21 +962,19 @@
                     body: JSON.stringify({ tipo, valor, orden: 0 })
                 });
                 const result = await response.json();
-                
                 if (result.success) {
                     showToast(`✅ "${valor}" agregado`, 'success');
                     input.value = '';
                     await cargarCatalogos();
-                } else {
-                    showToast(result.error || 'Error al agregar', 'error');
+                } else { 
+                    showToast(result.error || 'Error al agregar', 'error'); 
                 }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
             }
         }
         
         function openEditItemModal(id, tipo, valor, orden) {
-            document.getElementById('editItemModalTitle').textContent = 'Editar Item';
             document.getElementById('editItemId').value = id;
             document.getElementById('editItemTipo').value = tipo;
             document.getElementById('editItemValor').value = valor;
@@ -1007,9 +988,9 @@
             const valor = document.getElementById('editItemValor').value.trim();
             const orden = document.getElementById('editItemOrden').value;
             
-            if (!valor) {
-                showToast('El valor no puede estar vacío', 'warning');
-                return;
+            if (!valor) { 
+                showToast('El valor no puede estar vacío', 'warning'); 
+                return; 
             }
             
             try {
@@ -1020,22 +1001,20 @@
                     body: JSON.stringify({ valor, orden: parseInt(orden) })
                 });
                 const result = await response.json();
-                
                 if (result.success) {
                     showToast('Item actualizado', 'success');
                     closeModal();
                     await cargarCatalogos();
-                } else {
-                    showToast(result.error || 'Error al actualizar', 'error');
+                } else { 
+                    showToast(result.error || 'Error al actualizar', 'error'); 
                 }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
             }
         }
         
         async function eliminarItem(id, tipo) {
             if (!confirm('¿Eliminar este elemento?')) return;
-            
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=catalogos&id=${id}`, {
@@ -1043,28 +1022,25 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const result = await response.json();
-                
                 if (result.success) {
                     showToast('Elemento eliminado', 'success');
                     await cargarCatalogos();
-                } else {
-                    showToast(result.error || 'Error al eliminar', 'error');
+                } else { 
+                    showToast(result.error || 'Error al eliminar', 'error'); 
                 }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
             }
         }
         
         async function eliminarCategoriaCompleta(tipo) {
             const items = catalogosData[tipo] || [];
             const nombre = getNombreCategoria(tipo);
-            
             if (!confirm(`¿Eliminar TODA la categoría "${nombre}"?\n\nSe eliminarán ${items.length} items.\n\n¿Está seguro?`)) return;
             
             try {
                 const token = getToken();
                 let eliminados = 0;
-                
                 for (const item of items) {
                     const response = await fetch(`${API_URL}?endpoint=catalogos&id=${item.id}`, {
                         method: 'DELETE',
@@ -1073,44 +1049,36 @@
                     const result = await response.json();
                     if (result.success) eliminados++;
                 }
-                
                 showToast(`✅ Categoría "${nombre}" eliminada (${eliminados} items)`, 'success');
                 await cargarCatalogos();
-                
-            } catch (error) {
-                showToast('Error al eliminar categoría', 'error');
+            } catch(error) { 
+                showToast('Error al eliminar categoría', 'error'); 
             }
         }
         
         async function limpiarCatalogosDuplicados() {
-            if (!confirm('¿Eliminar tipos duplicados (ej: tipo_oficio si ya existe tipos_oficio)?')) return;
-            
+            if (!confirm('¿Eliminar tipos duplicados?')) return;
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=catalogos`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const tipos = await response.json();
-                
                 const tiposUnicos = new Set();
                 const tiposAEliminar = [];
-                
                 for (const t of tipos) {
                     const tipo = t.tipo;
                     const normalizado = tipo.replace(/^tipo_/, 'tipos_');
-                    
                     if (tiposUnicos.has(normalizado) || (normalizado !== tipo && tipos.some(otro => otro.tipo === normalizado))) {
                         tiposAEliminar.push(tipo);
-                    } else {
-                        tiposUnicos.add(tipo);
+                    } else { 
+                        tiposUnicos.add(tipo); 
                     }
                 }
-                
-                if (tiposAEliminar.length === 0) {
-                    showToast('No se encontraron duplicados', 'info');
-                    return;
+                if (tiposAEliminar.length === 0) { 
+                    showToast('No se encontraron duplicados', 'info'); 
+                    return; 
                 }
-                
                 let eliminados = 0;
                 for (const tipo of tiposAEliminar) {
                     const items = await cargarItems(tipo);
@@ -1122,27 +1090,23 @@
                         eliminados++;
                     }
                 }
-                
                 showToast(`✅ Limpiados ${tiposAEliminar.length} tipos duplicados (${eliminados} items)`, 'success');
                 await cargarCatalogos();
-                
-            } catch (error) {
-                showToast('Error al limpiar duplicados', 'error');
+            } catch(error) { 
+                showToast('Error al limpiar duplicados', 'error'); 
             }
         }
         
-        // ==================== DEPENDENCIAS ====================
+        // ==================== DEPENDENCIAS (UNIDADES REGIONALES) ====================
         async function cargarDependencias() {
             const tbody = document.getElementById('dependenciasTableBody');
-            tbody.innerHTML = '<td><td colspan="5" class="text-center">Cargando...</td></tr>';
-            
+            tbody.innerHTML = '</table><td colspan="5" class="text-center">Cargando...</td></tr>';
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=dependencias`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
-                
                 if (!data || data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay unidades regionales registradas</td></tr>';
                 } else {
@@ -1159,14 +1123,12 @@
                         </tr>
                     `).join('');
                 }
-                
                 const selectPadre = document.getElementById('dependencia_padre');
                 if (selectPadre) {
                     selectPadre.innerHTML = '<option value="">Ninguna (Nivel superior)</option>' + 
                         data.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
                 }
-                
-            } catch (error) {
+            } catch(error) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center">Error cargando datos</td></tr>';
                 showToast('Error cargando unidades regionales', 'error');
             }
@@ -1208,16 +1170,14 @@
                 telefono: document.getElementById('dependencia_telefono').value,
                 email: document.getElementById('dependencia_email').value
             };
-            
-            if (!data.nombre) {
-                showToast('El nombre es requerido', 'warning');
-                return;
+            if (!data.nombre) { 
+                showToast('El nombre es requerido', 'warning'); 
+                return; 
             }
             
             try {
                 const token = getToken();
                 let result;
-                
                 if (id) {
                     result = await fetch(`${API_URL}?endpoint=dependencias&id=${id}`, {
                         method: 'PUT',
@@ -1231,18 +1191,17 @@
                         body: JSON.stringify(data)
                     });
                 }
-                
                 const resultData = await result.json();
-                
                 if (resultData.success) {
                     showToast(`Unidad Regional ${id ? 'actualizada' : 'creada'} correctamente`, 'success');
                     closeModal();
                     cargarDependencias();
-                } else {
-                    showToast(resultData.error || 'Error al guardar', 'error');
+                    cargarSubordinados();
+                } else { 
+                    showToast(resultData.error || 'Error al guardar', 'error'); 
                 }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
             }
         }
         
@@ -1254,14 +1213,13 @@
                 });
                 const data = await response.json();
                 if (data && data.id) openDependenciaModal(data);
-            } catch (error) {
-                showToast('Error cargando datos', 'error');
+            } catch(error) { 
+                showToast('Error cargando datos', 'error'); 
             }
         }
         
         async function deleteDependencia(id) {
             if (!confirm('¿Eliminar esta unidad regional? Se eliminarán también sus dependencias hijas.')) return;
-            
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=dependencias&id=${id}`, {
@@ -1269,15 +1227,173 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const result = await response.json();
-                
                 if (result.success) {
                     showToast('Unidad Regional eliminada', 'success');
                     cargarDependencias();
-                } else {
-                    showToast(result.error || 'Error al eliminar', 'error');
+                    cargarSubordinados();
+                } else { 
+                    showToast(result.error || 'Error al eliminar', 'error'); 
                 }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
+            }
+        }
+        
+        // ==================== SUBORDINADOS ====================
+        async function cargarUnidadesParaSelectores() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=dependencias`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                const selectFiltro = document.getElementById('filtro_unidad_subordinados');
+                const selectModal = document.getElementById('subordinado_dependencia_id');
+                
+                const options = '<option value="">Todas las Unidades</option>' + 
+                    data.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+                
+                if (selectFiltro && selectFiltro.options.length <= 1) {
+                    selectFiltro.innerHTML = options;
+                }
+                
+                if (selectModal) {
+                    selectModal.innerHTML = '<option value="">Seleccionar Unidad Regional...</option>' + 
+                        data.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+                }
+            } catch(e) { 
+                console.error('Error cargando unidades:', e); 
+            }
+        }
+        
+        async function cargarSubordinados() {
+            const tbody = document.getElementById('subordinadosTableBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando...</td></tr>';
+            
+            const filtroUnidad = document.getElementById('filtro_unidad_subordinados').value;
+            let url = `${API_URL}?endpoint=subordinados`;
+            if (filtroUnidad) { 
+                url += `&dependencia_id=${filtroUnidad}`; 
+            }
+            
+            try {
+                const token = getToken();
+                const response = await fetch(url, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                const data = await response.json();
+                
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay subordinados registrados</td></tr>';
+                } else {
+                    tbody.innerHTML = data.map(item => `
+                        <tr>
+                            <td><strong>${escapeHtml(item.valor)}</strong></td>
+                            <td>${escapeHtml(item.dependencia_nombre || 'Sin asignar')}</td>
+                            <td>${item.orden || 0}</td>
+                            <td>
+                                <button class="btn-icon btn-icon-primary" onclick="editSubordinado(${item.id}, '${escapeHtml(item.valor)}', ${item.orden || 0}, ${item.dependencia_id || 'null'})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-icon-danger" onclick="eliminarSubordinado(${item.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+                await cargarUnidadesParaSelectores();
+            } catch(error) {
+                console.error('Error:', error);
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">Error cargando datos</td></tr>';
+                showToast('Error cargando subordinados', 'error');
+            }
+        }
+        
+        function openSubordinadoModal(data = null) {
+            const modal = document.getElementById('subordinadoModal');
+            if (data) {
+                document.getElementById('subordinado_id').value = data.id;
+                document.getElementById('subordinado_valor').value = data.valor;
+                document.getElementById('subordinado_orden').value = data.orden || 0;
+                document.getElementById('subordinado_dependencia_id').value = data.dependencia_id || '';
+                document.getElementById('subordinadoModalTitle').textContent = 'Editar Subordinado';
+            } else {
+                document.getElementById('subordinado_id').value = '';
+                document.getElementById('subordinado_valor').value = '';
+                document.getElementById('subordinado_orden').value = '0';
+                document.getElementById('subordinado_dependencia_id').value = '';
+                document.getElementById('subordinadoModalTitle').textContent = 'Agregar Subordinado';
+            }
+            modal.style.display = 'flex';
+        }
+        
+        async function saveSubordinado() {
+            const id = document.getElementById('subordinado_id').value;
+            const valor = document.getElementById('subordinado_valor').value.trim();
+            const orden = document.getElementById('subordinado_orden').value;
+            const dependencia_id = document.getElementById('subordinado_dependencia_id').value;
+            
+            if (!valor) { 
+                showToast('El nombre del subordinado es requerido', 'warning'); 
+                return; 
+            }
+            if (!dependencia_id) { 
+                showToast('Debe seleccionar una Unidad Regional', 'warning'); 
+                return; 
+            }
+            
+            try {
+                const token = getToken();
+                let result;
+                if (id) {
+                    result = await fetch(`${API_URL}?endpoint=subordinados&id=${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ valor, orden: parseInt(orden), dependencia_id })
+                    });
+                } else {
+                    result = await fetch(`${API_URL}?endpoint=subordinados`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ valor, orden: parseInt(orden), dependencia_id })
+                    });
+                }
+                const resultData = await result.json();
+                if (resultData.success) {
+                    showToast(`Subordinado ${id ? 'actualizado' : 'agregado'} correctamente`, 'success');
+                    closeModal();
+                    cargarSubordinados();
+                } else { 
+                    showToast(resultData.error || 'Error al guardar', 'error'); 
+                }
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
+            }
+        }
+        
+        function editSubordinado(id, valor, orden, dependencia_id) {
+            openSubordinadoModal({ id, valor, orden, dependencia_id });
+        }
+        
+        async function eliminarSubordinado(id) {
+            if (!confirm('¿Eliminar este subordinado?')) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=subordinados&id=${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Subordinado eliminado', 'success');
+                    cargarSubordinados();
+                } else { 
+                    showToast(result.error || 'Error al eliminar', 'error'); 
+                }
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
             }
         }
         
@@ -1285,14 +1401,12 @@
         async function cargarFeriados() {
             const tbody = document.getElementById('feriadosTableBody');
             tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando...</td></tr>';
-            
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=feriados`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
-                
                 if (!data || data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay feriados registrados</td></tr>';
                 } else {
@@ -1307,7 +1421,7 @@
                         </tr>
                     `).join('');
                 }
-            } catch (error) {
+            } catch(error) {
                 tbody.innerHTML = '<tr><td colspan="4" class="text-center">Error cargando datos</td></tr>';
                 showToast('Error cargando feriados', 'error');
             }
@@ -1324,10 +1438,9 @@
             const fecha = document.getElementById('feriado_fecha').value;
             const motivo = document.getElementById('feriado_motivo').value.trim();
             const tipo = document.getElementById('feriado_tipo').value;
-            
-            if (!fecha || !motivo) {
-                showToast('Complete todos los campos', 'warning');
-                return;
+            if (!fecha || !motivo) { 
+                showToast('Complete todos los campos', 'warning'); 
+                return; 
             }
             
             try {
@@ -1338,22 +1451,20 @@
                     body: JSON.stringify({ fecha, motivo, tipo })
                 });
                 const result = await response.json();
-                
                 if (result.success) {
                     showToast('Feriado agregado', 'success');
                     closeModal();
                     cargarFeriados();
-                } else {
-                    showToast('Error al guardar', 'error');
+                } else { 
+                    showToast('Error al guardar', 'error'); 
                 }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
             }
         }
         
         async function eliminarFeriado(id) {
             if (!confirm('¿Eliminar este feriado?')) return;
-            
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=feriados&id=${id}`, {
@@ -1361,15 +1472,14 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const result = await response.json();
-                
                 if (result.success) {
                     showToast('Feriado eliminado', 'success');
                     cargarFeriados();
-                } else {
-                    showToast('Error al eliminar', 'error');
+                } else { 
+                    showToast('Error al eliminar', 'error'); 
                 }
-            } catch (error) {
-                showToast('Error de conexión', 'error');
+            } catch(error) { 
+                showToast('Error de conexión', 'error'); 
             }
         }
         
@@ -1381,7 +1491,6 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const config = await response.json();
-                
                 if (config) {
                     document.getElementById('config_nombre_sistema').value = config.nombre_sistema || 'Sistema Policial';
                     document.getElementById('sistemaNombreNavbar').textContent = config.nombre_sistema || 'Sistema Policial';
@@ -1404,98 +1513,31 @@
                         if (btnEliminar) btnEliminar.style.display = 'none';
                     }
                 }
-            } catch (error) {
-                console.error('Error loading config:', error);
+            } catch(error) { 
+                console.error('Error loading config:', error); 
             }
         }
         
-        // Eventos configuración
-        document.getElementById('btnSubirLogo')?.addEventListener('click', () => {
-            const archivo = document.getElementById('logoArchivo').files[0];
-            if (!archivo) {
-                showToast('Seleccione un archivo de imagen', 'warning');
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('logo', archivo);
-            
-            fetch(`${API_URL}?endpoint=subir_logo`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${getToken()}` },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success) {
-                    showToast('Logo subido correctamente', 'success');
-                    cargarConfiguracion();
-                    document.getElementById('logoArchivo').value = '';
-                } else {
-                    showToast(result.error || 'Error al subir', 'error');
-                }
-            })
-            .catch(e => showToast('Error de conexión', 'error'));
-        });
-        
-        document.getElementById('btnEliminarLogo')?.addEventListener('click', async () => {
-            if (!confirm('¿Eliminar el logo actual?')) return;
-            try {
-                await fetch(`${API_URL}?endpoint=eliminar_logo`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                showToast('Logo eliminado', 'success');
-                cargarConfiguracion();
-            } catch(e) {
-                showToast('Error', 'error');
-            }
-        });
-        
-        document.getElementById('btnGuardarConfig')?.addEventListener('click', async () => {
-            const data = { nombre_sistema: document.getElementById('config_nombre_sistema').value };
-            try {
-                await fetch(`${API_URL}?endpoint=configuracion_sistema`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-                    body: JSON.stringify(data)
-                });
-                showToast('Configuración guardada', 'success');
-                cargarConfiguracion();
-            } catch(e) {
-                showToast('Error', 'error');
-            }
-        });
-        
-        document.getElementById('btnRestaurarLogo')?.addEventListener('click', async () => {
-            if (!confirm('¿Restaurar el logo por defecto?')) return;
-            try {
-                await fetch(`${API_URL}?endpoint=eliminar_logo`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                showToast('Logo por defecto restaurado', 'success');
-                cargarConfiguracion();
-            } catch(e) {
-                showToast('Error', 'error');
-            }
-        });
-        
-        // ==================== TEMA ====================
+        // ==================== TEMA (OSCURO/CLARO) ====================
         const THEME_KEY = 'sistema_policial_theme';
         
         function applyTheme(theme) {
             if (theme === 'light') {
                 document.body.classList.add('light-theme');
-                document.getElementById('themeIcon').className = 'fas fa-sun';
+                const themeIcon = document.getElementById('themeIcon');
+                if (themeIcon) themeIcon.className = 'fas fa-sun';
             } else {
                 document.body.classList.remove('light-theme');
-                document.getElementById('themeIcon').className = 'fas fa-moon';
+                const themeIcon = document.getElementById('themeIcon');
+                if (themeIcon) themeIcon.className = 'fas fa-moon';
             }
             localStorage.setItem(THEME_KEY, theme);
+            
+            // Actualizar clase selected en las opciones de tema
             document.querySelectorAll('.theme-option').forEach(opt => {
                 opt.classList.remove('selected');
-                if ((theme === 'dark' && opt.classList.contains('dark')) || (theme === 'light' && opt.classList.contains('light'))) {
+                if ((theme === 'dark' && opt.classList.contains('dark')) || 
+                    (theme === 'light' && opt.classList.contains('light'))) {
                     opt.classList.add('selected');
                 }
             });
@@ -1511,33 +1553,129 @@
             showToast(`Tema cambiado a ${theme === 'light' ? 'claro' : 'oscuro'}`, 'success');
         }
         
-        function initTheme() {
-            applyTheme(getCurrentTheme());
-            document.getElementById('themeToggleBtn')?.addEventListener('click', () => {
-                setTheme(getCurrentTheme() === 'dark' ? 'light' : 'dark');
-            });
+        function initTheme() { 
+            applyTheme(getCurrentTheme()); 
         }
         
         // ==================== AUTENTICACIÓN ====================
         function checkAuth() {
             const user = localStorage.getItem('current_user');
-            if (!user) {
-                window.location.href = 'index.html';
-                return false;
+            if (!user) { 
+                window.location.href = 'index.html'; 
+                return false; 
             }
             const userData = JSON.parse(user);
-            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="categoria-badge">${escapeHtml(userData.rol)}</span>`;
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) {
+                userInfo.innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="categoria-badge">${escapeHtml(userData.rol)}</span>`;
+            }
             return true;
         }
         
-        function handleLogout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
+        function handleLogout() { 
+            localStorage.clear(); 
+            window.location.href = 'index.html'; 
         }
         
-        function toggleMobileMenu() {
-            document.querySelector('.nav-menu')?.classList.toggle('active');
+        function toggleMobileMenu() { 
+            document.querySelector('.nav-menu')?.classList.toggle('active'); 
         }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(`${tabName}Panel`).classList.add('active');
+            const btn = document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Btn`);
+            if (btn) btn.classList.add('active');
+            
+            if (tabName === 'catalogos') cargarCatalogos();
+            if (tabName === 'dependencias') cargarDependencias();
+            if (tabName === 'subordinados') cargarSubordinados();
+            if (tabName === 'feriados') cargarFeriados();
+            if (tabName === 'sistema') cargarConfiguracion();
+        }
+        
+        // ==================== EVENT LISTENERS ====================
+        document.getElementById('btnSubirLogo')?.addEventListener('click', () => {
+            const archivo = document.getElementById('logoArchivo').files[0];
+            if (!archivo) { 
+                showToast('Seleccione un archivo de imagen', 'warning'); 
+                return; 
+            }
+            const formData = new FormData();
+            formData.append('logo', archivo);
+            fetch(`${API_URL}?endpoint=subir_logo`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${getToken()}` },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) { 
+                    showToast('Logo subido correctamente', 'success'); 
+                    cargarConfiguracion(); 
+                    document.getElementById('logoArchivo').value = ''; 
+                } else { 
+                    showToast(result.error || 'Error al subir', 'error'); 
+                }
+            })
+            .catch(e => showToast('Error de conexión', 'error'));
+        });
+        
+        document.getElementById('btnEliminarLogo')?.addEventListener('click', async () => {
+            if (!confirm('¿Eliminar el logo actual?')) return;
+            try {
+                await fetch(`${API_URL}?endpoint=eliminar_logo`, { 
+                    method: 'DELETE', 
+                    headers: { 'Authorization': `Bearer ${getToken()}` } 
+                });
+                showToast('Logo eliminado', 'success');
+                cargarConfiguracion();
+            } catch(e) { 
+                showToast('Error', 'error'); 
+            }
+        });
+        
+        document.getElementById('btnGuardarConfig')?.addEventListener('click', async () => {
+            const data = { nombre_sistema: document.getElementById('config_nombre_sistema').value };
+            try {
+                await fetch(`${API_URL}?endpoint=configuracion_sistema`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+                    body: JSON.stringify(data)
+                });
+                showToast('Configuración guardada', 'success');
+                cargarConfiguracion();
+            } catch(e) { 
+                showToast('Error', 'error'); 
+            }
+        });
+        
+        document.getElementById('btnRestaurarLogo')?.addEventListener('click', async () => {
+            if (!confirm('¿Restaurar el logo por defecto?')) return;
+            try {
+                await fetch(`${API_URL}?endpoint=eliminar_logo`, { 
+                    method: 'DELETE', 
+                    headers: { 'Authorization': `Bearer ${getToken()}` } 
+                });
+                showToast('Logo por defecto restaurado', 'success');
+                cargarConfiguracion();
+            } catch(e) { 
+                showToast('Error', 'error'); 
+            }
+        });
+        
+        document.getElementById('themeToggleBtn')?.addEventListener('click', () => { 
+            setTheme(getCurrentTheme() === 'dark' ? 'light' : 'dark'); 
+        });
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+        document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu);
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+        window.addEventListener('click', (e) => { 
+            if (e.target.classList?.contains('modal')) closeModal(); 
+        });
         
         // ==================== INICIALIZACIÓN ====================
         document.addEventListener('DOMContentLoaded', () => {
@@ -1546,15 +1684,9 @@
                 cargarCatalogos();
                 cargarConfiguracion();
                 cargarDependencias();
+                cargarSubordinados();
                 cargarFeriados();
             }
-            
-            document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
-            document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu);
-            document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
-            window.addEventListener('click', (e) => {
-                if (e.target.classList?.contains('modal')) closeModal();
-            });
         });
         
         // Exponer funciones globales
@@ -1571,12 +1703,17 @@
         window.saveDependencia = saveDependencia;
         window.editDependencia = editDependencia;
         window.deleteDependencia = deleteDependencia;
+        window.openSubordinadoModal = openSubordinadoModal;
+        window.saveSubordinado = saveSubordinado;
+        window.editSubordinado = editSubordinado;
+        window.eliminarSubordinado = eliminarSubordinado;
         window.openFeriadoModal = openFeriadoModal;
         window.saveFeriado = saveFeriado;
         window.eliminarFeriado = eliminarFeriado;
         window.setTheme = setTheme;
         window.cargarCatalogos = cargarCatalogos;
         window.cargarDependencias = cargarDependencias;
+        window.cargarSubordinados = cargarSubordinados;
         window.cargarFeriados = cargarFeriados;
         window.cargarConfiguracion = cargarConfiguracion;
     </script>

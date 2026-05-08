@@ -36,7 +36,7 @@ $endpoint = $_GET['endpoint'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];
 $id = $_GET['id'] ?? null;
 
-// Endpoints públicos (incluyendo feriados para pruebas)
+// Endpoints públicos
 $publicEndpoints = ['test', 'login', 'feriados'];
 if (!in_array($endpoint, $publicEndpoints) && !$authUser) {
     http_response_code(401);
@@ -97,7 +97,6 @@ try {
                 while ($row = $stmt->fetch()) {
                     $config[$row['clave']] = $row['valor'];
                 }
-                // Asegurar valores por defecto
                 if (!isset($config['nombre_sistema'])) $config['nombre_sistema'] = 'Sistema de Gestión Policial';
                 if (!isset($config['logo_url'])) $config['logo_url'] = '';
                 echo json_encode($config);
@@ -124,24 +123,20 @@ try {
                 $tiposPermitidos = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
                 
                 if (!in_array($extension, $tiposPermitidos)) {
-                    echo json_encode(['error' => 'Tipo de archivo no permitido. Use JPG, PNG, GIF o WEBP']);
+                    echo json_encode(['error' => 'Tipo de archivo no permitido']);
                     break;
                 }
                 
-                // Crear carpeta si no existe
                 $uploadDir = __DIR__ . '/../uploads/logo/';
                 if (!file_exists($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
                 
-                // Generar nombre único
                 $nombreArchivo = 'logo_' . time() . '_' . uniqid() . '.' . $extension;
                 $rutaCompleta = $uploadDir . $nombreArchivo;
                 $rutaRelativa = 'uploads/logo/' . $nombreArchivo;
                 
-                // Mover archivo
                 if (move_uploaded_file($archivo['tmp_name'], $rutaCompleta)) {
-                    // Guardar en BD
                     $stmt = $db->prepare("INSERT INTO configuracion (clave, valor, tipo) VALUES ('logo_url', ?, 'image') ON DUPLICATE KEY UPDATE valor = VALUES(valor)");
                     $stmt->execute([$rutaRelativa]);
                     echo json_encode(['success' => true, 'logo_url' => $rutaRelativa]);
@@ -154,7 +149,6 @@ try {
         // ==================== ELIMINAR LOGO ====================
         case 'eliminar_logo':
             if ($method == 'DELETE') {
-                // Obtener logo actual
                 $stmt = $db->query("SELECT valor FROM configuracion WHERE clave = 'logo_url'");
                 $logo = $stmt->fetch();
                 
@@ -165,10 +159,8 @@ try {
                     }
                 }
                 
-                // Eliminar de BD
                 $stmt = $db->prepare("UPDATE configuracion SET valor = '' WHERE clave = 'logo_url'");
                 $stmt->execute();
-                
                 echo json_encode(['success' => true]);
             }
             break;
@@ -185,7 +177,7 @@ try {
                 $username = $data['username'] ?? '';
                 $password = $data['password'] ?? '';
                 
-                $stmt = $db->prepare("SELECT u.*, r.nombre as rol_nombre FROM usuarios u LEFT JOIN roles r ON u.rol_id = r.id WHERE u.username = ? AND u.estado = 1");
+                $stmt = $db->prepare("SELECT u.*, r.nombre as rol_nombre FROM usuarios u LEFT JOIN roles r ON u.rol_id = r.id WHERE u.username = ? AND u.estado = 'Activo'");
                 $stmt->execute([$username]);
                 $user = $stmt->fetch();
                 
@@ -205,73 +197,68 @@ try {
             }
             break;
         
- // ==================== DEPENDENCIAS ====================
-case 'dependencias':
-    if ($method == 'GET') {
-        $sql = "SELECT d.*, p.nombre as padre_nombre FROM dependencias d 
-                LEFT JOIN dependencias p ON d.padre_id = p.id 
-                WHERE d.activo = 1 ORDER BY d.id";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetchAll();
-        echo json_encode($result);
-    } elseif ($method == 'POST') {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $db->prepare("INSERT INTO dependencias (nombre, nivel, padre_id, codigo, direccion, telefono, email, activo) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
-        $stmt->execute([
-            $data['nombre'],
-            $data['nivel'] ?? 'seccion',
-            $data['padre_id'] ?? null,
-            $data['codigo'] ?? null,
-            $data['direccion'] ?? null,
-            $data['telefono'] ?? null,
-            $data['email'] ?? null
-        ]);
-        echo json_encode(['success' => true, 'id' => $db->lastInsertId()]);
-    } elseif ($method == 'PUT') {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $db->prepare("UPDATE dependencias SET nombre=?, nivel=?, padre_id=?, codigo=?, direccion=?, telefono=?, email=? WHERE id=?");
-        $stmt->execute([
-            $data['nombre'],
-            $data['nivel'] ?? 'seccion',
-            $data['padre_id'] ?? null,
-            $data['codigo'] ?? null,
-            $data['direccion'] ?? null,
-            $data['telefono'] ?? null,
-            $data['email'] ?? null,
-            $id
-        ]);
-        echo json_encode(['success' => true]);
-    } elseif ($method == 'DELETE') {
-        // ELIMINACIÓN EN CASCADA - Primero obtener todas las dependencias hijas
-        function eliminarDependenciaRecursiva($db, $id) {
-            // Obtener hijas
-            $stmt = $db->prepare("SELECT id FROM dependencias WHERE padre_id = ?");
-            $stmt->execute([$id]);
-            $hijas = $stmt->fetchAll();
-            
-            // Eliminar recursivamente las hijas
-            foreach ($hijas as $hija) {
-                eliminarDependenciaRecursiva($db, $hija['id']);
+        // ==================== DEPENDENCIAS ====================
+        case 'dependencias':
+            if ($method == 'GET') {
+                $sql = "SELECT d.*, p.nombre as padre_nombre FROM dependencias d 
+                        LEFT JOIN dependencias p ON d.padre_id = p.id 
+                        WHERE d.activo = 1 ORDER BY d.id";
+                $stmt = $db->prepare($sql);
+                $stmt->execute();
+                $result = $stmt->fetchAll();
+                echo json_encode($result);
+            } elseif ($method == 'POST') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $stmt = $db->prepare("INSERT INTO dependencias (nombre, nivel, padre_id, codigo, direccion, telefono, email, activo) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+                $stmt->execute([
+                    $data['nombre'],
+                    $data['nivel'] ?? 'seccion',
+                    $data['padre_id'] ?? null,
+                    $data['codigo'] ?? null,
+                    $data['direccion'] ?? null,
+                    $data['telefono'] ?? null,
+                    $data['email'] ?? null
+                ]);
+                echo json_encode(['success' => true, 'id' => $db->lastInsertId()]);
+            } elseif ($method == 'PUT') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $stmt = $db->prepare("UPDATE dependencias SET nombre=?, nivel=?, padre_id=?, codigo=?, direccion=?, telefono=?, email=? WHERE id=?");
+                $stmt->execute([
+                    $data['nombre'],
+                    $data['nivel'] ?? 'seccion',
+                    $data['padre_id'] ?? null,
+                    $data['codigo'] ?? null,
+                    $data['direccion'] ?? null,
+                    $data['telefono'] ?? null,
+                    $data['email'] ?? null,
+                    $id
+                ]);
+                echo json_encode(['success' => true]);
+            } elseif ($method == 'DELETE') {
+                function eliminarDependenciaRecursiva($db, $id) {
+                    $stmt = $db->prepare("SELECT id FROM dependencias WHERE padre_id = ?");
+                    $stmt->execute([$id]);
+                    $hijas = $stmt->fetchAll();
+                    
+                    foreach ($hijas as $hija) {
+                        eliminarDependenciaRecursiva($db, $hija['id']);
+                    }
+                    
+                    $stmt = $db->prepare("UPDATE personal SET dependencia_id = NULL WHERE dependencia_id = ?");
+                    $stmt->execute([$id]);
+                    
+                    $stmt = $db->prepare("DELETE FROM dependencias WHERE id = ?");
+                    $stmt->execute([$id]);
+                }
+                
+                try {
+                    eliminarDependenciaRecursiva($db, $id);
+                    echo json_encode(['success' => true, 'message' => 'Dependencia eliminada correctamente']);
+                } catch (Exception $e) {
+                    echo json_encode(['error' => 'Error al eliminar: ' . $e->getMessage()]);
+                }
             }
-            
-            // Actualizar personal que tenga esta dependencia (setear a NULL)
-            $stmt = $db->prepare("UPDATE personal SET dependencia_id = NULL WHERE dependencia_id = ?");
-            $stmt->execute([$id]);
-            
-            // Eliminar la dependencia actual
-            $stmt = $db->prepare("DELETE FROM dependencias WHERE id = ?");
-            $stmt->execute([$id]);
-        }
-        
-        try {
-            eliminarDependenciaRecursiva($db, $id);
-            echo json_encode(['success' => true, 'message' => 'Dependencia y sus hijas eliminadas correctamente']);
-        } catch (Exception $e) {
-            echo json_encode(['error' => 'Error al eliminar: ' . $e->getMessage()]);
-        }
-    }
-    break;
+            break;
         
         // ==================== CATÁLOGOS ====================
         case 'catalogos':
@@ -298,6 +285,53 @@ case 'dependencias':
                 echo json_encode(['success' => true]);
             } elseif ($method == 'DELETE') {
                 $stmt = $db->prepare("DELETE FROM catalogos WHERE id = ?");
+                $stmt->execute([$id]);
+                echo json_encode(['success' => true]);
+            }
+            break;
+        
+        // ==================== SUBORDINADOS (OFICINAS) CON DEPENDENCIA ====================
+        case 'subordinados':
+            if ($method == 'GET') {
+                $dependencia_id = $_GET['dependencia_id'] ?? null;
+                if ($dependencia_id && $dependencia_id !== '') {
+                    $stmt = $db->prepare("SELECT c.*, d.nombre as dependencia_nombre 
+                                          FROM catalogos c 
+                                          LEFT JOIN dependencias d ON c.dependencia_id = d.id 
+                                          WHERE c.tipo = 'oficinas' AND c.activo = 1 
+                                          AND (c.dependencia_id = ? OR c.dependencia_id IS NULL)
+                                          ORDER BY c.orden, c.valor");
+                    $stmt->execute([$dependencia_id]);
+                } else {
+                    $stmt = $db->prepare("SELECT c.*, d.nombre as dependencia_nombre 
+                                          FROM catalogos c 
+                                          LEFT JOIN dependencias d ON c.dependencia_id = d.id 
+                                          WHERE c.tipo = 'oficinas' AND c.activo = 1 
+                                          ORDER BY d.nombre, c.orden, c.valor");
+                    $stmt->execute();
+                }
+                echo json_encode($stmt->fetchAll());
+            } elseif ($method == 'POST') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $stmt = $db->prepare("INSERT INTO catalogos (tipo, valor, orden, dependencia_id) VALUES ('oficinas', ?, ?, ?)");
+                $stmt->execute([
+                    $data['valor'],
+                    $data['orden'] ?? 0,
+                    $data['dependencia_id'] ?? null
+                ]);
+                echo json_encode(['success' => true, 'id' => $db->lastInsertId()]);
+            } elseif ($method == 'PUT') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $stmt = $db->prepare("UPDATE catalogos SET valor = ?, orden = ?, dependencia_id = ? WHERE id = ? AND tipo = 'oficinas'");
+                $stmt->execute([
+                    $data['valor'],
+                    $data['orden'] ?? 0,
+                    $data['dependencia_id'] ?? null,
+                    $id
+                ]);
+                echo json_encode(['success' => true]);
+            } elseif ($method == 'DELETE') {
+                $stmt = $db->prepare("DELETE FROM catalogos WHERE id = ? AND tipo = 'oficinas'");
                 $stmt->execute([$id]);
                 echo json_encode(['success' => true]);
             }
@@ -340,8 +374,31 @@ case 'dependencias':
                 }
             } elseif ($method == 'POST') {
                 $data = json_decode(file_get_contents('php://input'), true);
-                $dependencia_id = $data['dependencia_id'] ?? ($authUser['dependencia_id'] ?? null);
-                $seccion_guardia_id = $data['seccion_guardia_id'] ?? null;
+                
+                // Validar datos requeridos
+                if (empty($data['legajo']) || empty($data['apellido']) || empty($data['nombre']) || empty($data['dni'])) {
+                    echo json_encode(['error' => 'Faltan datos requeridos: legajo, apellido, nombre, dni']);
+                    break;
+                }
+                
+                // Verificar si ya existe el legajo
+                $stmt = $db->prepare("SELECT COUNT(*) FROM personal WHERE legajo = ?");
+                $stmt->execute([$data['legajo']]);
+                if ($stmt->fetchColumn() > 0) {
+                    echo json_encode(['error' => 'Ya existe un registro con el legajo ' . $data['legajo']]);
+                    break;
+                }
+                
+                // Verificar si ya existe el DNI
+                $stmt = $db->prepare("SELECT COUNT(*) FROM personal WHERE dni = ?");
+                $stmt->execute([$data['dni']]);
+                if ($stmt->fetchColumn() > 0) {
+                    echo json_encode(['error' => 'Ya existe un registro con el DNI ' . $data['dni']]);
+                    break;
+                }
+                
+                $dependencia_id = !empty($data['dependencia_id']) ? $data['dependencia_id'] : null;
+                $seccion_guardia_id = !empty($data['seccion_guardia_id']) ? $data['seccion_guardia_id'] : null;
                 
                 $stmt = $db->prepare("INSERT INTO personal (
                     legajo, jerarquia, apellido, nombre, dni, sexo, oficina, fecha_nacimiento, 
@@ -349,20 +406,42 @@ case 'dependencias':
                     nro_credencial, nro_licencia_conducir, licencia_categoria, fecha_vencimiento_licencia, es_chofer,
                     obra_social, obra_social_numero, nro_afiliado, telefono, email, direccion, dependencia_id, seccion_guardia_id
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([
-                    $data['legajo'], $data['jerarquia'], $data['apellido'], $data['nombre'],
-                    $data['dni'], $data['sexo'], $data['oficina'], $data['fecha_nacimiento'],
+                
+                $result = $stmt->execute([
+                    $data['legajo'], 
+                    $data['jerarquia'] ?? null, 
+                    $data['apellido'], 
+                    $data['nombre'],
+                    $data['dni'], 
+                    $data['sexo'] ?? null, 
+                    $data['oficina'] ?? null, 
+                    $data['fecha_nacimiento'] ?? null,
                     isset($data['tiene_arma']) ? (int)$data['tiene_arma'] : 0,
-                    $data['arma_marca'] ?? null, $data['arma_modelo'] ?? null, $data['arma_serie'] ?? null,
-                    $data['chaleco_numero'] ?? null, $data['sin_arma_motivo'] ?? null,
-                    $data['nro_credencial'] ?? null, $data['nro_licencia_conducir'] ?? null,
-                    $data['licencia_categoria'] ?? null, $data['fecha_vencimiento_licencia'] ?? null,
+                    $data['arma_marca'] ?? null, 
+                    $data['arma_modelo'] ?? null, 
+                    $data['arma_serie'] ?? null,
+                    $data['chaleco_numero'] ?? null, 
+                    $data['sin_arma_motivo'] ?? null,
+                    $data['nro_credencial'] ?? null, 
+                    $data['nro_licencia_conducir'] ?? null,
+                    $data['licencia_categoria'] ?? null, 
+                    $data['fecha_vencimiento_licencia'] ?? null,
                     isset($data['es_chofer']) ? (int)$data['es_chofer'] : 0,
-                    $data['obra_social'] ?? null, $data['obra_social_numero'] ?? null,
-                    $data['nro_afiliado'] ?? null, $data['telefono'] ?? null,
-                    $data['email'] ?? null, $data['direccion'] ?? null, $dependencia_id, $seccion_guardia_id
+                    $data['obra_social'] ?? null, 
+                    $data['obra_social_numero'] ?? null,
+                    $data['nro_afiliado'] ?? null, 
+                    $data['telefono'] ?? null,
+                    $data['email'] ?? null, 
+                    $data['direccion'] ?? null, 
+                    $dependencia_id, 
+                    $seccion_guardia_id
                 ]);
-                echo json_encode(['success' => true, 'id' => $db->lastInsertId()]);
+                
+                if ($result) {
+                    echo json_encode(['success' => true, 'id' => $db->lastInsertId()]);
+                } else {
+                    echo json_encode(['error' => 'Error al insertar en la base de datos']);
+                }
             } elseif ($method == 'PUT') {
                 $data = json_decode(file_get_contents('php://input'), true);
                 
@@ -872,7 +951,7 @@ case 'dependencias':
             echo json_encode($stats);
             break;
         
-         // ==================== FERIADOS ====================
+        // ==================== FERIADOS ====================
         case 'feriados':
             if ($method == 'GET') {
                 $stmt = $db->prepare("SELECT * FROM feriados ORDER BY fecha DESC");
@@ -890,7 +969,7 @@ case 'dependencias':
                 echo json_encode(['success' => true]);
             }
             break;
-            
+        
         // ==================== DASHBOARD CONFIG ====================
         case 'dashboard_config':
             $usuario_id = $authUser['user_id'];
@@ -913,7 +992,6 @@ case 'dependencias':
                 
                 $stmt = $db->prepare("INSERT INTO dashboard_config (usuario_id, widgets) VALUES (?, ?) ON DUPLICATE KEY UPDATE widgets = VALUES(widgets)");
                 $stmt->execute([$usuario_id, $widgets]);
-                
                 echo json_encode(['success' => true]);
             }
             break;
@@ -967,7 +1045,6 @@ case 'dependencias':
                 
                 $stmt = $db->prepare("INSERT INTO user_table_config (usuario_id, tabla, columnas) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE columnas = VALUES(columnas)");
                 $stmt->execute([$usuario_id, $tabla, $columnas]);
-                
                 echo json_encode(['success' => true]);
             }
             break;
@@ -994,7 +1071,6 @@ case 'dependencias':
                     $stmt->execute([$data['nombre_completo'], $data['email'], $usuario_id]);
                     echo json_encode(['success' => true]);
                 } elseif (isset($data['password_actual']) && isset($data['nueva_password'])) {
-                    // Verificar contraseña actual
                     $stmt = $db->prepare("SELECT password FROM usuarios WHERE id = ?");
                     $stmt->execute([$usuario_id]);
                     $user = $stmt->fetch();

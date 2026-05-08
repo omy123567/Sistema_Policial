@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-05-2026 a las 14:41:07
+-- Tiempo de generación: 09-05-2026 a las 00:11:14
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -76,6 +76,7 @@ CREATE TABLE `bitacora` (
 CREATE TABLE `catalogos` (
   `id` int(11) NOT NULL,
   `tipo` varchar(50) NOT NULL,
+  `dependencia_id` int(11) DEFAULT NULL,
   `valor` varchar(100) NOT NULL,
   `orden` int(11) DEFAULT 0,
   `activo` tinyint(1) DEFAULT 1,
@@ -86,90 +87,91 @@ CREATE TABLE `catalogos` (
 -- Volcado de datos para la tabla `catalogos`
 --
 
-INSERT INTO `catalogos` (`id`, `tipo`, `valor`, `orden`, `activo`, `created_at`) VALUES
-(31, 'tipos_licencia', 'Especial', 3, 1, '2026-04-21 15:12:12'),
-(33, 'tipos_licencia', 'Maternidad/Paternidad', 5, 1, '2026-04-21 15:12:12'),
-(53, 'tipos_licencia', 'Enfermedad', 2, 1, '2026-04-22 13:08:13'),
-(69, 'licencia_categorias', 'B1', 1, 1, '2026-04-24 14:06:24'),
-(70, 'licencia_categorias', 'B2', 2, 1, '2026-04-24 14:06:24'),
-(71, 'licencia_categorias', 'B3', 3, 1, '2026-04-24 14:06:24'),
-(72, 'licencia_categorias', 'C1', 4, 1, '2026-04-24 14:06:24'),
-(73, 'licencia_categorias', 'C2', 5, 1, '2026-04-24 14:06:24'),
-(74, 'licencia_categorias', 'C3', 6, 1, '2026-04-24 14:06:24'),
-(75, 'licencia_categorias', 'D1', 7, 1, '2026-04-24 14:06:24'),
-(76, 'licencia_categorias', 'D2', 8, 1, '2026-04-24 14:06:24'),
-(77, 'licencia_categorias', 'E1', 9, 1, '2026-04-24 14:06:24'),
-(78, 'licencia_categorias', 'E2', 10, 1, '2026-04-24 14:06:24'),
-(79, 'licencia_categorias', 'G', 11, 1, '2026-04-24 14:06:24'),
-(80, 'licencia_categorias', 'A1', 12, 1, '2026-04-24 14:06:24'),
-(81, 'licencia_categorias', 'A2', 13, 1, '2026-04-24 14:06:24'),
-(82, 'licencia_categorias', 'A3', 14, 1, '2026-04-24 14:06:24'),
-(84, 'tipo_oficio', 'Oficio Judicial', 1, 1, '2026-04-28 12:29:30'),
-(98, 'licencia_categorias', 'C', 6, 1, '2026-04-28 12:29:30'),
-(99, 'licencia_categorias', 'D', 7, 1, '2026-04-28 12:29:30'),
-(100, 'licencia_categorias', 'E', 8, 1, '2026-04-28 12:29:30'),
-(109, 'jerarquias', 'Comisario General', 1, 1, '2026-04-30 12:44:29'),
-(110, 'jerarquias', 'Comisario Mayor', 2, 1, '2026-04-30 12:44:29'),
-(111, 'jerarquias', 'Comisario Inspector', 3, 1, '2026-04-30 12:44:29'),
-(112, 'jerarquias', 'Comisario', 4, 1, '2026-04-30 12:44:29'),
-(113, 'jerarquias', 'Subcomisario', 5, 1, '2026-04-30 12:44:29'),
-(114, 'jerarquias', 'Oficial Principal', 6, 1, '2026-04-30 12:44:29'),
-(115, 'jerarquias', 'Oficial Inspector', 7, 1, '2026-04-30 12:44:29'),
-(116, 'jerarquias', 'Oficial Subinspector', 8, 1, '2026-04-30 12:44:29'),
-(117, 'jerarquias', 'Oficial Ayudante', 9, 1, '2026-04-30 12:44:29'),
-(118, 'jerarquias', 'Suboficial Mayor', 10, 1, '2026-04-30 12:44:29'),
-(119, 'jerarquias', 'Suboficial Principal', 11, 1, '2026-04-30 12:44:29'),
-(120, 'jerarquias', 'Sargento Ayudante', 12, 1, '2026-04-30 12:44:29'),
-(121, 'jerarquias', 'Sargento 1°', 13, 1, '2026-04-30 12:44:29'),
-(122, 'jerarquias', 'Sargento', 14, 1, '2026-04-30 12:44:29'),
-(123, 'jerarquias', 'Cabo 1°', 15, 1, '2026-04-30 12:44:29'),
-(124, 'jerarquias', 'Cabo', 16, 1, '2026-04-30 12:44:29'),
-(125, 'jerarquias', 'Agente', 17, 1, '2026-04-30 12:44:29'),
-(126, 'tipos_recargo', 'Seguridad CIudanada', 0, 1, '2026-04-30 12:45:00'),
-(127, 'tipos_recargo', 'Operativo', 0, 1, '2026-04-30 12:45:08'),
-(142, 'juzgados', 'J.I.C  Nro. 1- 1° Circunscripción', 0, 1, '2026-04-30 13:07:30'),
-(143, 'juzgados', 'J.I.C  Nro. 2- 1° Circunscripción', 0, 1, '2026-04-30 13:07:37'),
-(144, 'juzgados', 'J.I.C  Nro. 3- 1° Circunscripción', 0, 1, '2026-04-30 13:07:42'),
-(145, 'juzgados', 'J.I.C  Nro. 4- 1° Circunscripción', 0, 1, '2026-04-30 13:07:48'),
-(146, 'juzgados', 'J.I.C  Nro. 5- 1° Circunscripción', 0, 1, '2026-04-30 13:07:57'),
-(147, 'juzgados', 'J.I.C  Nro. 6- 1° Circunscripción', 0, 1, '2026-04-30 13:08:07'),
-(148, 'juzgados', 'Excelenticima Camara Primera en lo Criminal', 0, 1, '2026-04-30 13:08:25'),
-(149, 'juzgados', 'Excelenticima Camara Segunda en lo Criminal', 0, 1, '2026-04-30 13:08:39'),
-(150, 'juzgados', 'Federal Nº 1- 1° Circunscripción', 0, 1, '2026-04-30 13:09:01'),
-(151, 'juzgados', 'Federal Nº 2- 1° Circunscripción', 0, 1, '2026-04-30 13:09:09'),
-(152, 'juzgados', 'J.I.C  Nro. 1- 2° Circunscripción', 0, 1, '2026-04-30 13:09:44'),
-(153, 'juzgados', 'J.I.C  Nro. 2- 2° Circunscripción', 0, 1, '2026-04-30 13:09:50'),
-(155, 'tipos_requerimiento', 'Resguardo de Evidencia', 0, 1, '2026-04-30 13:10:58'),
-(157, 'unidades_regionales', 'Dirección General de Policía Científica', 1, 1, '2026-05-01 02:40:33'),
-(164, 'subordinados', 'Delegacion El Colorado', 1, 1, '2026-05-01 02:40:33'),
-(165, 'subordinados', 'Delegacion Criminalística C-5', 2, 1, '2026-05-01 02:40:33'),
-(166, 'subordinados', 'Delegacion Pirané', 3, 1, '2026-05-01 02:40:33'),
-(167, 'subordinados', 'Direccion de Policia Cientifica', 4, 1, '2026-05-01 02:40:33'),
-(168, 'subordinados', 'Deleg Clorinda', 5, 1, '2026-05-01 02:40:33'),
-(169, 'subordinados', 'Delegacion Laguna Blanca', 6, 1, '2026-05-01 02:40:33'),
-(170, 'subordinados', 'Delegacion Las Lomitas', 7, 1, '2026-05-01 02:40:33'),
-(171, 'subordinados', 'Delegacion Ing Juarez', 8, 1, '2026-05-01 02:40:33'),
-(172, 'subordinados', 'Delegacion Güemes', 9, 1, '2026-05-01 02:40:33'),
-(173, 'subordinados', 'Deleg Ibarreta', 10, 1, '2026-05-01 02:40:33'),
-(174, 'subordinados', 'Delegacion Nueva Formosa', 11, 1, '2026-05-01 02:40:33'),
-(175, 'subordinados', 'Division Investigación Ciberdelitos', 12, 1, '2026-05-01 02:40:33'),
-(176, 'subordinados', 'Division Informatica Forense', 13, 1, '2026-05-01 02:40:33'),
-(177, 'subordinados', 'Sección Criminalística', 14, 1, '2026-05-01 02:40:33'),
-(178, 'subordinados', 'Sección Balística', 15, 1, '2026-05-01 02:40:33'),
-(179, 'subordinados', 'Sección Documentología', 16, 1, '2026-05-01 02:40:33'),
-(180, 'subordinados', 'Sección Química Legal', 17, 1, '2026-05-01 02:40:33'),
-(181, 'subordinados', 'Sección Informática Forense', 18, 1, '2026-05-01 02:40:33'),
-(183, 'obras_sociales', 'A.M.P.', 0, 1, '2026-05-06 11:29:52'),
-(184, 'tipos_requerimiento', 'Descarga de Filmaciones', 0, 1, '2026-05-06 11:31:04'),
-(185, 'tipos_requerimiento', 'Escalamiento de Datos', 0, 1, '2026-05-06 11:31:09'),
-(186, 'tipos_requerimiento', 'Informe Técnico', 0, 1, '2026-05-06 11:31:21'),
-(187, 'tipos_licencia', 'Anual', 0, 1, '2026-05-06 11:32:24'),
-(188, 'tipos_licencia', 'Invernal', 0, 1, '2026-05-06 11:32:28'),
-(189, 'tipos_recargo', 'Cancha', 0, 1, '2026-05-06 11:32:54'),
-(190, 'tipo_oficio', 'Oficio Vario', 0, 1, '2026-05-06 11:33:25'),
-(191, 'tipo_oficio', 'Nota V', 0, 1, '2026-05-06 11:33:29'),
-(192, 'tipo_oficio', 'Memorandum', 0, 1, '2026-05-06 11:33:35'),
-(193, 'tipos_recargo', 'Recargo Guardia', 0, 1, '2026-05-06 12:05:35');
+INSERT INTO `catalogos` (`id`, `tipo`, `dependencia_id`, `valor`, `orden`, `activo`, `created_at`) VALUES
+(31, 'tipos_licencia', NULL, 'Especial', 3, 1, '2026-04-21 15:12:12'),
+(33, 'tipos_licencia', NULL, 'Maternidad/Paternidad', 5, 1, '2026-04-21 15:12:12'),
+(53, 'tipos_licencia', NULL, 'Enfermedad', 2, 1, '2026-04-22 13:08:13'),
+(69, 'licencia_categorias', NULL, 'B1', 1, 1, '2026-04-24 14:06:24'),
+(70, 'licencia_categorias', NULL, 'B2', 2, 1, '2026-04-24 14:06:24'),
+(71, 'licencia_categorias', NULL, 'B3', 3, 1, '2026-04-24 14:06:24'),
+(72, 'licencia_categorias', NULL, 'C1', 4, 1, '2026-04-24 14:06:24'),
+(73, 'licencia_categorias', NULL, 'C2', 5, 1, '2026-04-24 14:06:24'),
+(74, 'licencia_categorias', NULL, 'C3', 6, 1, '2026-04-24 14:06:24'),
+(75, 'licencia_categorias', NULL, 'D1', 7, 1, '2026-04-24 14:06:24'),
+(76, 'licencia_categorias', NULL, 'D2', 8, 1, '2026-04-24 14:06:24'),
+(77, 'licencia_categorias', NULL, 'E1', 9, 1, '2026-04-24 14:06:24'),
+(78, 'licencia_categorias', NULL, 'E2', 10, 1, '2026-04-24 14:06:24'),
+(79, 'licencia_categorias', NULL, 'G', 11, 1, '2026-04-24 14:06:24'),
+(80, 'licencia_categorias', NULL, 'A1', 12, 1, '2026-04-24 14:06:24'),
+(81, 'licencia_categorias', NULL, 'A2', 13, 1, '2026-04-24 14:06:24'),
+(82, 'licencia_categorias', NULL, 'A3', 14, 1, '2026-04-24 14:06:24'),
+(84, 'tipo_oficio', NULL, 'Oficio Judicial', 1, 1, '2026-04-28 12:29:30'),
+(98, 'licencia_categorias', NULL, 'C', 6, 1, '2026-04-28 12:29:30'),
+(99, 'licencia_categorias', NULL, 'D', 7, 1, '2026-04-28 12:29:30'),
+(100, 'licencia_categorias', NULL, 'E', 8, 1, '2026-04-28 12:29:30'),
+(109, 'jerarquias', NULL, 'Comisario General', 1, 1, '2026-04-30 12:44:29'),
+(110, 'jerarquias', NULL, 'Comisario Mayor', 2, 1, '2026-04-30 12:44:29'),
+(111, 'jerarquias', NULL, 'Comisario Inspector', 3, 1, '2026-04-30 12:44:29'),
+(112, 'jerarquias', NULL, 'Comisario', 4, 1, '2026-04-30 12:44:29'),
+(113, 'jerarquias', NULL, 'Subcomisario', 5, 1, '2026-04-30 12:44:29'),
+(114, 'jerarquias', NULL, 'Oficial Principal', 6, 1, '2026-04-30 12:44:29'),
+(115, 'jerarquias', NULL, 'Oficial Inspector', 7, 1, '2026-04-30 12:44:29'),
+(116, 'jerarquias', NULL, 'Oficial Subinspector', 8, 1, '2026-04-30 12:44:29'),
+(117, 'jerarquias', NULL, 'Oficial Ayudante', 9, 1, '2026-04-30 12:44:29'),
+(118, 'jerarquias', NULL, 'Suboficial Mayor', 10, 1, '2026-04-30 12:44:29'),
+(119, 'jerarquias', NULL, 'Suboficial Principal', 11, 1, '2026-04-30 12:44:29'),
+(120, 'jerarquias', NULL, 'Sargento Ayudante', 12, 1, '2026-04-30 12:44:29'),
+(121, 'jerarquias', NULL, 'Sargento 1°', 13, 1, '2026-04-30 12:44:29'),
+(122, 'jerarquias', NULL, 'Sargento', 14, 1, '2026-04-30 12:44:29'),
+(123, 'jerarquias', NULL, 'Cabo 1°', 15, 1, '2026-04-30 12:44:29'),
+(124, 'jerarquias', NULL, 'Cabo', 16, 1, '2026-04-30 12:44:29'),
+(125, 'jerarquias', NULL, 'Agente', 17, 1, '2026-04-30 12:44:29'),
+(126, 'tipos_recargo', NULL, 'Seguridad CIudanada', 0, 1, '2026-04-30 12:45:00'),
+(127, 'tipos_recargo', NULL, 'Operativo', 0, 1, '2026-04-30 12:45:08'),
+(142, 'juzgados', NULL, 'J.I.C  Nro. 1- 1° Circunscripción', 0, 1, '2026-04-30 13:07:30'),
+(143, 'juzgados', NULL, 'J.I.C  Nro. 2- 1° Circunscripción', 0, 1, '2026-04-30 13:07:37'),
+(144, 'juzgados', NULL, 'J.I.C  Nro. 3- 1° Circunscripción', 0, 1, '2026-04-30 13:07:42'),
+(145, 'juzgados', NULL, 'J.I.C  Nro. 4- 1° Circunscripción', 0, 1, '2026-04-30 13:07:48'),
+(146, 'juzgados', NULL, 'J.I.C  Nro. 5- 1° Circunscripción', 0, 1, '2026-04-30 13:07:57'),
+(147, 'juzgados', NULL, 'J.I.C  Nro. 6- 1° Circunscripción', 0, 1, '2026-04-30 13:08:07'),
+(148, 'juzgados', NULL, 'Excelenticima Camara Primera en lo Criminal', 0, 1, '2026-04-30 13:08:25'),
+(149, 'juzgados', NULL, 'Excelenticima Camara Segunda en lo Criminal', 0, 1, '2026-04-30 13:08:39'),
+(150, 'juzgados', NULL, 'Federal Nº 1- 1° Circunscripción', 0, 1, '2026-04-30 13:09:01'),
+(151, 'juzgados', NULL, 'Federal Nº 2- 1° Circunscripción', 0, 1, '2026-04-30 13:09:09'),
+(152, 'juzgados', NULL, 'J.I.C  Nro. 1- 2° Circunscripción', 0, 1, '2026-04-30 13:09:44'),
+(153, 'juzgados', NULL, 'J.I.C  Nro. 2- 2° Circunscripción', 0, 1, '2026-04-30 13:09:50'),
+(155, 'tipos_requerimiento', NULL, 'Resguardo de Evidencia', 0, 1, '2026-04-30 13:10:58'),
+(157, 'unidades_regionales', NULL, 'Dirección General de Policía Científica', 1, 1, '2026-05-01 02:40:33'),
+(164, 'subordinados', NULL, 'Delegacion El Colorado', 1, 1, '2026-05-01 02:40:33'),
+(165, 'subordinados', NULL, 'Delegacion Criminalística C-5', 2, 1, '2026-05-01 02:40:33'),
+(166, 'subordinados', NULL, 'Delegacion Pirané', 3, 1, '2026-05-01 02:40:33'),
+(167, 'subordinados', NULL, 'Direccion de Policia Cientifica', 4, 1, '2026-05-01 02:40:33'),
+(168, 'subordinados', NULL, 'Deleg Clorinda', 5, 1, '2026-05-01 02:40:33'),
+(169, 'subordinados', NULL, 'Delegacion Laguna Blanca', 6, 1, '2026-05-01 02:40:33'),
+(170, 'subordinados', NULL, 'Delegacion Las Lomitas', 7, 1, '2026-05-01 02:40:33'),
+(171, 'subordinados', NULL, 'Delegacion Ing Juarez', 8, 1, '2026-05-01 02:40:33'),
+(172, 'subordinados', NULL, 'Delegacion Güemes', 9, 1, '2026-05-01 02:40:33'),
+(173, 'subordinados', NULL, 'Deleg Ibarreta', 10, 1, '2026-05-01 02:40:33'),
+(174, 'subordinados', NULL, 'Delegacion Nueva Formosa', 11, 1, '2026-05-01 02:40:33'),
+(175, 'subordinados', NULL, 'Division Investigación Ciberdelitos', 12, 1, '2026-05-01 02:40:33'),
+(176, 'subordinados', NULL, 'Division Informatica Forense', 13, 1, '2026-05-01 02:40:33'),
+(177, 'subordinados', NULL, 'Sección Criminalística', 14, 1, '2026-05-01 02:40:33'),
+(178, 'subordinados', NULL, 'Sección Balística', 15, 1, '2026-05-01 02:40:33'),
+(179, 'subordinados', NULL, 'Sección Documentología', 16, 1, '2026-05-01 02:40:33'),
+(180, 'subordinados', NULL, 'Sección Química Legal', 17, 1, '2026-05-01 02:40:33'),
+(181, 'subordinados', NULL, 'Sección Informática Forense', 18, 1, '2026-05-01 02:40:33'),
+(183, 'obras_sociales', NULL, 'A.M.P.', 0, 1, '2026-05-06 11:29:52'),
+(184, 'tipos_requerimiento', NULL, 'Descarga de Filmaciones', 0, 1, '2026-05-06 11:31:04'),
+(185, 'tipos_requerimiento', NULL, 'Escalamiento de Datos', 0, 1, '2026-05-06 11:31:09'),
+(186, 'tipos_requerimiento', NULL, 'Informe Técnico', 0, 1, '2026-05-06 11:31:21'),
+(187, 'tipos_licencia', NULL, 'Anual', 0, 1, '2026-05-06 11:32:24'),
+(188, 'tipos_licencia', NULL, 'Invernal', 0, 1, '2026-05-06 11:32:28'),
+(189, 'tipos_recargo', NULL, 'Cancha', 0, 1, '2026-05-06 11:32:54'),
+(190, 'tipo_oficio', NULL, 'Oficio Vario', 0, 1, '2026-05-06 11:33:25'),
+(191, 'tipo_oficio', NULL, 'Nota V', 0, 1, '2026-05-06 11:33:29'),
+(192, 'tipo_oficio', NULL, 'Memorandum', 0, 1, '2026-05-06 11:33:35'),
+(193, 'tipos_recargo', NULL, 'Recargo Guardia', 0, 1, '2026-05-06 12:05:35'),
+(194, 'oficinas', 1, 'Delegacion Laguna Blanca', 0, 1, '2026-05-08 14:38:43');
 
 -- --------------------------------------------------------
 
@@ -928,7 +930,8 @@ ALTER TABLE `bitacora`
 ALTER TABLE `catalogos`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `unique_tipo_valor` (`tipo`,`valor`),
-  ADD KEY `idx_tipo` (`tipo`);
+  ADD KEY `idx_tipo` (`tipo`),
+  ADD KEY `idx_dependencia_id` (`dependencia_id`);
 
 --
 -- Indices de la tabla `configuracion`
@@ -1166,7 +1169,7 @@ ALTER TABLE `bitacora`
 -- AUTO_INCREMENT de la tabla `catalogos`
 --
 ALTER TABLE `catalogos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=194;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=195;
 
 --
 -- AUTO_INCREMENT de la tabla `configuracion`
@@ -1327,6 +1330,12 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `bitacora`
   ADD CONSTRAINT `bitacora_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL;
+
+--
+-- Filtros para la tabla `catalogos`
+--
+ALTER TABLE `catalogos`
+  ADD CONSTRAINT `fk_catalogos_dependencia` FOREIGN KEY (`dependencia_id`) REFERENCES `dependencias` (`id`) ON DELETE SET NULL;
 
 --
 -- Filtros para la tabla `dashboard_config`
