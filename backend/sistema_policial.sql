@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-05-2026 a las 00:11:14
+-- Tiempo de generación: 09-05-2026 a las 00:50:21
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -142,24 +142,6 @@ INSERT INTO `catalogos` (`id`, `tipo`, `dependencia_id`, `valor`, `orden`, `acti
 (153, 'juzgados', NULL, 'J.I.C  Nro. 2- 2° Circunscripción', 0, 1, '2026-04-30 13:09:50'),
 (155, 'tipos_requerimiento', NULL, 'Resguardo de Evidencia', 0, 1, '2026-04-30 13:10:58'),
 (157, 'unidades_regionales', NULL, 'Dirección General de Policía Científica', 1, 1, '2026-05-01 02:40:33'),
-(164, 'subordinados', NULL, 'Delegacion El Colorado', 1, 1, '2026-05-01 02:40:33'),
-(165, 'subordinados', NULL, 'Delegacion Criminalística C-5', 2, 1, '2026-05-01 02:40:33'),
-(166, 'subordinados', NULL, 'Delegacion Pirané', 3, 1, '2026-05-01 02:40:33'),
-(167, 'subordinados', NULL, 'Direccion de Policia Cientifica', 4, 1, '2026-05-01 02:40:33'),
-(168, 'subordinados', NULL, 'Deleg Clorinda', 5, 1, '2026-05-01 02:40:33'),
-(169, 'subordinados', NULL, 'Delegacion Laguna Blanca', 6, 1, '2026-05-01 02:40:33'),
-(170, 'subordinados', NULL, 'Delegacion Las Lomitas', 7, 1, '2026-05-01 02:40:33'),
-(171, 'subordinados', NULL, 'Delegacion Ing Juarez', 8, 1, '2026-05-01 02:40:33'),
-(172, 'subordinados', NULL, 'Delegacion Güemes', 9, 1, '2026-05-01 02:40:33'),
-(173, 'subordinados', NULL, 'Deleg Ibarreta', 10, 1, '2026-05-01 02:40:33'),
-(174, 'subordinados', NULL, 'Delegacion Nueva Formosa', 11, 1, '2026-05-01 02:40:33'),
-(175, 'subordinados', NULL, 'Division Investigación Ciberdelitos', 12, 1, '2026-05-01 02:40:33'),
-(176, 'subordinados', NULL, 'Division Informatica Forense', 13, 1, '2026-05-01 02:40:33'),
-(177, 'subordinados', NULL, 'Sección Criminalística', 14, 1, '2026-05-01 02:40:33'),
-(178, 'subordinados', NULL, 'Sección Balística', 15, 1, '2026-05-01 02:40:33'),
-(179, 'subordinados', NULL, 'Sección Documentología', 16, 1, '2026-05-01 02:40:33'),
-(180, 'subordinados', NULL, 'Sección Química Legal', 17, 1, '2026-05-01 02:40:33'),
-(181, 'subordinados', NULL, 'Sección Informática Forense', 18, 1, '2026-05-01 02:40:33'),
 (183, 'obras_sociales', NULL, 'A.M.P.', 0, 1, '2026-05-06 11:29:52'),
 (184, 'tipos_requerimiento', NULL, 'Descarga de Filmaciones', 0, 1, '2026-05-06 11:31:04'),
 (185, 'tipos_requerimiento', NULL, 'Escalamiento de Datos', 0, 1, '2026-05-06 11:31:09'),
@@ -171,7 +153,18 @@ INSERT INTO `catalogos` (`id`, `tipo`, `dependencia_id`, `valor`, `orden`, `acti
 (191, 'tipo_oficio', NULL, 'Nota V', 0, 1, '2026-05-06 11:33:29'),
 (192, 'tipo_oficio', NULL, 'Memorandum', 0, 1, '2026-05-06 11:33:35'),
 (193, 'tipos_recargo', NULL, 'Recargo Guardia', 0, 1, '2026-05-06 12:05:35'),
-(194, 'oficinas', 1, 'Delegacion Laguna Blanca', 0, 1, '2026-05-08 14:38:43');
+(194, 'oficinas', 1, 'Delegacion Laguna Blanca', 0, 1, '2026-05-08 14:38:43'),
+(195, 'oficinas', 1, 'Delegacion Criminalística C-5', 0, 1, '2026-05-08 22:38:58'),
+(196, 'oficinas', 1, 'Delegacion Pirané', 0, 1, '2026-05-08 22:39:08'),
+(197, 'oficinas', 1, 'Direccion de Policia Cientifica', 0, 1, '2026-05-08 22:47:50'),
+(198, 'oficinas', 1, 'Delegacion Clorinda', 0, 1, '2026-05-08 22:48:03'),
+(199, 'oficinas', 1, 'Delegacion Las Lomitas', 0, 1, '2026-05-08 22:48:14'),
+(202, 'oficinas', 1, 'Delegacion Ing Juarez', 0, 1, '2026-05-08 22:49:02'),
+(203, 'oficinas', 1, 'Delegacion Güemes', 0, 1, '2026-05-08 22:49:10'),
+(204, 'oficinas', 1, 'Delegacion Ibarreta', 0, 1, '2026-05-08 22:49:19'),
+(205, 'oficinas', 1, 'Delegacion Nueva Formosa', 0, 1, '2026-05-08 22:49:25'),
+(206, 'oficinas', 1, 'Division Investigación Ciberdelitos', 0, 1, '2026-05-08 22:49:44'),
+(207, 'oficinas', 1, 'Division Informatica Forense', 0, 1, '2026-05-08 22:49:51');
 
 -- --------------------------------------------------------
 
@@ -245,12 +238,7 @@ CREATE TABLE `dependencias` (
 --
 
 INSERT INTO `dependencias` (`id`, `nombre`, `nivel`, `padre_id`, `codigo`, `direccion`, `telefono`, `email`, `activo`, `created_at`) VALUES
-(1, 'Dirección General de Policía Científica', 'central', NULL, 'DGPC-001', NULL, NULL, NULL, 1, '2026-04-21 15:12:12'),
-(3, 'Delegación Mar del Plata', 'delegacion', 1, 'DEL-MDP-001', NULL, NULL, NULL, 1, '2026-04-21 15:12:12'),
-(4, 'Delegación Bahía Blanca', 'delegacion', 1, 'DEL-BB-001', NULL, NULL, NULL, 1, '2026-04-21 15:12:12'),
-(8, 'Sección Química Legal', 'seccion', 3, 'SEC-QUIM-MDP-001', NULL, NULL, NULL, 1, '2026-04-21 15:12:12'),
-(9, 'Sección Balística', 'seccion', 3, 'SEC-BAL-MDP-001', NULL, NULL, NULL, 1, '2026-04-21 15:12:12'),
-(10, 'Sección Criminalística', 'seccion', 4, 'SEC-CRIM-BB-001', NULL, NULL, NULL, 1, '2026-04-21 15:12:12');
+(1, 'Dirección General de Policía Científica', 'central', NULL, 'DGPC-001', NULL, NULL, NULL, 1, '2026-04-21 15:12:12');
 
 -- --------------------------------------------------------
 
@@ -874,7 +862,8 @@ CREATE TABLE `user_table_config` (
 
 INSERT INTO `user_table_config` (`id`, `usuario_id`, `tabla`, `columnas`, `created_at`, `updated_at`) VALUES
 (2, 1, 'expedientes', '[\"nro_expediente\",\"expediente_origen\",\"fecha\",\"tipo_oficio\",\"juzgado_origen\",\"tipo_requerimiento\",\"estado\"]', '2026-04-23 22:03:14', '2026-04-23 22:19:54'),
-(11, 1, 'recargos', '[\"fecha\",\"hora\",\"tipo_recargo\",\"oficina\",\"personal\",\"estado\",\"observaciones\"]', '2026-04-24 14:22:32', '2026-04-24 14:22:32');
+(11, 1, 'recargos', '[\"fecha\",\"hora\",\"tipo_recargo\",\"oficina\",\"personal\",\"estado\",\"observaciones\"]', '2026-04-24 14:22:32', '2026-04-24 14:22:32'),
+(22, 1, 'personal', '[\"legajo\",\"jerarquia\",\"apellido_nombre\",\"dni\",\"sexo\",\"fecha_nacimiento\",\"edad\",\"tiene_arma\",\"dependencia\",\"oficina\"]', '2026-05-08 22:36:33', '2026-05-08 22:36:33');
 
 -- --------------------------------------------------------
 
@@ -1169,7 +1158,7 @@ ALTER TABLE `bitacora`
 -- AUTO_INCREMENT de la tabla `catalogos`
 --
 ALTER TABLE `catalogos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=195;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
 
 --
 -- AUTO_INCREMENT de la tabla `configuracion`
@@ -1277,7 +1266,7 @@ ALTER TABLE `permisos`
 -- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `personal_documentos`
@@ -1313,7 +1302,7 @@ ALTER TABLE `secciones_guardia`
 -- AUTO_INCREMENT de la tabla `user_table_config`
 --
 ALTER TABLE `user_table_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
