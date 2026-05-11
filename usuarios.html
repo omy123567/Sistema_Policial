@@ -7,14 +7,291 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
-        .permisos-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-top: 0.5rem; }
-        .modulo-permiso { margin-bottom: 1rem; padding: 0.5rem; border-bottom: 1px solid var(--border); }
-        .modulo-permiso h4 { margin-bottom: 0.5rem; color: var(--accent-primary); }
-        .permiso-checkbox { display: inline-flex; align-items: center; margin-right: 1rem; }
-        .permiso-checkbox input { margin-right: 0.25rem; }
-        @media (max-width: 768px) { .permiso-checkbox { display: block; margin-bottom: 0.5rem; } }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .permisos-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            background: var(--bg-surface);
+        }
+        .modulo-permiso {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            border-radius: 8px;
+        }
+        .modulo-permiso:last-child {
+            border-bottom: none;
+        }
+        .modulo-permiso h4 {
+            margin-bottom: 0.5rem;
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+        .permiso-checkbox {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        .permiso-checkbox input {
+            margin-right: 0.25rem;
+            cursor: pointer;
+        }
+        .permiso-checkbox label {
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-success {
+            background: rgba(22, 163, 74, 0.2);
+            color: #16a34a;
+        }
+        .badge-danger {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+        }
+        .badge-info {
+            background: rgba(29, 78, 216, 0.2);
+            color: #1d4ed8;
+        }
+        .badge-warning {
+            background: rgba(217, 119, 6, 0.2);
+            color: #d97706;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+        .btn-danger {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-secondary {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-primary);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 850px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-surface);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .modal-body {
+            padding: 1.5rem;
+        }
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: var(--bg-surface);
+            position: sticky;
+            bottom: 0;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        .close-modal:hover {
+            color: #dc2626;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2);
+        }
+        select.form-control {
+            cursor: pointer;
+        }
+        .text-secondary {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--bg-surface);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        tr:hover {
+            background: var(--bg-surface);
+        }
+        .text-center {
+            text-align: center;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+        .toast {
+            background: var(--bg-card);
+            border-left: 4px solid;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            min-width: 280px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-success { border-left-color: #16a34a; }
+        .toast-error { border-left-color: #dc2626; }
+        .toast-warning { border-left-color: #d97706; }
+        .toast-info { border-left-color: #1d4ed8; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .nivel-acceso-info {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+        }
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 98%;
+                margin: 1rem;
+            }
+            .permiso-checkbox {
+                display: block;
+                margin-bottom: 0.5rem;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
     </style>
 </head>
 <body>
@@ -29,54 +306,213 @@
                 <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
                 <li><a href="usuarios.html" class="nav-link active"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
                 <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
-            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+            <div class="user-info">
+                <span id="userInfo"></span>
+                <button id="themeToggleBtn" class="theme-toggle" style="background:none;border:none;cursor:pointer;font-size:1.2rem;padding:0.5rem;border-radius:50%;">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                </button>
+                <button id="logoutBtn" class="btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </div>
         </nav>
     </div>
     
     <div class="container">
         <div class="card-header">
             <h1><i class="fas fa-user-cog"></i> Gestión de Usuarios</h1>
-            <button id="btnNuevoUsuario" class="btn btn-primary" onclick="openUsuarioModal()"><i class="fas fa-plus"></i> Nuevo Usuario</button>
+            <button id="btnNuevoUsuario" class="btn-sm btn-primary" onclick="openUsuarioModal()" style="padding: 0.5rem 1rem;">
+                <i class="fas fa-plus"></i> Nuevo Usuario
+            </button>
         </div>
         
         <div class="table-container">
             <table id="usuariosTable">
-                <thead><tr><th>Nombre</th><th>Usuario</th><th>Email</th><th>Rol</th><th>Dependencia</th><th>Estado</th><th>Acciones</th></tr></thead>
-                <tbody id="usuariosTableBody"><tr><td colspan="7" class="text-center">Cargando...<\/td></tr></tbody>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Dependencia</th>
+                        <th>Subordinado</th>
+                        <th>Nivel Acceso</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="usuariosTableBody">
+                    <tr><td colspan="9" class="text-center">Cargando...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
     
-    <div id="usuarioModal" class="modal"><div class="modal-content" style="max-width:600px;max-height:90vh;overflow-y:auto;">
-        <div class="modal-header"><h3 id="modalTitle">Nuevo Usuario</h3><span class="close-modal">&times;</span></div>
-        <div class="modal-body">
-            <form id="usuarioForm">
-                <input type="hidden" id="usuarioId">
-                <div><label>Nombre Completo *</label><input type="text" id="usuario_nombre" class="form-control" required></div>
-                <div><label>Usuario *</label><input type="text" id="usuario_username" class="form-control" required></div>
-                <div><label>Email *</label><input type="email" id="usuario_email" class="form-control" required></div>
-                <div><label>Contraseña</label><div style="display:flex;gap:0.5rem;"><input type="password" id="usuario_password" class="form-control" placeholder="Dejar en blanco para no cambiar"><button type="button" class="btn-sm btn-secondary" onclick="togglePasswordVisibility('usuario_password')"><i class="fas fa-eye"></i></button></div></div>
-                <div><label>Rol *</label><select id="usuario_rol" class="form-control" required><option value="">Seleccionar</option><option value="1">Administrador Central</option><option value="2">Supervisor Delegación</option><option value="3">Jefe Sección</option><option value="4">Operador</option></select></div>
-                <div><label>Dependencia</label><select id="usuario_dependencia" class="form-control" data-dependencia><option value="">Seleccionar</option></select></div>
-                <div><label>Nivel Acceso</label><select id="usuario_nivel_acceso" class="form-control"><option value="solo_propio">Solo su dependencia</option><option value="delegacion">Toda la delegación</option><option value="todas">Todas las dependencias</option></select></div>
-                <div><label>Estado</label><select id="usuario_estado" class="form-control"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select></div>
-                <div><label>Permisos</label><div id="permisosContainer" class="permisos-container"></div></div>
-            </form>
+    <!-- Modal Usuario -->
+    <div id="usuarioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nuevo Usuario</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="usuarioForm">
+                    <input type="hidden" id="usuarioId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre Completo *</label>
+                            <input type="text" id="usuario_nombre" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Usuario *</label>
+                            <input type="text" id="usuario_username" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="usuario_email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <div style="display:flex;gap:0.5rem;">
+                                <input type="password" id="usuario_password" class="form-control" placeholder="Dejar en blanco para no cambiar">
+                                <button type="button" class="btn-sm btn-primary" onclick="togglePasswordVisibility('usuario_password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-secondary">Requerida para nuevos usuarios</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Rol *</label>
+                            <select id="usuario_rol" class="form-control" required>
+                                <option value="">Seleccionar</option>
+                                <option value="1">Administrador Central</option>
+                                <option value="2">Supervisor Delegación</option>
+                                <option value="3">Jefe Sección</option>
+                                <option value="4">Operador</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <select id="usuario_estado" class="form-control">
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Dependencia (Unidad Regional/Superior)</label>
+                            <select id="usuario_dependencia" class="form-control">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                            <small class="text-secondary">Unidad Regional/Superior a la que pertenece</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Subordinado (Opcional)</label>
+                            <select id="usuario_subordinado" class="form-control">
+                                <option value="">Seleccionar Subordinado...</option>
+                            </select>
+                            <small class="text-secondary">Subordinado específico (ej: Delegación Laguna Blanca)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Nivel de Acceso *</label>
+                        <select id="usuario_nivel_acceso" class="form-control" required>
+                            <option value="solo_propio">🔒 Solo su propia dependencia</option>
+                            <option value="solo_subordinado">📍 Solo su subordinado específico</option>
+                            <option value="delegacion">🏢 Su dependencia + todas las hijas</option>
+                            <option value="todas">🌍 Todas las dependencias</option>
+                        </select>
+                        <div class="nivel-acceso-info">
+                            <span>🔒 <strong>Solo propia:</strong> Ve solo registros de su dependencia</span>
+                            <span>📍 <strong>Solo subordinado:</strong> Ve solo registros de su subordinado</span>
+                            <span>🏢 <strong>Delegación:</strong> Ve su dependencia y todas las subdependencias</span>
+                            <span>🌍 <strong>Todas:</strong> Ve TODO el sistema (solo Administradores)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-shield-alt"></i> Permisos Específicos (opcional)</label>
+                        <small class="text-secondary" style="display: block; margin-bottom: 0.5rem;">Si no selecciona permisos, se aplicarán los permisos por defecto del rol</small>
+                        <div id="permisosContainer" class="permisos-container">
+                            <div class="modulo-permiso">
+                                <h4><i class="fas fa-tachometer-alt"></i> Dashboard</h4>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-dashboard" data-modulo="dashboard" data-accion="ver"> Ver</label>
+                            </div>
+                            <div class="modulo-permiso">
+                                <h4><i class="fas fa-users"></i> Personal</h4>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-personal" data-modulo="personal" data-accion="ver"> Ver</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-personal" data-modulo="personal" data-accion="crear"> Crear</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-personal" data-modulo="personal" data-accion="editar"> Editar</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-personal" data-modulo="personal" data-accion="eliminar"> Eliminar</label>
+                            </div>
+                            <div class="modulo-permiso">
+                                <h4><i class="fas fa-exclamation-triangle"></i> Recargos</h4>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-recargos" data-modulo="recargos" data-accion="ver"> Ver</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-recargos" data-modulo="recargos" data-accion="crear"> Crear</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-recargos" data-modulo="recargos" data-accion="editar"> Editar</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-recargos" data-modulo="recargos" data-accion="eliminar"> Eliminar</label>
+                            </div>
+                            <div class="modulo-permiso">
+                                <h4><i class="fas fa-folder-open"></i> Expedientes</h4>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-expedientes" data-modulo="expedientes" data-accion="ver"> Ver</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-expedientes" data-modulo="expedientes" data-accion="crear"> Crear</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-expedientes" data-modulo="expedientes" data-accion="editar"> Editar</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-expedientes" data-modulo="expedientes" data-accion="eliminar"> Eliminar</label>
+                            </div>
+                            <div class="modulo-permiso">
+                                <h4><i class="fas fa-calendar-alt"></i> Licencias</h4>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-licencias" data-modulo="licencias" data-accion="ver"> Ver</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-licencias" data-modulo="licencias" data-accion="crear"> Crear</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-licencias" data-modulo="licencias" data-accion="editar"> Editar</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-licencias" data-modulo="licencias" data-accion="eliminar"> Eliminar</label>
+                            </div>
+                            <div class="modulo-permiso">
+                                <h4><i class="fas fa-user-cog"></i> Usuarios</h4>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-usuarios" data-modulo="usuarios" data-accion="ver"> Ver</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-usuarios" data-modulo="usuarios" data-accion="crear"> Crear</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-usuarios" data-modulo="usuarios" data-accion="editar"> Editar</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-usuarios" data-modulo="usuarios" data-accion="eliminar"> Eliminar</label>
+                            </div>
+                            <div class="modulo-permiso">
+                                <h4><i class="fas fa-cog"></i> Configuración</h4>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-configuracion" data-modulo="configuracion" data-accion="ver"> Ver</label>
+                                <label class="permiso-checkbox"><input type="checkbox" class="permiso-configuracion" data-modulo="configuracion" data-accion="editar"> Editar</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-sm btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn-sm btn-primary" onclick="saveUsuario()">Guardar</button>
+            </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveUsuario()">Guardar</button></div>
-    </div></div>
+    </div>
     
     <div id="toast-container" class="toast-container"></div>
     
     <script>
         const API_URL = 'backend/api.php';
-        let permisosData = {};
         
         function showToast(message, type) {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `<div>${message}</div>`;
@@ -91,7 +527,9 @@
             return div.innerHTML;
         }
         
-        function getToken() { return localStorage.getItem('jwt_token'); }
+        function getToken() { 
+            return localStorage.getItem('jwt_token'); 
+        }
         
         async function apiRequest(endpoint, method = 'GET', data = null) {
             const token = getToken();
@@ -105,7 +543,14 @@
             try {
                 const response = await fetch(url, options);
                 const result = await response.json();
-                if (response.status === 401) { window.location.href = 'index.html'; throw new Error('Sesión expirada'); }
+                if (response.status === 401) { 
+                    window.location.href = 'index.html'; 
+                    throw new Error('Sesión expirada'); 
+                }
+                if (response.status === 403) {
+                    showToast(result.error || 'No tiene permisos para esta acción', 'error');
+                    throw new Error('Permiso denegado');
+                }
                 return result;
             } catch (error) {
                 console.error('API Error:', error);
@@ -114,122 +559,263 @@
             }
         }
         
-        function renderUsuariosTable(d) {
-            const tbody = document.getElementById('usuariosTableBody');
-            if (!tbody) return;
-            if (!d || d.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay registros<\/td></td>';
-                return;
+        // ==================== VERIFICAR PERMISOS DE ADMINISTRADOR ====================
+        function verificarPermisosAdmin() {
+            const user = localStorage.getItem('current_user');
+            if (!user) {
+                window.location.href = 'index.html';
+                return false;
             }
-            tbody.innerHTML = d.map(i => `<tr>
-                <td>${escapeHtml(i.nombre_completo)}</td>
-                <td>${escapeHtml(i.username)}</td>
-                <td>${escapeHtml(i.email)}</td>
-                <td>${escapeHtml(i.rol_nombre||'-')}</td>
-                <td>${escapeHtml(i.dependencia_nombre||'-')}</td>
-                <td>${i.estado === 'Activo' ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>'}</td>
-                <td>
-                    <button class="btn-sm btn-primary" onclick="editUsuario(${i.id})"><i class="fas fa-edit"></i></button>
-                    <button class="btn-sm btn-danger" onclick="deleteUsuario(${i.id})"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>`).join('');
-        }
-        
-        function cargarPermisos(rolId) {
-            const c = document.getElementById('permisosContainer');
-            if (!c) return;
-            const modulos = ['dashboard','personal','recargos','expedientes','licencias','usuarios','configuracion'];
-            const acciones = ['ver','crear','editar','eliminar'];
-            c.innerHTML = modulos.map(m => `<div class="modulo-permiso"><h4><i class="fas fa-${m==='dashboard'?'tachometer-alt':m==='personal'?'users':m==='recargos'?'exclamation-triangle':m==='expedientes'?'folder-open':m==='licencias'?'calendar-alt':m==='usuarios'?'user-cog':'cog'}"></i> ${m.charAt(0).toUpperCase()+m.slice(1)}</h4><div>${acciones.map(a => `<label class="permiso-checkbox"><input type="checkbox" class="permiso-${m}" data-modulo="${m}" data-accion="${a}" ${permisosData[m]?.includes(a)?'checked':''}> ${a.charAt(0).toUpperCase()+a.slice(1)}</label>`).join('')}</div></div>`).join('');
-            if (rolId == 1) document.querySelectorAll('.permiso-checkbox input').forEach(cb => cb.checked = true);
-        }
-        
-        function recopilarPermisos() {
-            const p = {};
-            const modulos = ['dashboard','personal','recargos','expedientes','licencias','usuarios','configuracion'];
-            modulos.forEach(m => {
-                const a = [];
-                document.querySelectorAll(`.permiso-${m}`).forEach(cb => { if (cb.checked) a.push(cb.dataset.accion); });
-                if (a.length > 0) p[m] = a;
-            });
-            return p;
+            const userData = JSON.parse(user);
+            // Solo Administrador Central puede acceder a usuarios.html
+            if (userData.rol_id !== 1 && userData.rol !== 'Administrador Central') {
+                showToast('No tiene permisos para acceder a esta sección', 'error');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+                return false;
+            }
+            return true;
         }
         
         async function cargarDependenciasSelect() {
             try {
-                const d = await apiRequest('dependencias');
-                const sel = document.getElementById('usuario_dependencia');
-                if (sel) sel.innerHTML = '<option value="">Seleccionar...</option>' + d.map(dep => `<option value="${dep.id}">${escapeHtml(dep.nombre)}</option>`).join('');
-            } catch(e) { console.error(e); }
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=dependencias`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                const select = document.getElementById('usuario_dependencia');
+                if (select && Array.isArray(data)) {
+                    select.innerHTML = '<option value="">Seleccionar Unidad Regional...</option>' + 
+                        data.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+                }
+            } catch(e) { 
+                console.error('Error cargando dependencias:', e);
+            }
+        }
+        
+        async function cargarSubordinadosSelect() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=oficinas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                const select = document.getElementById('usuario_subordinado');
+                if (select && Array.isArray(data)) {
+                    select.innerHTML = '<option value="">Seleccionar Subordinado...</option>' + 
+                        data.map(s => `<option value="${s.id}">${escapeHtml(s.valor)}</option>`).join('');
+                }
+            } catch(e) { 
+                console.error('Error cargando subordinados:', e);
+            }
+        }
+        
+        async function loadUsuarios() {
+            const tbody = document.getElementById('usuariosTableBody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center">Cargando...</td></tr>';
+            
+            try {
+                const data = await apiRequest('usuarios');
+                if (data && Array.isArray(data)) {
+                    renderUsuariosTable(data);
+                    showToast(`✅ ${data.length} usuarios cargados`, 'success');
+                } else {
+                    renderUsuariosTable([]);
+                }
+            } catch(e) {
+                renderUsuariosTable([]);
+                showToast('Error cargando usuarios', 'error');
+            }
+        }
+        
+        function renderUsuariosTable(data) {
+            const tbody = document.getElementById('usuariosTableBody');
+            if (!tbody) return;
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay registros</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(item => {
+                let nivelAccesoText = '';
+                let nivelAccesoClass = 'badge-info';
+                
+                if (item.nivel_acceso === 'solo_propio') {
+                    nivelAccesoText = '🔒 Solo propia';
+                    nivelAccesoClass = 'badge-info';
+                } else if (item.nivel_acceso === 'solo_subordinado') {
+                    nivelAccesoText = '📍 Solo subordinado';
+                    nivelAccesoClass = 'badge-warning';
+                } else if (item.nivel_acceso === 'delegacion') {
+                    nivelAccesoText = '🏢 Delegación + hijas';
+                    nivelAccesoClass = 'badge-info';
+                } else if (item.nivel_acceso === 'todas') {
+                    nivelAccesoText = '🌍 Todas';
+                    nivelAccesoClass = 'badge-success';
+                } else {
+                    nivelAccesoText = item.nivel_acceso || 'solo_propio';
+                }
+                
+                return `
+                    <tr>
+                        <td>${escapeHtml(item.nombre_completo)}</td>
+                        <td>${escapeHtml(item.username)}</td>
+                        <td>${escapeHtml(item.email)}</td>
+                        <td><span class="badge badge-info">${escapeHtml(item.rol_nombre || '-')}</span></td>
+                        <td>${escapeHtml(item.dependencia_nombre || '-')}</td>
+                        <td>${escapeHtml(item.subordinado_nombre || '-')}</td>
+                        <td><span class="badge ${nivelAccesoClass}">${nivelAccesoText}</span></td>
+                        <td>${item.estado === 'Activo' ? '<span class="badge badge-success">Activo</span>' : '<span class="badge badge-danger">Inactivo</span>'}</td>
+                        <td>
+                            <button class="btn-sm btn-primary" onclick="editUsuario(${item.id})" style="margin-right: 0.25rem;">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn-sm btn-danger" onclick="deleteUsuario(${item.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function recopilarPermisos() {
+            const permisos = {};
+            const modulos = ['dashboard', 'personal', 'recargos', 'expedientes', 'licencias', 'usuarios', 'configuracion'];
+            
+            modulos.forEach(modulo => {
+                const acciones = [];
+                document.querySelectorAll(`.permiso-${modulo}`).forEach(cb => {
+                    if (cb.checked) acciones.push(cb.dataset.accion);
+                });
+                if (acciones.length > 0) permisos[modulo] = acciones;
+            });
+            
+            return permisos;
+        }
+        
+        function cargarPermisosEnModal(permisos) {
+            const modulos = ['dashboard', 'personal', 'recargos', 'expedientes', 'licencias', 'usuarios', 'configuracion'];
+            
+            modulos.forEach(modulo => {
+                document.querySelectorAll(`.permiso-${modulo}`).forEach(cb => {
+                    if (permisos && permisos[modulo] && permisos[modulo].includes(cb.dataset.accion)) {
+                        cb.checked = true;
+                    } else {
+                        cb.checked = false;
+                    }
+                });
+            });
         }
         
         function openUsuarioModal(data = null) {
             const modal = document.getElementById('usuarioModal');
             if (!modal) return;
+            
+            cargarDependenciasSelect();
+            cargarSubordinadosSelect();
+            
+            document.querySelectorAll('.permiso-dashboard, .permiso-personal, .permiso-recargos, .permiso-expedientes, .permiso-licencias, .permiso-usuarios, .permiso-configuracion').forEach(cb => {
+                cb.checked = false;
+            });
+            
             if (data) {
                 document.getElementById('usuarioId').value = data.id;
-                document.getElementById('usuario_nombre').value = data.nombre_completo;
-                document.getElementById('usuario_username').value = data.username;
-                document.getElementById('usuario_email').value = data.email;
-                document.getElementById('usuario_rol').value = data.rol_id;
+                document.getElementById('usuario_nombre').value = data.nombre_completo || '';
+                document.getElementById('usuario_username').value = data.username || '';
+                document.getElementById('usuario_email').value = data.email || '';
+                document.getElementById('usuario_rol').value = data.rol_id || '';
                 document.getElementById('usuario_dependencia').value = data.dependencia_id || '';
+                document.getElementById('usuario_subordinado').value = data.subordinado_id || '';
                 document.getElementById('usuario_nivel_acceso').value = data.nivel_acceso || 'solo_propio';
-                document.getElementById('usuario_estado').value = data.estado;
-                permisosData = data.permisos || {};
+                document.getElementById('usuario_estado').value = data.estado || 'Activo';
+                document.getElementById('usuario_password').value = '';
                 document.getElementById('modalTitle').textContent = 'Editar Usuario';
+                
+                const permisos = data.permisos || {};
+                cargarPermisosEnModal(permisos);
             } else {
                 document.getElementById('usuarioForm').reset();
                 document.getElementById('usuarioId').value = '';
-                permisosData = {};
+                document.getElementById('usuario_nivel_acceso').value = 'solo_propio';
+                document.getElementById('usuario_estado').value = 'Activo';
                 document.getElementById('modalTitle').textContent = 'Nuevo Usuario';
+                cargarPermisosEnModal({});
             }
-            cargarPermisos(document.getElementById('usuario_rol').value);
             modal.style.display = 'flex';
         }
         
         async function saveUsuario() {
             const id = document.getElementById('usuarioId')?.value;
+            const permisos = recopilarPermisos();
+            
             const data = {
                 nombre_completo: document.getElementById('usuario_nombre')?.value,
                 username: document.getElementById('usuario_username')?.value,
                 email: document.getElementById('usuario_email')?.value,
                 password: document.getElementById('usuario_password')?.value,
                 rol_id: document.getElementById('usuario_rol')?.value,
-                dependencia_id: document.getElementById('usuario_dependencia')?.value,
+                dependencia_id: document.getElementById('usuario_dependencia')?.value || null,
+                subordinado_id: document.getElementById('usuario_subordinado')?.value || null,
                 nivel_acceso: document.getElementById('usuario_nivel_acceso')?.value,
                 estado: document.getElementById('usuario_estado')?.value,
-                permisos: recopilarPermisos()
+                permisos: permisos
             };
-            if (!data.nombre_completo || !data.username || !data.email) { showToast('Complete campos requeridos', 'warning'); return; }
+            
+            if (!data.nombre_completo || !data.username || !data.email) {
+                showToast('Complete los campos requeridos', 'warning');
+                return;
+            }
+            
+            if (!data.rol_id) {
+                showToast('Seleccione un rol', 'warning');
+                return;
+            }
+            
+            if (data.nivel_acceso === 'solo_subordinado' && !data.subordinado_id) {
+                showToast('Para nivel "Solo subordinado" debe seleccionar un subordinado', 'warning');
+                return;
+            }
+            
             try {
                 let result;
-                if (id) result = await apiRequest(`usuarios&id=${id}`, 'PUT', data);
-                else {
-                    if (!data.password) { showToast('Contraseña requerida', 'error'); return; }
+                if (id) {
+                    result = await apiRequest(`usuarios&id=${id}`, 'PUT', data);
+                } else {
+                    if (!data.password) {
+                        showToast('La contraseña es requerida para nuevos usuarios', 'warning');
+                        return;
+                    }
                     result = await apiRequest('usuarios', 'POST', data);
                 }
+                
                 if (result && result.success) {
                     showToast(`Usuario ${id ? 'actualizado' : 'creado'} correctamente`, 'success');
                     closeModal();
                     await loadUsuarios();
-                } else showToast('Error al guardar', 'error');
-            } catch(e) { showToast('Error', 'error'); }
-        }
-        
-        async function loadUsuarios() {
-            try {
-                const data = await apiRequest('usuarios');
-                renderUsuariosTable(data);
-                await cargarDependenciasSelect();
-                showToast('Usuarios cargados', 'success');
-            } catch(e) { showToast('Error', 'error'); }
+                } else {
+                    showToast(result?.error || 'Error al guardar', 'error');
+                }
+            } catch(e) {
+                console.error('Error:', e);
+                showToast('Error de conexión', 'error');
+            }
         }
         
         async function editUsuario(id) {
             try {
                 const data = await apiRequest(`usuarios&id=${id}`);
-                if (data) openUsuarioModal(data);
-            } catch(e) { showToast('Error', 'error'); }
+                if (data && data.id) {
+                    openUsuarioModal(data);
+                } else {
+                    showToast('No se encontraron datos', 'error');
+                }
+            } catch(e) {
+                showToast('Error cargando datos', 'error');
+            }
         }
         
         async function deleteUsuario(id) {
@@ -239,8 +825,12 @@
                     if (result && result.success) {
                         showToast('Usuario eliminado', 'success');
                         await loadUsuarios();
+                    } else {
+                        showToast('Error al eliminar', 'error');
                     }
-                } catch(e) { showToast('Error', 'error'); }
+                } catch(e) {
+                    showToast('Error de conexión', 'error');
+                }
             }
         }
         
@@ -249,12 +839,81 @@
             if (input) input.type = input.type === 'password' ? 'text' : 'password';
         }
         
-        function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+        function closeModal() { 
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        }
         
+        // ==================== TEMA ====================
+        const THEME_KEY = 'sistema_policial_theme';
+        
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+                const icon = document.getElementById('themeIcon');
+                if (icon) icon.className = 'fas fa-sun';
+            } else {
+                document.body.classList.remove('light-theme');
+                const icon = document.getElementById('themeIcon');
+                if (icon) icon.className = 'fas fa-moon';
+            }
+            localStorage.setItem(THEME_KEY, theme);
+        }
+        
+        function getCurrentTheme() {
+            const saved = localStorage.getItem(THEME_KEY);
+            if (saved === 'light' || saved === 'dark') return saved;
+            return 'dark';
+        }
+        
+        function initTheme() {
+            const savedTheme = getCurrentTheme();
+            applyTheme(savedTheme);
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            if (toggleBtn) toggleBtn.addEventListener('click', () => {
+                const newTheme = getCurrentTheme() === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+                showToast(`Tema cambiado a ${newTheme === 'light' ? 'claro' : 'oscuro'}`, 'info');
+            });
+        }
+        
+        // ==================== AUTENTICACIÓN ====================
+        function checkAuth() {
+            const user = localStorage.getItem('current_user');
+            if (!user) {
+                window.location.href = 'index.html';
+                return false;
+            }
+            const userData = JSON.parse(user);
+            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            return true;
+        }
+        
+        function handleLogout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+        
+        function toggleMobileMenu() {
+            document.querySelector('.nav-menu')?.classList.toggle('active');
+        }
+        
+        // ==================== INICIALIZACIÓN ====================
         document.addEventListener('DOMContentLoaded', () => {
-            loadUsuarios();
-            document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
-            document.getElementById('usuario_rol')?.addEventListener('change', function() { cargarPermisos(this.value); });
+            if (!verificarPermisosAdmin()) return;
+            
+            if (checkAuth()) {
+                initTheme();
+                loadUsuarios();
+                cargarDependenciasSelect();
+                cargarSubordinadosSelect();
+            }
+            
+            document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+            document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu);
+            document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+            window.addEventListener('click', (e) => {
+                if (e.target.classList?.contains('modal')) closeModal();
+            });
         });
         
         window.openUsuarioModal = openUsuarioModal;
@@ -263,7 +922,7 @@
         window.deleteUsuario = deleteUsuario;
         window.togglePasswordVisibility = togglePasswordVisibility;
         window.closeModal = closeModal;
+        window.loadUsuarios = loadUsuarios;
     </script>
-        <script src="theme.js"></script>
 </body>
 </html>

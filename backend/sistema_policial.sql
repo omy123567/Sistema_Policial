@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-05-2026 a las 00:50:21
+-- Tiempo de generación: 11-05-2026 a las 15:04:53
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -91,24 +91,24 @@ INSERT INTO `catalogos` (`id`, `tipo`, `dependencia_id`, `valor`, `orden`, `acti
 (31, 'tipos_licencia', NULL, 'Especial', 3, 1, '2026-04-21 15:12:12'),
 (33, 'tipos_licencia', NULL, 'Maternidad/Paternidad', 5, 1, '2026-04-21 15:12:12'),
 (53, 'tipos_licencia', NULL, 'Enfermedad', 2, 1, '2026-04-22 13:08:13'),
-(69, 'licencia_categorias', NULL, 'B1', 1, 1, '2026-04-24 14:06:24'),
-(70, 'licencia_categorias', NULL, 'B2', 2, 1, '2026-04-24 14:06:24'),
-(71, 'licencia_categorias', NULL, 'B3', 3, 1, '2026-04-24 14:06:24'),
-(72, 'licencia_categorias', NULL, 'C1', 4, 1, '2026-04-24 14:06:24'),
-(73, 'licencia_categorias', NULL, 'C2', 5, 1, '2026-04-24 14:06:24'),
-(74, 'licencia_categorias', NULL, 'C3', 6, 1, '2026-04-24 14:06:24'),
-(75, 'licencia_categorias', NULL, 'D1', 7, 1, '2026-04-24 14:06:24'),
-(76, 'licencia_categorias', NULL, 'D2', 8, 1, '2026-04-24 14:06:24'),
-(77, 'licencia_categorias', NULL, 'E1', 9, 1, '2026-04-24 14:06:24'),
-(78, 'licencia_categorias', NULL, 'E2', 10, 1, '2026-04-24 14:06:24'),
-(79, 'licencia_categorias', NULL, 'G', 11, 1, '2026-04-24 14:06:24'),
-(80, 'licencia_categorias', NULL, 'A1', 12, 1, '2026-04-24 14:06:24'),
-(81, 'licencia_categorias', NULL, 'A2', 13, 1, '2026-04-24 14:06:24'),
-(82, 'licencia_categorias', NULL, 'A3', 14, 1, '2026-04-24 14:06:24'),
+(69, 'licencia_categorias', NULL, 'A1', 1, 1, '2026-04-24 14:06:24'),
+(70, 'licencia_categorias', NULL, 'A2', 2, 1, '2026-04-24 14:06:24'),
+(71, 'licencia_categorias', NULL, 'A3', 3, 1, '2026-04-24 14:06:24'),
+(72, 'licencia_categorias', NULL, 'B1', 4, 1, '2026-04-24 14:06:24'),
+(73, 'licencia_categorias', NULL, 'B2', 5, 1, '2026-04-24 14:06:24'),
+(74, 'licencia_categorias', NULL, 'B3', 6, 1, '2026-04-24 14:06:24'),
+(75, 'licencia_categorias', NULL, 'C1', 7, 1, '2026-04-24 14:06:24'),
+(76, 'licencia_categorias', NULL, 'C2', 8, 1, '2026-04-24 14:06:24'),
+(77, 'licencia_categorias', NULL, 'C3', 9, 1, '2026-04-24 14:06:24'),
+(78, 'licencia_categorias', NULL, 'D1', 10, 1, '2026-04-24 14:06:24'),
+(79, 'licencia_categorias', NULL, 'D2', 11, 1, '2026-04-24 14:06:24'),
+(80, 'licencia_categorias', NULL, 'E1', 12, 1, '2026-04-24 14:06:24'),
+(81, 'licencia_categorias', NULL, 'E2', 13, 1, '2026-04-24 14:06:24'),
+(82, 'licencia_categorias', NULL, 'G', 14, 1, '2026-04-24 14:06:24'),
 (84, 'tipo_oficio', NULL, 'Oficio Judicial', 1, 1, '2026-04-28 12:29:30'),
-(98, 'licencia_categorias', NULL, 'C', 6, 1, '2026-04-28 12:29:30'),
-(99, 'licencia_categorias', NULL, 'D', 7, 1, '2026-04-28 12:29:30'),
-(100, 'licencia_categorias', NULL, 'E', 8, 1, '2026-04-28 12:29:30'),
+(98, 'licencia_categorias', NULL, 'C', 15, 1, '2026-04-28 12:29:30'),
+(99, 'licencia_categorias', NULL, 'D', 16, 1, '2026-04-28 12:29:30'),
+(100, 'licencia_categorias', NULL, 'E', 17, 1, '2026-04-28 12:29:30'),
 (109, 'jerarquias', NULL, 'Comisario General', 1, 1, '2026-04-30 12:44:29'),
 (110, 'jerarquias', NULL, 'Comisario Mayor', 2, 1, '2026-04-30 12:44:29'),
 (111, 'jerarquias', NULL, 'Comisario Inspector', 3, 1, '2026-04-30 12:44:29'),
@@ -126,45 +126,44 @@ INSERT INTO `catalogos` (`id`, `tipo`, `dependencia_id`, `valor`, `orden`, `acti
 (123, 'jerarquias', NULL, 'Cabo 1°', 15, 1, '2026-04-30 12:44:29'),
 (124, 'jerarquias', NULL, 'Cabo', 16, 1, '2026-04-30 12:44:29'),
 (125, 'jerarquias', NULL, 'Agente', 17, 1, '2026-04-30 12:44:29'),
-(126, 'tipos_recargo', NULL, 'Seguridad CIudanada', 0, 1, '2026-04-30 12:45:00'),
-(127, 'tipos_recargo', NULL, 'Operativo', 0, 1, '2026-04-30 12:45:08'),
-(142, 'juzgados', NULL, 'J.I.C  Nro. 1- 1° Circunscripción', 0, 1, '2026-04-30 13:07:30'),
-(143, 'juzgados', NULL, 'J.I.C  Nro. 2- 1° Circunscripción', 0, 1, '2026-04-30 13:07:37'),
-(144, 'juzgados', NULL, 'J.I.C  Nro. 3- 1° Circunscripción', 0, 1, '2026-04-30 13:07:42'),
-(145, 'juzgados', NULL, 'J.I.C  Nro. 4- 1° Circunscripción', 0, 1, '2026-04-30 13:07:48'),
-(146, 'juzgados', NULL, 'J.I.C  Nro. 5- 1° Circunscripción', 0, 1, '2026-04-30 13:07:57'),
-(147, 'juzgados', NULL, 'J.I.C  Nro. 6- 1° Circunscripción', 0, 1, '2026-04-30 13:08:07'),
-(148, 'juzgados', NULL, 'Excelenticima Camara Primera en lo Criminal', 0, 1, '2026-04-30 13:08:25'),
-(149, 'juzgados', NULL, 'Excelenticima Camara Segunda en lo Criminal', 0, 1, '2026-04-30 13:08:39'),
-(150, 'juzgados', NULL, 'Federal Nº 1- 1° Circunscripción', 0, 1, '2026-04-30 13:09:01'),
-(151, 'juzgados', NULL, 'Federal Nº 2- 1° Circunscripción', 0, 1, '2026-04-30 13:09:09'),
-(152, 'juzgados', NULL, 'J.I.C  Nro. 1- 2° Circunscripción', 0, 1, '2026-04-30 13:09:44'),
-(153, 'juzgados', NULL, 'J.I.C  Nro. 2- 2° Circunscripción', 0, 1, '2026-04-30 13:09:50'),
-(155, 'tipos_requerimiento', NULL, 'Resguardo de Evidencia', 0, 1, '2026-04-30 13:10:58'),
-(157, 'unidades_regionales', NULL, 'Dirección General de Policía Científica', 1, 1, '2026-05-01 02:40:33'),
-(183, 'obras_sociales', NULL, 'A.M.P.', 0, 1, '2026-05-06 11:29:52'),
-(184, 'tipos_requerimiento', NULL, 'Descarga de Filmaciones', 0, 1, '2026-05-06 11:31:04'),
-(185, 'tipos_requerimiento', NULL, 'Escalamiento de Datos', 0, 1, '2026-05-06 11:31:09'),
-(186, 'tipos_requerimiento', NULL, 'Informe Técnico', 0, 1, '2026-05-06 11:31:21'),
-(187, 'tipos_licencia', NULL, 'Anual', 0, 1, '2026-05-06 11:32:24'),
-(188, 'tipos_licencia', NULL, 'Invernal', 0, 1, '2026-05-06 11:32:28'),
-(189, 'tipos_recargo', NULL, 'Cancha', 0, 1, '2026-05-06 11:32:54'),
-(190, 'tipo_oficio', NULL, 'Oficio Vario', 0, 1, '2026-05-06 11:33:25'),
-(191, 'tipo_oficio', NULL, 'Nota V', 0, 1, '2026-05-06 11:33:29'),
-(192, 'tipo_oficio', NULL, 'Memorandum', 0, 1, '2026-05-06 11:33:35'),
-(193, 'tipos_recargo', NULL, 'Recargo Guardia', 0, 1, '2026-05-06 12:05:35'),
-(194, 'oficinas', 1, 'Delegacion Laguna Blanca', 0, 1, '2026-05-08 14:38:43'),
-(195, 'oficinas', 1, 'Delegacion Criminalística C-5', 0, 1, '2026-05-08 22:38:58'),
-(196, 'oficinas', 1, 'Delegacion Pirané', 0, 1, '2026-05-08 22:39:08'),
-(197, 'oficinas', 1, 'Direccion de Policia Cientifica', 0, 1, '2026-05-08 22:47:50'),
-(198, 'oficinas', 1, 'Delegacion Clorinda', 0, 1, '2026-05-08 22:48:03'),
-(199, 'oficinas', 1, 'Delegacion Las Lomitas', 0, 1, '2026-05-08 22:48:14'),
-(202, 'oficinas', 1, 'Delegacion Ing Juarez', 0, 1, '2026-05-08 22:49:02'),
-(203, 'oficinas', 1, 'Delegacion Güemes', 0, 1, '2026-05-08 22:49:10'),
-(204, 'oficinas', 1, 'Delegacion Ibarreta', 0, 1, '2026-05-08 22:49:19'),
-(205, 'oficinas', 1, 'Delegacion Nueva Formosa', 0, 1, '2026-05-08 22:49:25'),
-(206, 'oficinas', 1, 'Division Investigación Ciberdelitos', 0, 1, '2026-05-08 22:49:44'),
-(207, 'oficinas', 1, 'Division Informatica Forense', 0, 1, '2026-05-08 22:49:51');
+(126, 'tipos_recargo', NULL, 'Seguridad Ciudadana', 1, 1, '2026-04-30 12:45:00'),
+(127, 'tipos_recargo', NULL, 'Operativo', 2, 1, '2026-04-30 12:45:08'),
+(142, 'juzgados', NULL, 'J.I.C Nro. 1- 1° Circunscripción', 1, 1, '2026-04-30 13:07:30'),
+(143, 'juzgados', NULL, 'J.I.C Nro. 2- 1° Circunscripción', 2, 1, '2026-04-30 13:07:37'),
+(144, 'juzgados', NULL, 'J.I.C Nro. 3- 1° Circunscripción', 3, 1, '2026-04-30 13:07:42'),
+(145, 'juzgados', NULL, 'J.I.C Nro. 4- 1° Circunscripción', 4, 1, '2026-04-30 13:07:48'),
+(146, 'juzgados', NULL, 'J.I.C Nro. 5- 1° Circunscripción', 5, 1, '2026-04-30 13:07:57'),
+(147, 'juzgados', NULL, 'J.I.C Nro. 6- 1° Circunscripción', 6, 1, '2026-04-30 13:08:07'),
+(148, 'juzgados', NULL, 'Excelenticima Camara Primera en lo Criminal', 7, 1, '2026-04-30 13:08:25'),
+(149, 'juzgados', NULL, 'Excelenticima Camara Segunda en lo Criminal', 8, 1, '2026-04-30 13:08:39'),
+(150, 'juzgados', NULL, 'Federal Nº 1- 1° Circunscripción', 9, 1, '2026-04-30 13:09:01'),
+(151, 'juzgados', NULL, 'Federal Nº 2- 1° Circunscripción', 10, 1, '2026-04-30 13:09:09'),
+(152, 'juzgados', NULL, 'J.I.C Nro. 1- 2° Circunscripción', 11, 1, '2026-04-30 13:09:44'),
+(153, 'juzgados', NULL, 'J.I.C Nro. 2- 2° Circunscripción', 12, 1, '2026-04-30 13:09:50'),
+(155, 'tipos_requerimiento', NULL, 'Resguardo de Evidencia', 1, 1, '2026-04-30 13:10:58'),
+(183, 'obras_sociales', NULL, 'A.M.P.', 1, 1, '2026-05-06 11:29:52'),
+(184, 'tipos_requerimiento', NULL, 'Descarga de Filmaciones', 2, 1, '2026-05-06 11:31:04'),
+(185, 'tipos_requerimiento', NULL, 'Escalamiento de Datos', 3, 1, '2026-05-06 11:31:09'),
+(186, 'tipos_requerimiento', NULL, 'Informe Técnico', 4, 1, '2026-05-06 11:31:21'),
+(187, 'tipos_licencia', NULL, 'Anual', 1, 1, '2026-05-06 11:32:24'),
+(188, 'tipos_licencia', NULL, 'Invernal', 4, 1, '2026-05-06 11:32:28'),
+(189, 'tipos_recargo', NULL, 'Cancha', 3, 1, '2026-05-06 11:32:54'),
+(190, 'tipo_oficio', NULL, 'Oficio Vario', 2, 1, '2026-05-06 11:33:25'),
+(191, 'tipo_oficio', NULL, 'Nota V', 3, 1, '2026-05-06 11:33:29'),
+(192, 'tipo_oficio', NULL, 'Memorandum', 4, 1, '2026-05-06 11:33:35'),
+(193, 'tipos_recargo', NULL, 'Recargo Guardia', 4, 1, '2026-05-06 12:05:35'),
+(194, 'oficinas', 1, 'Delegacion Laguna Blanca', 1, 1, '2026-05-08 14:38:43'),
+(195, 'oficinas', 1, 'Delegacion Criminalística C-5', 2, 1, '2026-05-08 22:38:58'),
+(196, 'oficinas', 1, 'Delegacion Pirané', 3, 1, '2026-05-08 22:39:08'),
+(197, 'oficinas', 1, 'Direccion de Policia Cientifica', 4, 1, '2026-05-08 22:47:50'),
+(198, 'oficinas', 1, 'Delegacion Clorinda', 5, 1, '2026-05-08 22:48:03'),
+(199, 'oficinas', 1, 'Delegacion Las Lomitas', 6, 1, '2026-05-08 22:48:14'),
+(202, 'oficinas', 1, 'Delegacion Ing Juarez', 7, 1, '2026-05-08 22:49:02'),
+(203, 'oficinas', 1, 'Delegacion Güemes', 8, 1, '2026-05-08 22:49:10'),
+(204, 'oficinas', 1, 'Delegacion Ibarreta', 9, 1, '2026-05-08 22:49:19'),
+(205, 'oficinas', 1, 'Delegacion Nueva Formosa', 10, 1, '2026-05-08 22:49:25'),
+(206, 'oficinas', 1, 'Division Investigación Ciberdelitos', 11, 1, '2026-05-08 22:49:44'),
+(207, 'oficinas', 1, 'Division Informatica Forense', 12, 1, '2026-05-08 22:49:51');
 
 -- --------------------------------------------------------
 
@@ -188,10 +187,9 @@ CREATE TABLE `configuracion` (
 --
 
 INSERT INTO `configuracion` (`id`, `clave`, `valor`, `tipo`, `created_at`, `updated_at`, `logo_url`, `logo_updated_at`) VALUES
-(1, 'nombre_sistema', 'Sistema de Gestión ', 'text', '2026-04-21 15:12:12', '2026-04-28 22:14:52', NULL, NULL),
+(1, 'nombre_sistema', 'Sistema de Gestión Policial', 'text', '2026-04-21 15:12:12', '2026-05-09 03:00:00', NULL, NULL),
 (2, 'logo_sistema', '', 'image', '2026-04-21 15:12:12', '2026-04-21 15:12:12', NULL, NULL),
-(3, 'widgets_dashboard', '[\"stats\",\"jerarquias\",\"recargos\",\"expedientes\",\"licencias\",\"licencias_vencer\"]', 'json', '2026-04-21 15:12:12', '2026-04-21 15:12:12', NULL, NULL),
-(4, 'logo_url', 'uploads/logo/logo_1777417287_69f13c47795dc.png', 'image', '2026-04-28 22:04:54', '2026-04-28 23:01:27', NULL, NULL);
+(3, 'widgets_dashboard', '[\"stats\",\"jerarquias\",\"recargos\",\"expedientes\",\"licencias\",\"licencias_vencer\"]', 'json', '2026-04-21 15:12:12', '2026-04-21 15:12:12', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -313,8 +311,9 @@ CREATE TABLE `expedientes` (
   `tipo_oficio` varchar(100) DEFAULT NULL,
   `juzgado_origen` varchar(200) DEFAULT NULL,
   `responsable_id` int(11) DEFAULT NULL,
-  `dependencia` varchar(100) DEFAULT NULL,
   `dependencia_id` int(11) DEFAULT NULL,
+  `dependencia` varchar(100) DEFAULT NULL,
+  `oficina` varchar(100) DEFAULT NULL,
   `tipo_requerimiento` varchar(100) DEFAULT NULL,
   `resumen` text DEFAULT NULL,
   `observaciones` text DEFAULT NULL,
@@ -323,6 +322,13 @@ CREATE TABLE `expedientes` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `expedientes`
+--
+
+INSERT INTO `expedientes` (`id`, `nro_expediente`, `anio`, `expediente_origen`, `anio_origen`, `fecha`, `fecha_vencimiento`, `tipo_oficio`, `juzgado_origen`, `responsable_id`, `dependencia_id`, `dependencia`, `oficina`, `tipo_requerimiento`, `resumen`, `observaciones`, `nro_informe_tecnico`, `estado`, `created_by`, `created_at`) VALUES
+(1, 'EXP-001', '2026', '2', '', '2026-05-11', NULL, 'Oficio Judicial', '8', NULL, 1, NULL, 'Delegacion Laguna Blanca', '', '', '', '', 'Pendiente', NULL, '2026-05-11 12:48:58');
 
 -- --------------------------------------------------------
 
@@ -637,8 +643,6 @@ CREATE TABLE `personal` (
   `sexo` enum('Masculino','Femenino','Otro') DEFAULT NULL,
   `oficina` varchar(100) DEFAULT NULL,
   `dependencia_id` int(11) DEFAULT NULL,
-  `unidad_regional_id` int(11) DEFAULT NULL,
-  `subordinado` varchar(100) DEFAULT NULL,
   `seccion_guardia_id` int(11) DEFAULT NULL,
   `fecha_nacimiento` date DEFAULT NULL,
   `tiene_arma` tinyint(1) DEFAULT 0,
@@ -879,6 +883,7 @@ CREATE TABLE `usuarios` (
   `password` varchar(255) NOT NULL,
   `rol_id` int(11) DEFAULT NULL,
   `dependencia_id` int(11) DEFAULT NULL,
+  `subordinado_id` int(11) DEFAULT NULL,
   `puede_ver_todas` tinyint(1) DEFAULT 0,
   `nivel_acceso` enum('solo_propio','delegacion','todas') DEFAULT 'solo_propio',
   `estado` enum('Activo','Inactivo') DEFAULT 'Activo',
@@ -891,9 +896,11 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `nombre_completo`, `username`, `email`, `password`, `rol_id`, `dependencia_id`, `puede_ver_todas`, `nivel_acceso`, `estado`, `permisos`, `created_at`, `updated_at`) VALUES
-(1, 'Administrador Central', 'admin', 'admin@sistema.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 1, 1, 'todas', 'Activo', NULL, '2026-04-21 15:12:12', '2026-04-21 15:12:12'),
-(3, 'Jefe Criminalística LP', 'jefe.crim.lp', 'jefe.crim.lp@policia.gob.ar', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, NULL, 0, 'solo_propio', 'Activo', NULL, '2026-04-21 15:12:12', '2026-04-21 15:12:12');
+INSERT INTO `usuarios` (`id`, `nombre_completo`, `username`, `email`, `password`, `rol_id`, `dependencia_id`, `subordinado_id`, `puede_ver_todas`, `nivel_acceso`, `estado`, `permisos`, `created_at`, `updated_at`) VALUES
+(1, 'Administrador Central', 'admin', 'admin@sistema.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 1, NULL, 1, 'todas', 'Activo', NULL, '2026-04-21 15:12:12', '2026-05-09 03:00:00'),
+(2, 'Supervisor La Plata', 'supervisor.lp', 'supervisor.lp@policia.gob.ar', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 1, NULL, 0, 'delegacion', 'Activo', NULL, '2026-04-21 15:12:12', '2026-05-09 03:00:00'),
+(3, 'Jefe Criminalística LP', 'jefe.crim.lp', 'jefe.crim.lp@policia.gob.ar', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, 1, NULL, 0, 'solo_propio', 'Activo', NULL, '2026-04-21 15:12:12', '2026-05-09 03:00:00'),
+(4, 'Lezcano Omar ', 'ojlezcano', 'omarlezcano93@gmail.com', '$2y$10$GkUyL7Sw3.VWVnAJsNF28.WH3ma9JmTIN8ssf/PAp9cKNQ8nuSI2u', 4, NULL, 194, 0, '', 'Activo', '{\"dashboard\":[\"ver\"],\"personal\":[\"ver\",\"crear\"],\"recargos\":[\"ver\"],\"expedientes\":[\"ver\"],\"licencias\":[\"ver\"],\"usuarios\":[\"ver\"]}', '2026-05-09 13:21:44', '2026-05-09 13:21:44');
 
 --
 -- Índices para tablas volcadas
@@ -957,8 +964,7 @@ ALTER TABLE `elevaciones`
 --
 ALTER TABLE `equipamiento_armas`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `personal_id` (`personal_id`),
-  ADD KEY `idx_armas_personal` (`personal_id`);
+  ADD KEY `personal_id` (`personal_id`);
 
 --
 -- Indices de la tabla `equipamiento_chalecos`
@@ -966,9 +972,7 @@ ALTER TABLE `equipamiento_armas`
 ALTER TABLE `equipamiento_chalecos`
   ADD PRIMARY KEY (`id`),
   ADD KEY `personal_id` (`personal_id`),
-  ADD KEY `idx_vencimiento` (`fecha_vencimiento`),
-  ADD KEY `idx_chalecos_personal` (`personal_id`),
-  ADD KEY `idx_chalecos_vencimiento` (`fecha_vencimiento`);
+  ADD KEY `idx_vencimiento` (`fecha_vencimiento`);
 
 --
 -- Indices de la tabla `expedientes`
@@ -976,16 +980,13 @@ ALTER TABLE `equipamiento_chalecos`
 ALTER TABLE `expedientes`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nro_expediente` (`nro_expediente`),
-  ADD KEY `dependencia_id` (`dependencia_id`),
   ADD KEY `created_by` (`created_by`),
   ADD KEY `idx_nro_expediente` (`nro_expediente`),
   ADD KEY `idx_fecha` (`fecha`),
   ADD KEY `idx_tipo_oficio` (`tipo_oficio`),
   ADD KEY `idx_juzgado_origen` (`juzgado_origen`),
   ADD KEY `idx_estado` (`estado`),
-  ADD KEY `idx_expedientes_nro` (`nro_expediente`),
-  ADD KEY `idx_expedientes_estado` (`estado`),
-  ADD KEY `idx_expedientes_fecha` (`fecha`);
+  ADD KEY `idx_expedientes_dependencia` (`dependencia_id`);
 
 --
 -- Indices de la tabla `expediente_documentos`
@@ -1037,7 +1038,8 @@ ALTER TABLE `licencias`
   ADD KEY `agente_id` (`agente_id`),
   ADD KEY `dependencia_id` (`dependencia_id`),
   ADD KEY `idx_estado` (`estado`),
-  ADD KEY `idx_fechas` (`fecha_inicio`,`fecha_fin`);
+  ADD KEY `idx_fechas` (`fecha_inicio`,`fecha_fin`),
+  ADD KEY `idx_licencias_dependencia` (`dependencia_id`);
 
 --
 -- Indices de la tabla `logs`
@@ -1090,7 +1092,8 @@ ALTER TABLE `recargos`
   ADD KEY `personal_id` (`personal_id`),
   ADD KEY `idx_fecha` (`fecha`),
   ADD KEY `idx_estado` (`estado`),
-  ADD KEY `idx_seccion` (`seccion_guardia_id`);
+  ADD KEY `idx_seccion` (`seccion_guardia_id`),
+  ADD KEY `idx_recargos_dependencia` (`dependencia_id`);
 
 --
 -- Indices de la tabla `reportes_guardados`
@@ -1134,9 +1137,8 @@ ALTER TABLE `usuarios`
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`),
   ADD KEY `rol_id` (`rol_id`),
-  ADD KEY `dependencia_id` (`dependencia_id`),
-  ADD KEY `idx_username` (`username`),
-  ADD KEY `idx_email` (`email`);
+  ADD KEY `fk_usuarios_dependencia` (`dependencia_id`),
+  ADD KEY `fk_usuarios_subordinado` (`subordinado_id`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -1200,7 +1202,7 @@ ALTER TABLE `equipamiento_chalecos`
 -- AUTO_INCREMENT de la tabla `expedientes`
 --
 ALTER TABLE `expedientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `expediente_documentos`
@@ -1308,7 +1310,7 @@ ALTER TABLE `user_table_config`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restricciones para tablas volcadas
@@ -1411,8 +1413,9 @@ ALTER TABLE `roles_permisos`
 -- Filtros para la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `usuarios_ibfk_2` FOREIGN KEY (`dependencia_id`) REFERENCES `dependencias` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `fk_usuarios_dependencia` FOREIGN KEY (`dependencia_id`) REFERENCES `dependencias` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_usuarios_subordinado` FOREIGN KEY (`subordinado_id`) REFERENCES `catalogos` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

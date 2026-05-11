@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Expedientes - Sistema de Gestión Policial</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,14 +12,99 @@
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
         }
-        .form-group {
-            margin-bottom: 1rem;
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-weight: 500;
+        .filtros-container {
+            background-color: var(--bg-surface);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
         }
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .config-columnas {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .btn-config {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-config:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-primary);
+        }
+        
+        th.draggable {
+            cursor: move;
+            user-select: none;
+        }
+        th.draggable:active {
+            cursor: grabbing;
+        }
+        th .drag-handle {
+            display: inline-block;
+            margin-right: 5px;
+            opacity: 0.5;
+            cursor: move;
+        }
+        th:hover .drag-handle {
+            opacity: 1;
+        }
+        th.drag-over {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+        .column-order-list {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            padding: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .column-order-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: move;
+            transition: all 0.2s;
+        }
+        .column-order-item:hover {
+            background: var(--bg-surface);
+            border-color: var(--accent-primary);
+        }
+        .column-order-item.dragging {
+            opacity: 0.5;
+        }
+        .column-order-item .drag-icon {
+            color: var(--text-secondary);
+            cursor: grab;
+        }
+        .column-order-item .drag-icon:active {
+            cursor: grabbing;
+        }
+        .column-order-item .col-name {
+            flex: 1;
+        }
+        
         .documentos-container {
             max-height: 200px;
             overflow-y: auto;
@@ -46,17 +131,6 @@
             cursor: pointer;
             border: none;
         }
-        .filtros-container {
-            background-color: var(--bg-surface);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .filtros-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
         .badge {
             display: inline-block;
             padding: 0.2rem 0.5rem;
@@ -70,6 +144,7 @@
         .badge-archivado { background: rgba(107,114,128,0.2); color: #6b7280; }
         .badge-elevado { background: rgba(139,92,246,0.2); color: #8b5cf6; }
         .badge-en-tramite { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        
         .btn-accion {
             padding: 0.3rem 0.6rem;
             border-radius: 6px;
@@ -107,6 +182,7 @@
         .acciones-cell {
             white-space: nowrap;
         }
+        
         .modal {
             display: none;
             position: fixed;
@@ -154,20 +230,15 @@
             border-radius: 8px;
             border-left: 3px solid var(--accent-primary);
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .form-group {
+            margin-bottom: 1rem;
         }
-        th, td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
+        .form-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
         }
-        th {
-            background: var(--bg-surface);
-            font-weight: 600;
-        }
-        input.list-input, select.form-control, input.form-control, textarea.form-control {
+        .form-control {
             width: 100%;
             padding: 0.5rem;
             border-radius: 6px;
@@ -175,19 +246,95 @@
             background: var(--bg-card);
             color: var(--text-primary);
         }
-        input.list-input:focus, select.form-control:focus, input.form-control:focus, textarea.form-control:focus {
-            outline: none;
-            border-color: var(--accent-primary);
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--bg-surface);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        tr:hover {
+            background: var(--bg-surface);
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+        .timeline-item {
+            padding: 0.5rem;
+            border-left: 2px solid var(--accent-primary);
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+        }
+        .timeline-date {
+            font-weight: bold;
+            color: var(--accent-primary);
+            font-size: 0.8rem;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+        .toast {
+            background: var(--bg-card);
+            border-left: 4px solid;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            min-width: 280px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-success { border-left-color: #16a34a; }
+        .toast-error { border-left-color: #dc2626; }
+        .toast-warning { border-left-color: #d97706; }
+        .toast-info { border-left-color: #1d4ed8; }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .mt-2 { margin-top: 0.5rem; }
+        
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
             .filtros-grid {
                 grid-template-columns: 1fr;
             }
-            .table-container {
-                overflow-x: auto;
+            .acciones-cell {
+                white-space: normal;
+            }
+            .btn-accion {
+                margin-bottom: 0.25rem;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
             }
         }
     </style>
@@ -195,7 +342,7 @@
 <body>
     <div class="header">
         <nav class="navbar">
-            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="logo"><i class="fas fa-shield-alt"></i><span id="sistemaNombre">Sistema Policial</span></div>
             <div class="hamburger"><span></span><span></span><span></span></div>
             <ul class="nav-menu">
                 <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -207,14 +354,35 @@
                 <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
                 <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
-            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+            <div class="user-info">
+                <span id="userInfo"></span>
+                <button id="themeToggleBtn" class="theme-toggle" style="background:none;border:none;cursor:pointer;font-size:1.2rem;padding:0.5rem;border-radius:50%;">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                </button>
+                <button id="logoutBtn" class="btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </div>
         </nav>
     </div>
     
     <div class="container">
         <div class="card-header">
             <h1><i class="fas fa-folder-open"></i> Gestión de Expedientes</h1>
-            <button id="btnNuevoExpediente" class="btn btn-primary" onclick="openExpedienteModal()"><i class="fas fa-plus"></i> Nuevo Expediente</button>
+            <div>
+                <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar Columnas</button>
+                <button id="btnNuevoExpediente" class="btn btn-primary" onclick="openExpedienteModal()"><i class="fas fa-plus"></i> Nuevo Expediente</button>
+            </div>
+        </div>
+        
+        <!-- Panel Configuración Columnas -->
+        <div id="configPanel" class="config-columnas" style="display: none;">
+            <h3><i class="fas fa-sliders-h"></i> Personalizar Columnas</h3>
+            <p class="text-secondary">Arrastre para reordenar. Marque/desmarque para mostrar/ocultar.</p>
+            <div id="columnOrderList" class="column-order-list"></div>
+            <div class="mt-2">
+                <button id="btnResetColumns" class="btn btn-secondary btn-sm">Restablecer</button>
+                <button id="btnGuardarConfig" class="btn btn-primary">Guardar</button>
+                <button id="btnCerrarConfig" class="btn btn-secondary">Cancelar</button>
+            </div>
         </div>
         
         <div class="filtros-container">
@@ -230,13 +398,15 @@
                 </div>
                 <div class="form-group">
                     <label>Tipo de Oficio</label>
-                    <input type="text" id="filtro_tipo" class="form-control" list="listaTiposOficio" placeholder="Escriba para buscar...">
-                    <datalist id="listaTiposOficio"></datalist>
+                    <select id="filtro_tipo" class="form-control">
+                        <option value="">Todos</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Juzgado Origen</label>
-                    <input type="text" id="filtro_juzgado" class="form-control" list="listaJuzgados" placeholder="Escriba para buscar...">
-                    <datalist id="listaJuzgados"></datalist>
+                    <select id="filtro_juzgado" class="form-control">
+                        <option value="">Todos</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Estado</label>
@@ -252,8 +422,19 @@
                 </div>
                 <div class="form-group">
                     <label>Responsable</label>
-                    <input type="text" id="filtro_responsable" class="form-control" list="listaResponsables" placeholder="Escriba para buscar...">
-                    <datalist id="listaResponsables"></datalist>
+                    <input type="text" id="filtro_responsable" class="form-control" placeholder="Buscar por nombre...">
+                </div>
+                <div class="form-group">
+                    <label>Unidad Regional</label>
+                    <select id="filtro_dependencia" class="form-control">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Subordinado</label>
+                    <select id="filtro_oficina" class="form-control">
+                        <option value="">Todos</option>
+                    </select>
                 </div>
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem;">
@@ -264,21 +445,9 @@
         
         <div class="table-container">
             <table id="expedientesTable">
-                <thead>
-                    <tr>
-                        <th>N° Expediente</th>
-                        <th>Año</th>
-                        <th>Expediente Origen</th>
-                        <th>Fecha</th>
-                        <th>Tipo Oficio</th>
-                        <th>Juzgado</th>
-                        <th>Responsable</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+                <thead id="tableHeader"></thead>
                 <tbody id="expedientesTableBody">
-                    <tr><td colspan="9" class="text-center">Cargando expedientes...</td></tr>
+                    <tr><td colspan="10" class="text-center">Cargando...<\/td><\/tr>
                 </tbody>
             </table>
         </div>
@@ -286,7 +455,7 @@
     
     <!-- Modal Expediente -->
     <div id="expedienteModal" class="modal">
-        <div class="modal-content" style="max-width:800px; max-height:90vh; overflow-y:auto;">
+        <div class="modal-content" style="max-width:900px; max-height:90vh; overflow-y:auto;">
             <div class="modal-header">
                 <h3 id="modalTitle">Nuevo Expediente</h3>
                 <span class="close-modal" onclick="closeModal()">&times;</span>
@@ -302,7 +471,7 @@
                         </div>
                         <div class="form-group">
                             <label>Año *</label>
-                            <input type="text" id="anio" class="form-control" required placeholder="Ej: 2024" value="2024">
+                            <input type="text" id="anio" class="form-control" required placeholder="Ej: 2024" value="2025">
                         </div>
                     </div>
                     
@@ -324,30 +493,43 @@
                         </div>
                         <div class="form-group">
                             <label>Tipo de Oficio *</label>
-                            <input type="text" id="tipo_oficio" class="form-control" list="listaTiposOficioModal" required placeholder="Escriba para buscar...">
-                            <datalist id="listaTiposOficioModal"></datalist>
+                            <select id="tipo_oficio" class="form-control" required>
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label>Juzgado Origen *</label>
-                            <input type="text" id="juzgado_origen" class="form-control" list="listaJuzgadosModal" required placeholder="Escriba para buscar...">
-                            <datalist id="listaJuzgadosModal"></datalist>
+                            <select id="juzgado_origen" class="form-control" required>
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label>Dependencia</label>
-                            <input type="text" id="dependencia_id" class="form-control" list="listaDependencias" placeholder="Escriba para buscar...">
-                            <datalist id="listaDependencias"></datalist>
+                            <label>Unidad Regional/Superior</label>
+                            <select id="dependencia_id" class="form-control">
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Tipo de Requerimiento</label>
-                            <input type="text" id="tipo_requerimiento" class="form-control" list="listaTiposRequerimiento" placeholder="Escriba para buscar...">
-                            <datalist id="listaTiposRequerimiento"></datalist>
+                            <label>Subordinado</label>
+                            <select id="oficina" class="form-control">
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
+                        <div class="form-group">
+                            <label>Tipo de Requerimiento</label>
+                            <select id="tipo_requerimiento" class="form-control">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
                         <div class="form-group">
                             <label>Estado *</label>
                             <select id="estado" class="form-control" required>
@@ -356,14 +538,15 @@
                                 <option value="Derivado">Derivado</option>
                                 <option value="Resuelto">Resuelto</option>
                                 <option value="Archivado">Archivado</option>
+                                <option value="Elevado">Elevado</option>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Responsable del Diligenciamiento</label>
-                        <input type="text" id="responsable_id" class="form-control" list="listaResponsablesModal" placeholder="Escriba para buscar por legajo o nombre...">
-                        <datalist id="listaResponsablesModal"></datalist>
+                        <div class="form-group">
+                            <label>Responsable del Diligenciamiento</label>
+                            <select id="responsable_id" class="form-control">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -386,12 +569,23 @@
                         <h4><i class="fas fa-paperclip"></i> Documentos Adjuntos</h4>
                         <div id="documentosList" class="documentos-container"></div>
                         <div class="form-row mt-2">
-                            <div><label>Título</label><input type="text" id="doc_titulo" class="form-control" placeholder="Ej: Oficio, Nota, Resolución"></div>
-                            <div><label>Descripción</label><input type="text" id="doc_descripcion" class="form-control" placeholder="Descripción opcional"></div>
+                            <div class="form-group">
+                                <label>Título</label>
+                                <input type="text" id="doc_titulo" class="form-control" placeholder="Ej: Oficio, Nota, Resolución">
+                            </div>
+                            <div class="form-group">
+                                <label>Descripción</label>
+                                <input type="text" id="doc_descripcion" class="form-control" placeholder="Descripción opcional">
+                            </div>
                         </div>
                         <div class="form-row">
-                            <div><label>Archivo</label><input type="file" id="doc_archivo" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf"></div>
-                            <div><button type="button" class="btn btn-primary" onclick="subirDocumento()"><i class="fas fa-upload"></i> Subir Documento</button></div>
+                            <div class="form-group">
+                                <label>Archivo</label>
+                                <input type="file" id="doc_archivo" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf">
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-primary" onclick="subirDocumento()"><i class="fas fa-upload"></i> Subir Documento</button>
+                            </div>
                         </div>
                     </div>
                     
@@ -459,7 +653,10 @@
     <!-- Modal Ver Documento -->
     <div id="documentoModal" class="modal">
         <div class="modal-content" style="max-width:600px;">
-            <div class="modal-header"><h3>Documento</h3><span class="close-modal" onclick="cerrarDocumentoModal()">&times;</span></div>
+            <div class="modal-header">
+                <h3>Documento</h3>
+                <span class="close-modal" onclick="cerrarDocumentoModal()">&times;</span>
+            </div>
             <div class="modal-body" style="text-align:center;">
                 <img id="documentoPreview" src="" style="max-width:100%; border-radius:8px; display:none;">
                 <iframe id="documentoPdf" src="" style="width:100%; height:500px; display:none;"></iframe>
@@ -473,10 +670,30 @@
         const API_URL = 'backend/api.php';
         let expedientesData = [];
         let documentosActuales = [];
-        let catalogosData = { tiposOficio: [], tiposRequerimiento: [] };
+        let catalogosData = { tiposOficio: [], tiposRequerimiento: [], juzgados: [] };
         let dependenciasData = [];
+        let subordinadosData = [];
         let personalData = [];
-        let juzgadosData = [];
+        
+        // ==================== CONFIGURACIÓN DE COLUMNAS ====================
+        let activeColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado'];
+        
+        const columnLabels = {
+            'nro_expediente': 'N° Expediente',
+            'anio': 'Año',
+            'expediente_origen': 'Expediente Origen',
+            'fecha': 'Fecha',
+            'tipo_oficio': 'Tipo Oficio',
+            'juzgado_origen': 'Juzgado',
+            'responsable': 'Responsable',
+            'estado': 'Estado',
+            'oficina': 'Subordinado',
+            'dependencia': 'Unidad Regional',
+            'tipo_requerimiento': 'Tipo Requerimiento',
+            'nro_informe_tecnico': 'N° Informe'
+        };
+        
+        const allColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado', 'oficina', 'dependencia', 'tipo_requerimiento', 'nro_informe_tecnico'];
         
         function getToken() { return localStorage.getItem('jwt_token'); }
         
@@ -494,85 +711,231 @@
             return div.innerHTML;
         }
         
-        function checkAuth() {
-            const user = localStorage.getItem('current_user');
-            if (!user) { 
-                window.location.href = 'index.html'; 
-                return false; 
+        // ==================== RENDER TABLA PERSONALIZABLE ====================
+        function renderTable() {
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('expedientesTableBody');
+            if (!thead || !tbody) return;
+            
+            thead.innerHTML = '<tr>' + activeColumns.map(col => `
+                <th class="draggable" data-col="${col}" draggable="true">
+                    <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> 
+                    ${columnLabels[col] || col}
+                </th>
+            `).join('') + '<th>Acciones</th></tr>';
+            
+            initHeaderDragDrop();
+            
+            if (!expedientesData || expedientesData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay expedientes registrados<\/td><\/tr>';
+                return;
             }
-            const userData = JSON.parse(user);
-            const userInfo = document.getElementById('userInfo');
-            if (userInfo) {
-                userInfo.innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
-            }
-            return true;
+            
+            tbody.innerHTML = expedientesData.map(exp => {
+                let estadoClass = '';
+                const estado = exp.estado || 'Pendiente';
+                if (estado === 'Pendiente') estadoClass = 'badge-pendiente';
+                else if (estado === 'Resuelto') estadoClass = 'badge-resuelto';
+                else if (estado === 'Derivado') estadoClass = 'badge-derivado';
+                else if (estado === 'Archivado') estadoClass = 'badge-archivado';
+                else if (estado === 'Elevado') estadoClass = 'badge-elevado';
+                else if (estado === 'En trámite') estadoClass = 'badge-en-tramite';
+                else estadoClass = 'badge-pendiente';
+                
+                const responsable = exp.responsable_apellido ? `${exp.responsable_apellido}, ${exp.responsable_nombre}` : '-';
+                const anio = exp.anio || (exp.fecha ? exp.fecha.split('-')[0] : '-');
+                const expedienteOrigen = exp.expediente_origen ? `${exp.expediente_origen}${exp.anio_origen ? `/${exp.anio_origen}` : ''}` : '-';
+                const juzgadoNombre = exp.juzgado_nombre || exp.juzgado_origen || '-';
+                const dependenciaNombre = exp.dependencia_nombre || '-';
+                const oficinaNombre = exp.oficina || '-';
+                
+                let row = '<tr>';
+                for (const col of activeColumns) {
+                    if (col === 'responsable') row += '<td>' + escapeHtml(responsable) + '</td>';
+                    else if (col === 'juzgado_origen') row += '<td>' + escapeHtml(juzgadoNombre) + '</td>';
+                    else if (col === 'dependencia') row += '<td>' + escapeHtml(dependenciaNombre) + '</td>';
+                    else if (col === 'oficina') row += '<td>' + escapeHtml(oficinaNombre) + '</td>';
+                    else if (col === 'estado') row += '<td><span class="badge ' + estadoClass + '">' + escapeHtml(estado) + '</span></td>';
+                    else row += '<td>' + escapeHtml(exp[col] || '-') + '</td>';
+                }
+                row += `<td class="acciones-cell">
+                    <button class="btn-accion btn-editar" onclick="editExpediente(${exp.id})" title="Editar">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="btn-accion btn-eliminar" onclick="deleteExpediente(${exp.id})" title="Eliminar">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                    ${estado !== 'Elevado' ? `<button class="btn-accion btn-elevar" onclick="abrirElevacion(${exp.id})" title="Elevar Expediente">
+                        <i class="fas fa-arrow-up"></i> Elevar
+                    </button>` : ''}
+                </td>`;
+                row += '</tr>';
+                return row;
+            }).join('');
         }
         
-        // Cargar juzgados
-        async function loadJuzgados() {
+        function initHeaderDragDrop() {
+            const headers = document.querySelectorAll('#tableHeader th.draggable');
+            let dragSrc = null;
+            headers.forEach(header => {
+                header.addEventListener('dragstart', (e) => { dragSrc = header; e.dataTransfer.setData('text/plain', header.getAttribute('data-col')); header.style.opacity = '0.5'; });
+                header.addEventListener('dragend', (e) => { if (dragSrc) dragSrc.style.opacity = ''; dragSrc = null; headers.forEach(h => h.classList.remove('drag-over')); });
+                header.addEventListener('dragover', (e) => { e.preventDefault(); header.classList.add('drag-over'); });
+                header.addEventListener('dragleave', (e) => { header.classList.remove('drag-over'); });
+                header.addEventListener('drop', (e) => {
+                    e.preventDefault(); header.classList.remove('drag-over');
+                    const fromCol = e.dataTransfer.getData('text/plain');
+                    const toCol = header.getAttribute('data-col');
+                    if (fromCol !== toCol) {
+                        const fromIndex = activeColumns.indexOf(fromCol);
+                        const toIndex = activeColumns.indexOf(toCol);
+                        if (fromIndex !== -1 && toIndex !== -1) {
+                            const moved = activeColumns.splice(fromIndex, 1)[0];
+                            activeColumns.splice(toIndex, 0, moved);
+                            renderTable(); saveColumnOrder();
+                        }
+                    }
+                });
+            });
+        }
+        
+        async function saveColumnOrder() {
+            try { 
+                const token = getToken(); 
+                await fetch(`${API_URL}?endpoint=table_config&tabla=expedientes`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify({ columnas: activeColumns }) 
+                }); 
+            } catch(e) { console.error(e); }
+        }
+        
+        function openConfigModal() { 
+            document.getElementById('configPanel').style.display = 'block'; 
+            renderOrderList(); 
+        }
+        
+        function renderOrderList() {
+            const container = document.getElementById('columnOrderList');
+            if (!container) return;
+            container.innerHTML = '';
+            const orderedColumns = [...activeColumns];
+            allColumns.forEach(col => { if (!orderedColumns.includes(col)) orderedColumns.push(col); });
+            orderedColumns.forEach(col => {
+                const isVisible = activeColumns.includes(col);
+                const item = document.createElement('div');
+                item.className = 'column-order-item';
+                item.setAttribute('data-col', col);
+                item.setAttribute('draggable', 'true');
+                item.innerHTML = `<i class="fas fa-grip-vertical drag-icon"></i><span class="col-name">${columnLabels[col] || col}</span><input type="checkbox" class="col-toggle" ${isVisible ? 'checked' : ''}>`;
+                item.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', col); item.classList.add('dragging'); });
+                item.addEventListener('dragend', (e) => { item.classList.remove('dragging'); });
+                item.addEventListener('dragover', (e) => { e.preventDefault(); });
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const fromCol = e.dataTransfer.getData('text/plain');
+                    const toCol = col;
+                    if (fromCol !== toCol) {
+                        const fromIndex = orderedColumns.indexOf(fromCol);
+                        const toIndex = orderedColumns.indexOf(toCol);
+                        if (fromIndex !== -1 && toIndex !== -1) {
+                            const moved = orderedColumns.splice(fromIndex, 1)[0];
+                            orderedColumns.splice(toIndex, 0, moved);
+                            activeColumns = orderedColumns.filter(c => activeColumns.includes(c));
+                            renderOrderList();
+                        }
+                    }
+                });
+                const checkbox = item.querySelector('.col-toggle');
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) { if (!activeColumns.includes(col)) activeColumns.push(col); }
+                    else { const idx = activeColumns.indexOf(col); if (idx !== -1) activeColumns.splice(idx, 1); }
+                    renderOrderList();
+                });
+                container.appendChild(item);
+            });
+        }
+        
+        async function loadColumnConfig() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=table_config&tabla=expedientes`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const config = await response.json();
+                if (config && Array.isArray(config) && config.length > 0) {
+                    activeColumns = config;
+                } else {
+                    activeColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado'];
+                }
+                renderOrderList();
+            } catch(e) { console.error(e); }
+        }
+        
+        function resetColumns() {
+            activeColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado'];
+            renderOrderList();
+            renderTable();
+            saveColumnConfig();
+        }
+        
+        async function saveColumnConfig() {
+            try {
+                const token = getToken();
+                await fetch(`${API_URL}?endpoint=table_config&tabla=expedientes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ columnas: activeColumns })
+                });
+                showToast('Configuración de columnas guardada', 'success');
+                document.getElementById('configPanel').style.display = 'none';
+                renderTable();
+            } catch(e) { showToast('Error al guardar', 'error'); }
+        }
+        
+        // ==================== CARGAR DATOS ====================
+        async function cargarCatalogos() {
             try {
                 const token = getToken();
                 if (!token) return;
                 
-                const response = await fetch(`${API_URL}?endpoint=juzgados`, { 
+                const tiposOficioRes = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipo_oficio`, { 
                     headers: { 'Authorization': `Bearer ${token}` } 
                 });
-                juzgadosData = await response.json();
-                console.log('Juzgados cargados:', juzgadosData.length);
+                let tiposOficio = await tiposOficioRes.json();
+                catalogosData.tiposOficio = Array.isArray(tiposOficio) ? tiposOficio : (tiposOficio.data || []);
                 
-                // Actualizar datalists de juzgados
-                const listaJuzgadosFiltro = document.getElementById('listaJuzgados');
-                const listaJuzgadosModal = document.getElementById('listaJuzgadosModal');
-                
-                if (listaJuzgadosFiltro && juzgadosData) {
-                    listaJuzgadosFiltro.innerHTML = juzgadosData.map(j => `<option value="${escapeHtml(j.nombre)}">`).join('');
-                }
-                if (listaJuzgadosModal && juzgadosData) {
-                    listaJuzgadosModal.innerHTML = juzgadosData.map(j => `<option value="${escapeHtml(j.nombre)}">`).join('');
-                }
-            } catch(e) { 
-                console.error('Error cargando juzgados:', e);
-            }
-        }
-        
-        // Cargar todos los catálogos
-        async function loadCatalogos() {
-            try {
-                const token = getToken();
-                if (!token) return;
-                
-                // Cargar tipos de oficio
-                const tiposOficioRes = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipo_oficio`, { headers: { 'Authorization': `Bearer ${token}` } });
-                catalogosData.tiposOficio = await tiposOficioRes.json();
-                
-                // Cargar tipos de requerimiento
-                const tiposRequerimientoRes = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipo_requerimiento`, { headers: { 'Authorization': `Bearer ${token}` } });
-                catalogosData.tiposRequerimiento = await tiposRequerimientoRes.json();
-                
-                // Cargar dependencias
-                const dependenciasRes = await fetch(`${API_URL}?endpoint=dependencias`, { headers: { 'Authorization': `Bearer ${token}` } });
-                dependenciasData = await dependenciasRes.json();
-                
-                // Cargar personal
-                const personalRes = await fetch(`${API_URL}?endpoint=personal`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const personal = await personalRes.json();
-                personalData = Array.isArray(personal) ? personal.filter(p => p.legajo && p.legajo.trim() !== '') : [];
-                
-                // Cargar juzgados
-                await loadJuzgados();
-                
-                console.log('Datos cargados:', {
-                    tiposOficio: catalogosData.tiposOficio.length,
-                    tiposRequerimiento: catalogosData.tiposRequerimiento.length,
-                    dependencias: dependenciasData.length,
-                    personal: personalData.length,
-                    juzgados: juzgadosData.length
+                const tiposRequerimientoRes = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipos_requerimiento`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
                 });
+                let tiposRequerimiento = await tiposRequerimientoRes.json();
+                catalogosData.tiposRequerimiento = Array.isArray(tiposRequerimiento) ? tiposRequerimiento : (tiposRequerimiento.data || []);
                 
-                // Actualizar datalists
-                actualizarDatalists();
+                const juzgadosRes = await fetch(`${API_URL}?endpoint=juzgados`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                let juzgados = await juzgadosRes.json();
+                catalogosData.juzgados = Array.isArray(juzgados) ? juzgados : (juzgados.data || []);
                 
-                showToast('Catálogos cargados correctamente', 'success');
+                const dependenciasRes = await fetch(`${API_URL}?endpoint=dependencias`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                let dependencias = await dependenciasRes.json();
+                dependenciasData = Array.isArray(dependencias) ? dependencias : (dependencias.data || []);
+                
+                const subordinadosRes = await fetch(`${API_URL}?endpoint=catalogos&tipo=oficinas`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                let subordinados = await subordinadosRes.json();
+                subordinadosData = Array.isArray(subordinados) ? subordinados : (subordinados.data || []);
+                
+                const personalRes = await fetch(`${API_URL}?endpoint=personal`, { 
+                    headers: { 'Authorization': `Bearer ${token}` } 
+                });
+                let personal = await personalRes.json();
+                personalData = Array.isArray(personal) ? personal : [];
+                
+                actualizarSelects();
                 
             } catch(e) { 
                 console.error('Error cargando catálogos:', e);
@@ -580,67 +943,70 @@
             }
         }
         
-        // Actualizar todos los datalists
-        function actualizarDatalists() {
-            // Tipos de Oficio - Filtro
-            const listaTiposOficio = document.getElementById('listaTiposOficio');
-            if (listaTiposOficio && catalogosData.tiposOficio) {
-                listaTiposOficio.innerHTML = catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">`).join('');
+        function actualizarSelects() {
+            const filtroTipo = document.getElementById('filtro_tipo');
+            if (filtroTipo && catalogosData.tiposOficio) {
+                filtroTipo.innerHTML = '<option value="">Todos</option>' + 
+                    catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">${escapeHtml(c.valor)}</option>`).join('');
             }
             
-            // Tipos de Oficio - Modal
-            const listaTiposOficioModal = document.getElementById('listaTiposOficioModal');
-            if (listaTiposOficioModal && catalogosData.tiposOficio) {
-                listaTiposOficioModal.innerHTML = catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">`).join('');
+            const selectTipoOficio = document.getElementById('tipo_oficio');
+            if (selectTipoOficio && catalogosData.tiposOficio) {
+                selectTipoOficio.innerHTML = '<option value="">Seleccionar...</option>' + 
+                    catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">${escapeHtml(c.valor)}</option>`).join('');
             }
             
-            // Tipos de Requerimiento
-            const listaTiposRequerimiento = document.getElementById('listaTiposRequerimiento');
-            if (listaTiposRequerimiento && catalogosData.tiposRequerimiento) {
-                listaTiposRequerimiento.innerHTML = catalogosData.tiposRequerimiento.map(c => `<option value="${escapeHtml(c.valor)}">`).join('');
+            const selectTipoRequerimiento = document.getElementById('tipo_requerimiento');
+            if (selectTipoRequerimiento && catalogosData.tiposRequerimiento) {
+                selectTipoRequerimiento.innerHTML = '<option value="">Seleccionar...</option>' + 
+                    catalogosData.tiposRequerimiento.map(c => `<option value="${escapeHtml(c.valor)}">${escapeHtml(c.valor)}</option>`).join('');
             }
             
-            // Dependencias
-            const listaDependencias = document.getElementById('listaDependencias');
-            if (listaDependencias && dependenciasData) {
-                listaDependencias.innerHTML = dependenciasData.map(d => `<option value="${escapeHtml(d.nombre)}" data-id="${d.id}">`).join('');
+            const filtroJuzgado = document.getElementById('filtro_juzgado');
+            if (filtroJuzgado && catalogosData.juzgados) {
+                filtroJuzgado.innerHTML = '<option value="">Todos</option>' + 
+                    catalogosData.juzgados.map(j => `<option value="${escapeHtml(j.nombre)}">${escapeHtml(j.nombre)}</option>`).join('');
             }
             
-            // Responsables - Filtro
-            const listaResponsables = document.getElementById('listaResponsables');
-            if (listaResponsables && personalData) {
-                listaResponsables.innerHTML = personalData.map(p => `<option value="${p.legajo} - ${p.apellido}, ${p.nombre}" data-id="${p.id}">`).join('');
+            const selectJuzgado = document.getElementById('juzgado_origen');
+            if (selectJuzgado && catalogosData.juzgados) {
+                selectJuzgado.innerHTML = '<option value="">Seleccionar...</option>' + 
+                    catalogosData.juzgados.map(j => `<option value="${escapeHtml(j.nombre)}">${escapeHtml(j.nombre)}</option>`).join('');
             }
             
-            // Responsables - Modal
-            const listaResponsablesModal = document.getElementById('listaResponsablesModal');
-            if (listaResponsablesModal && personalData) {
-                listaResponsablesModal.innerHTML = personalData.map(p => `<option value="${p.legajo} - ${p.apellido}, ${p.nombre}" data-id="${p.id}">`).join('');
+            const selectDependencia = document.getElementById('dependencia_id');
+            const filtroDependencia = document.getElementById('filtro_dependencia');
+            if (selectDependencia && dependenciasData) {
+                selectDependencia.innerHTML = '<option value="">Seleccionar...</option>' + 
+                    dependenciasData.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+            }
+            if (filtroDependencia && dependenciasData) {
+                filtroDependencia.innerHTML = '<option value="">Todas</option>' + 
+                    dependenciasData.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+            }
+            
+            const selectSubordinado = document.getElementById('oficina');
+            const filtroSubordinado = document.getElementById('filtro_oficina');
+            if (selectSubordinado && subordinadosData) {
+                selectSubordinado.innerHTML = '<option value="">Seleccionar...</option>' + 
+                    subordinadosData.map(s => `<option value="${escapeHtml(s.valor)}">${escapeHtml(s.valor)}</option>`).join('');
+            }
+            if (filtroSubordinado && subordinadosData) {
+                filtroSubordinado.innerHTML = '<option value="">Todos</option>' + 
+                    subordinadosData.map(s => `<option value="${escapeHtml(s.valor)}">${escapeHtml(s.valor)}</option>`).join('');
+            }
+            
+            const selectResponsable = document.getElementById('responsable_id');
+            if (selectResponsable && personalData) {
+                selectResponsable.innerHTML = '<option value="">Seleccionar...</option>' + 
+                    personalData.map(p => `<option value="${p.id}">${escapeHtml(p.legajo)} - ${escapeHtml(p.apellido)}, ${escapeHtml(p.nombre)}</option>`).join('');
             }
         }
         
-        // Obtener ID de dependencia por nombre
-        function getDependenciaIdByNombre(nombre) {
-            const dep = dependenciasData.find(d => d.nombre === nombre);
-            return dep ? dep.id : null;
-        }
-        
-        // Obtener ID de responsable por texto
-        function getResponsableIdByText(texto) {
-            if (!texto) return null;
-            const match = personalData.find(p => `${p.legajo} - ${p.apellido}, ${p.nombre}` === texto);
-            return match ? match.id : null;
-        }
-        
-        // Obtener texto de responsable por ID
-        function getResponsableTextById(id) {
-            const p = personalData.find(p => p.id == id);
-            return p ? `${p.legajo} - ${p.apellido}, ${p.nombre}` : '';
-        }
-        
+        // ==================== EXPEDIENTES ====================
         async function loadExpedientes() {
             const tbody = document.getElementById('expedientesTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center">Cargando expedientes...</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Cargando expedientes...<\/td><\/tr>';
             
             try {
                 const token = getToken();
@@ -659,63 +1025,14 @@
                 
                 const data = await response.json();
                 expedientesData = Array.isArray(data) ? data : [];
+                await loadColumnConfig();
                 renderTable();
                 showToast(`✅ ${expedientesData.length} expedientes cargados`, 'success');
             } catch(e) {
                 console.error('Error cargando expedientes:', e);
-                if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center">Error cargando datos</td></tr>';
+                if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Error cargando datos: ' + e.message + '<\/td><\/tr>';
                 showToast('Error cargando expedientes', 'error');
             }
-        }
-        
-        function renderTable() {
-            const tbody = document.getElementById('expedientesTableBody');
-            if (!tbody) return;
-            
-            if (!expedientesData || expedientesData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="text-center">No hay expedientes registrados</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = expedientesData.map(exp => {
-                let estadoClass = '';
-                const estado = exp.estado || 'Pendiente';
-                if (estado === 'Pendiente') estadoClass = 'badge-pendiente';
-                else if (estado === 'Resuelto') estadoClass = 'badge-resuelto';
-                else if (estado === 'Derivado') estadoClass = 'badge-derivado';
-                else if (estado === 'Archivado') estadoClass = 'badge-archivado';
-                else if (estado === 'Elevado') estadoClass = 'badge-elevado';
-                else if (estado === 'En trámite') estadoClass = 'badge-en-tramite';
-                else estadoClass = 'badge-pendiente';
-                
-                const responsable = exp.responsable_legajo ? `${exp.responsable_legajo} - ${exp.responsable_apellido}, ${exp.responsable_nombre}` : '-';
-                const anio = exp.anio || (exp.fecha ? exp.fecha.split('-')[0] : '-');
-                const expedienteOrigen = exp.expediente_origen ? `${exp.expediente_origen}${exp.anio_origen ? `/${exp.anio_origen}` : ''}` : '-';
-                
-                return `
-                    <tr>
-                        <td>${escapeHtml(exp.nro_expediente || '-')}</td>
-                        <td>${escapeHtml(anio)}</td>
-                        <td>${escapeHtml(expedienteOrigen)}</td>
-                        <td>${escapeHtml(exp.fecha || '-')}</td>
-                        <td>${escapeHtml(exp.tipo_oficio || '-')}</td>
-                        <td>${escapeHtml(exp.juzgado_origen || '-')}</td>
-                        <td>${escapeHtml(responsable)}</td>
-                        <td><span class="badge ${estadoClass}">${estado}</span></td>
-                        <td class="acciones-cell">
-                            <button class="btn-accion btn-editar" onclick="editExpediente(${exp.id})" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-accion btn-eliminar" onclick="deleteExpediente(${exp.id})" title="Eliminar">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            ${estado !== 'Elevado' ? `<button class="btn-accion btn-elevar" onclick="abrirElevacion(${exp.id})" title="Elevar Expediente">
-                                <i class="fas fa-arrow-up"></i>
-                            </button>` : ''}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
         }
         
         function aplicarFiltros() {
@@ -727,20 +1044,26 @@
             const anio = document.getElementById('filtro_anio')?.value.trim();
             if (anio) filtrados = filtrados.filter(e => (e.anio || '').includes(anio));
             
-            const tipo = document.getElementById('filtro_tipo')?.value.trim();
-            if (tipo) filtrados = filtrados.filter(e => (e.tipo_oficio || '').toLowerCase().includes(tipo.toLowerCase()));
+            const tipo = document.getElementById('filtro_tipo')?.value;
+            if (tipo && tipo !== '') filtrados = filtrados.filter(e => e.tipo_oficio === tipo);
             
-            const juzgado = document.getElementById('filtro_juzgado')?.value.trim();
-            if (juzgado) filtrados = filtrados.filter(e => (e.juzgado_origen || '').toLowerCase().includes(juzgado.toLowerCase()));
+            const juzgado = document.getElementById('filtro_juzgado')?.value;
+            if (juzgado && juzgado !== '') filtrados = filtrados.filter(e => e.juzgado_nombre === juzgado || e.juzgado_origen === juzgado);
             
             const estado = document.getElementById('filtro_estado')?.value;
             if (estado && estado !== '') filtrados = filtrados.filter(e => e.estado === estado);
             
-            const responsableText = document.getElementById('filtro_responsable')?.value.trim();
+            const dependencia = document.getElementById('filtro_dependencia')?.value;
+            if (dependencia && dependencia !== '') filtrados = filtrados.filter(e => e.dependencia_id == dependencia);
+            
+            const subordinado = document.getElementById('filtro_oficina')?.value;
+            if (subordinado && subordinado !== '') filtrados = filtrados.filter(e => e.oficina === subordinado);
+            
+            const responsableText = document.getElementById('filtro_responsable')?.value.trim().toLowerCase();
             if (responsableText) {
                 filtrados = filtrados.filter(e => {
-                    const nombreResp = e.responsable_legajo ? `${e.responsable_legajo} - ${e.responsable_apellido}, ${e.responsable_nombre}` : '';
-                    return nombreResp.toLowerCase().includes(responsableText.toLowerCase());
+                    const nombreResp = e.responsable_apellido ? `${e.responsable_apellido} ${e.responsable_nombre}`.toLowerCase() : '';
+                    return nombreResp.includes(responsableText);
                 });
             }
             
@@ -755,10 +1078,13 @@
             document.getElementById('filtro_tipo').value = '';
             document.getElementById('filtro_juzgado').value = '';
             document.getElementById('filtro_estado').value = '';
+            document.getElementById('filtro_dependencia').value = '';
+            document.getElementById('filtro_oficina').value = '';
             document.getElementById('filtro_responsable').value = '';
             loadExpedientes();
         }
         
+        // ==================== DOCUMENTOS ====================
         async function cargarDocumentos(expedienteId) {
             if (!expedienteId) return;
             try {
@@ -862,6 +1188,7 @@
         
         function cerrarDocumentoModal() { document.getElementById('documentoModal').style.display = 'none'; }
         
+        // ==================== ELEVACIONES ====================
         async function cargarElevacion(expedienteId) {
             try {
                 const token = getToken();
@@ -883,11 +1210,6 @@
                         document.getElementById('reciboExistente').style.display = 'none';
                     }
                 } else {
-                    document.getElementById('fecha_elevacion').value = '';
-                    document.getElementById('hora_elevacion').value = '';
-                    document.getElementById('persona_recibio').value = '';
-                    document.getElementById('instancia_destino').value = '';
-                    document.getElementById('observaciones_elevacion').value = '';
                     document.getElementById('reciboExistente').style.display = 'none';
                 }
             } catch(e) { console.error(e); }
@@ -974,6 +1296,7 @@
             } catch(e) { showToast('Error', 'error'); }
         }
         
+        // ==================== CRUD EXPEDIENTES ====================
         function openExpedienteModal(data = null) {
             const modal = document.getElementById('expedienteModal');
             const anioActual = new Date().getFullYear().toString();
@@ -986,14 +1309,12 @@
                 document.getElementById('anio_origen').value = data.anio_origen || '';
                 document.getElementById('fecha').value = data.fecha || '';
                 document.getElementById('tipo_oficio').value = data.tipo_oficio || '';
-                document.getElementById('juzgado_origen').value = data.juzgado_origen || '';
-                
-                const dependencia = dependenciasData.find(d => d.id == data.dependencia_id);
-                document.getElementById('dependencia_id').value = dependencia ? dependencia.nombre : '';
-                
+                document.getElementById('juzgado_origen').value = data.juzgado_nombre || data.juzgado_origen || '';
+                document.getElementById('dependencia_id').value = data.dependencia_id || '';
+                document.getElementById('oficina').value = data.oficina || '';
                 document.getElementById('tipo_requerimiento').value = data.tipo_requerimiento || '';
                 document.getElementById('estado').value = data.estado || 'Pendiente';
-                document.getElementById('responsable_id').value = getResponsableTextById(data.responsable_id);
+                document.getElementById('responsable_id').value = data.responsable_id || '';
                 document.getElementById('nro_informe_tecnico').value = data.nro_informe_tecnico || '';
                 document.getElementById('resumen').value = data.resumen || '';
                 document.getElementById('observaciones').value = data.observaciones || '';
@@ -1020,12 +1341,6 @@
         async function saveExpediente() {
             const id = document.getElementById('expedienteId').value;
             
-            const dependenciaNombre = document.getElementById('dependencia_id').value;
-            const dependenciaId = getDependenciaIdByNombre(dependenciaNombre);
-            
-            const responsableText = document.getElementById('responsable_id').value;
-            const responsableId = getResponsableIdByText(responsableText);
-            
             const data = {
                 nro_expediente: document.getElementById('nro_expediente').value,
                 anio: document.getElementById('anio').value,
@@ -1034,10 +1349,11 @@
                 fecha: document.getElementById('fecha').value,
                 tipo_oficio: document.getElementById('tipo_oficio').value,
                 juzgado_origen: document.getElementById('juzgado_origen').value,
-                dependencia_id: dependenciaId,
+                dependencia_id: document.getElementById('dependencia_id').value || null,
+                oficina: document.getElementById('oficina').value,
                 tipo_requerimiento: document.getElementById('tipo_requerimiento').value,
                 estado: document.getElementById('estado').value,
-                responsable_id: responsableId,
+                responsable_id: document.getElementById('responsable_id').value || null,
                 nro_informe_tecnico: document.getElementById('nro_informe_tecnico').value,
                 resumen: document.getElementById('resumen').value,
                 observaciones: document.getElementById('observaciones').value
@@ -1065,7 +1381,10 @@
                 } else {
                     showToast('Error al guardar: ' + (result.error || 'Desconocido'), 'error');
                 }
-            } catch(e) { showToast('Error de conexión', 'error'); }
+            } catch(e) { 
+                console.error('Error:', e);
+                showToast('Error de conexión: ' + e.message, 'error'); 
+            }
         }
         
         async function editExpediente(id) {
@@ -1101,16 +1420,74 @@
             }, 500);
         }
         
-        function closeModal() { document.getElementById('expedienteModal').style.display = 'none'; }
+        function closeModal() { 
+            document.getElementById('expedienteModal').style.display = 'none';
+            document.getElementById('documentoModal').style.display = 'none';
+        }
         
-        // Event Listeners
+        // ==================== TEMA ====================
+        const THEME_KEY = 'sistema_policial_theme';
+        
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+                const icon = document.getElementById('themeIcon');
+                if (icon) icon.className = 'fas fa-sun';
+            } else {
+                document.body.classList.remove('light-theme');
+                const icon = document.getElementById('themeIcon');
+                if (icon) icon.className = 'fas fa-moon';
+            }
+            localStorage.setItem(THEME_KEY, theme);
+        }
+        
+        function getCurrentTheme() {
+            const saved = localStorage.getItem(THEME_KEY);
+            return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+        }
+        
+        function initTheme() {
+            const savedTheme = getCurrentTheme();
+            applyTheme(savedTheme);
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            if (toggleBtn) toggleBtn.addEventListener('click', () => {
+                const newTheme = getCurrentTheme() === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+                showToast(`Tema cambiado a ${newTheme === 'light' ? 'claro' : 'oscuro'}`, 'info');
+            });
+        }
+        
+        function checkAuth() {
+            const user = localStorage.getItem('current_user');
+            if (!user) { 
+                window.location.href = 'index.html'; 
+                return false; 
+            }
+            const userData = JSON.parse(user);
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo) {
+                userInfo.innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            }
+            return true;
+        }
+        
+        // ==================== EVENTOS E INICIALIZACIÓN ====================
         document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
         document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
         document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+        window.addEventListener('click', (e) => {
+            if (e.target.classList?.contains('modal')) closeModal();
+        });
+        
+        document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => { openConfigModal(); loadColumnConfig(); });
+        document.getElementById('btnCerrarConfig')?.addEventListener('click', () => { document.getElementById('configPanel').style.display = 'none'; });
+        document.getElementById('btnGuardarConfig')?.addEventListener('click', saveColumnConfig);
+        document.getElementById('btnResetColumns')?.addEventListener('click', resetColumns);
         
         document.addEventListener('DOMContentLoaded', async () => {
             if (checkAuth()) {
-                await loadCatalogos();
+                initTheme();
+                await cargarCatalogos();
                 await loadExpedientes();
             }
         });

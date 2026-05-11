@@ -6,6 +6,121 @@
     <title>Sistema de Gestión Policial - Login</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-surface) 100%);
+        }
+        .login-card {
+            background-color: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .login-header i {
+            font-size: 3rem;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+        .login-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2);
+        }
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1e40af;
+            transform: translateY(-2px);
+        }
+        .password-wrapper {
+            position: relative;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+        .toast {
+            background: var(--bg-card);
+            border-left: 4px solid;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            min-width: 280px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-success { border-left-color: #16a34a; }
+        .toast-error { border-left-color: #dc2626; }
+        .toast-warning { border-left-color: #d97706; }
+        .toast-info { border-left-color: #1d4ed8; }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -18,36 +133,96 @@
             
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="username"><i class="fas fa-user"></i> Usuario</label>
+                    <label><i class="fas fa-user"></i> Usuario</label>
                     <input type="text" id="username" name="username" class="form-control" 
                            placeholder="Ingrese su usuario" required autocomplete="off">
                 </div>
                 
                 <div class="form-group">
-                    <label for="password"><i class="fas fa-lock"></i> Contraseña</label>
-                    <div style="position: relative;">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <div class="password-wrapper">
                         <input type="password" id="password" name="password" class="form-control" 
                                placeholder="Ingrese su contraseña" required>
-                        <button type="button" class="btn btn-sm" 
-                                style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);"
-                                onclick="togglePasswordVisibility('password')">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <button type="submit" class="btn btn-primary">
                     <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                 </button>
             </form>
             
-          
+            <div class="login-footer" style="text-align: center; margin-top: 1.5rem;">
+                <small class="text-secondary">Sistema de Gestión Policial v2.0</small>
+            </div>
         </div>
     </div>
     
     <div id="toast-container" class="toast-container"></div>
     
-    <script src="main.js"></script>
-        <script src="theme.js"></script>
+    <script>
+        const API_URL = 'backend/api.php';
+        const AUTH_URL = 'backend/auth.php';
+        
+        function showToast(message, type) {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<div>${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) input.type = input.type === 'password' ? 'text' : 'password';
+        }
+        
+        async function handleLogin(event) {
+            if (event) event.preventDefault();
+            
+            const username = document.getElementById('username')?.value;
+            const password = document.getElementById('password')?.value;
+            
+            if (!username || !password) {
+                showToast('Ingrese usuario y contraseña', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${AUTH_URL}?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('jwt_token', data.token);
+                    localStorage.setItem('current_user', JSON.stringify(data.user));
+                    showToast(`Bienvenido ${data.user.nombre}`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 500);
+                } else {
+                    showToast(data.error || 'Credenciales inválidas', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Error de conexión', 'error');
+            }
+        }
+        
+        document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+        window.togglePasswordVisibility = togglePasswordVisibility;
+    </script>
 </body>
 </html>

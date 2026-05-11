@@ -35,6 +35,46 @@ function getToken() {
     return localStorage.getItem('jwt_token');
 }
 
+// ==================== VERIFICAR PERMISOS ====================
+function esAdministrador() {
+    const user = localStorage.getItem('current_user');
+    if (!user) return false;
+    const userData = JSON.parse(user);
+    return (userData.rol_id === 1 || userData.rol === 'Administrador Central');
+}
+
+function puedeGestionarUsuarios() {
+    return esAdministrador();
+}
+
+function puedeVerConfiguracion() {
+    return esAdministrador();
+}
+
+// Aplicar permisos al menú de navegación
+function aplicarPermisosMenu() {
+    const user = localStorage.getItem('current_user');
+    if (!user) return;
+    
+    const adminLinks = ['usuarios.html', 'configuracion.html'];
+    const esAdmin = esAdministrador();
+    
+    adminLinks.forEach(link => {
+        const elemento = document.querySelector(`a[href="${link}"]`);
+        if (elemento) {
+            if (!esAdmin) {
+                elemento.style.display = 'none';
+                const li = elemento.closest('li');
+                if (li) li.style.display = 'none';
+            } else {
+                elemento.style.display = 'flex';
+                const li = elemento.closest('li');
+                if (li) li.style.display = 'block';
+            }
+        }
+    });
+}
+
 // ==================== API REQUEST ====================
 async function apiRequest(endpoint, method = 'GET', data = null) {
     const token = getToken();
@@ -62,6 +102,10 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
         if (response.status === 401) {
             handleLogout();
             throw new Error('Sesión expirada');
+        }
+        if (response.status === 403) {
+            showToast(result.error || 'No tiene permisos para esta acción', 'error');
+            throw new Error('Permiso denegado');
         }
         return result;
     } catch (error) {
@@ -122,6 +166,7 @@ async function checkAuth() {
         currentUser = JSON.parse(user);
         currentPermissions = currentUser.permisos || {};
         loadUserInfo();
+        aplicarPermisosMenu();
         return true;
     }
     return false;
@@ -166,6 +211,39 @@ function calcularEdad(fechaNacimiento) {
     return edad;
 }
 
+// ==================== TEMA ====================
+const THEME_KEY = 'sistema_policial_theme';
+
+function applyTheme(theme) {
+    if (theme === 'light') {
+        document.body.classList.add('light-theme');
+        const icon = document.getElementById('themeIcon');
+        if (icon) icon.className = 'fas fa-sun';
+    } else {
+        document.body.classList.remove('light-theme');
+        const icon = document.getElementById('themeIcon');
+        if (icon) icon.className = 'fas fa-moon';
+    }
+    localStorage.setItem(THEME_KEY, theme);
+}
+
+function getCurrentTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+    return 'dark';
+}
+
+function initTheme() {
+    const savedTheme = getCurrentTheme();
+    applyTheme(savedTheme);
+    const toggleBtn = document.getElementById('themeToggleBtn');
+    if (toggleBtn) toggleBtn.addEventListener('click', () => {
+        const newTheme = getCurrentTheme() === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+        showToast(`Tema cambiado a ${newTheme === 'light' ? 'claro' : 'oscuro'}`, 'info');
+    });
+}
+
 // ==================== INICIALIZACIÓN ====================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Sistema iniciado');
@@ -188,7 +266,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target.classList?.contains('modal')) closeModal();
     });
     
-    // Verificar autenticación
+    // Theme
+    initTheme();
+    
+    // Verificar autenticación (excepto en login)
     if (!window.location.pathname.includes('index.html')) {
         await checkAuth();
     }
@@ -205,3 +286,6 @@ window.showToast = showToast;
 window.escapeHtml = escapeHtml;
 window.getToken = getToken;
 window.calcularEdad = calcularEdad;
+window.esAdministrador = esAdministrador;
+window.puedeGestionarUsuarios = puedeGestionarUsuarios;
+window.aplicarPermisosMenu = aplicarPermisosMenu;
