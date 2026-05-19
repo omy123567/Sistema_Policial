@@ -312,7 +312,7 @@
         .toast-warning { border-left-color: #d97706; }
         .toast-info { border-left-color: #1d4ed8; }
         
-        .card-header {
+        .card-header-con-filtro {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -320,6 +320,92 @@
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .card-header-left h1 {
+            margin: 0;
+        }
+        .subordinado-selector {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-surface);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        .subordinado-selector:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-card);
+        }
+        .subordinado-selector i {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+        .subordinado-selector select {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .subordinado-selector select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .filtro-activo-indicador {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(29, 78, 216, 0.15);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+        }
+        .filtro-activo-indicador i {
+            font-size: 0.7rem;
+        }
+        .filtro-activo-indicador .limpiar-filtro {
+            cursor: pointer;
+            margin-left: 0.5rem;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        .filtro-activo-indicador .limpiar-filtro:hover {
+            color: #dc2626;
+        }
+        .subordinado-actual {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(29, 78, 216, 0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid rgba(29, 78, 216, 0.3);
+        }
+        .subordinado-actual i {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+        .subordinado-actual .subordinado-nombre {
+            font-weight: 500;
+            color: var(--accent-primary);
+        }
+        input[readonly] {
+            cursor: not-allowed;
+            background-color: var(--bg-surface);
+            opacity: 0.8;
+        }
+        
         .mt-2 { margin-top: 0.5rem; }
         
         @media (max-width: 768px) {
@@ -332,9 +418,16 @@
             .btn-accion {
                 margin-bottom: 0.25rem;
             }
-            .card-header {
+            .card-header-con-filtro {
                 flex-direction: column;
                 align-items: stretch;
+            }
+            .card-header-left {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .subordinado-selector {
+                justify-content: space-between;
             }
         }
     </style>
@@ -365,15 +458,8 @@
     </div>
     
     <div class="container">
-        <div class="card-header">
-            <h1><i class="fas fa-folder-open"></i> Gestión de Expedientes</h1>
-            <div>
-                <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar Columnas</button>
-                <button id="btnNuevoExpediente" class="btn btn-primary" onclick="openExpedienteModal()"><i class="fas fa-plus"></i> Nuevo Expediente</button>
-            </div>
-        </div>
+        <div id="expedientesHeader"></div>
         
-        <!-- Panel Configuración Columnas -->
         <div id="configPanel" class="config-columnas" style="display: none;">
             <h3><i class="fas fa-sliders-h"></i> Personalizar Columnas</h3>
             <p class="text-secondary">Arrastre para reordenar. Marque/desmarque para mostrar/ocultar.</p>
@@ -398,15 +484,13 @@
                 </div>
                 <div class="form-group">
                     <label>Tipo de Oficio</label>
-                    <select id="filtro_tipo" class="form-control">
-                        <option value="">Todos</option>
-                    </select>
+                    <input type="text" id="filtro_tipo" class="form-control" list="listaTiposOficioFiltro" placeholder="Escriba para buscar...">
+                    <datalist id="listaTiposOficioFiltro"></datalist>
                 </div>
                 <div class="form-group">
                     <label>Juzgado Origen</label>
-                    <select id="filtro_juzgado" class="form-control">
-                        <option value="">Todos</option>
-                    </select>
+                    <input type="text" id="filtro_juzgado" class="form-control" list="listaJuzgadosFiltro" placeholder="Escriba para buscar...">
+                    <datalist id="listaJuzgadosFiltro"></datalist>
                 </div>
                 <div class="form-group">
                     <label>Estado</label>
@@ -432,9 +516,8 @@
                 </div>
                 <div class="form-group">
                     <label>Subordinado</label>
-                    <select id="filtro_oficina" class="form-control">
-                        <option value="">Todos</option>
-                    </select>
+                    <input type="text" id="filtro_oficina" class="form-control" list="listaSubordinadosFiltro" placeholder="Escriba para buscar...">
+                    <datalist id="listaSubordinadosFiltro"></datalist>
                 </div>
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem;">
@@ -453,7 +536,6 @@
         </div>
     </div>
     
-    <!-- Modal Expediente -->
     <div id="expedienteModal" class="modal">
         <div class="modal-content" style="max-width:900px; max-height:90vh; overflow-y:auto;">
             <div class="modal-header">
@@ -493,18 +575,16 @@
                         </div>
                         <div class="form-group">
                             <label>Tipo de Oficio *</label>
-                            <select id="tipo_oficio" class="form-control" required>
-                                <option value="">Seleccionar...</option>
-                            </select>
+                            <input type="text" id="tipo_oficio" class="form-control" list="listaTiposOficio" placeholder="Escriba para buscar..." required>
+                            <datalist id="listaTiposOficio"></datalist>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label>Juzgado Origen *</label>
-                            <select id="juzgado_origen" class="form-control" required>
-                                <option value="">Seleccionar...</option>
-                            </select>
+                            <input type="text" id="juzgado_origen" class="form-control" list="listaJuzgados" placeholder="Escriba para buscar..." required>
+                            <datalist id="listaJuzgados"></datalist>
                         </div>
                         <div class="form-group">
                             <label>Unidad Regional/Superior</label>
@@ -517,15 +597,12 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Subordinado</label>
-                            <select id="oficina" class="form-control">
-                                <option value="">Seleccionar...</option>
-                            </select>
+                            <input type="text" id="oficina" class="form-control" placeholder="Delegación asignada" readonly>
                         </div>
                         <div class="form-group">
                             <label>Tipo de Requerimiento</label>
-                            <select id="tipo_requerimiento" class="form-control">
-                                <option value="">Seleccionar...</option>
-                            </select>
+                            <input type="text" id="tipo_requerimiento" class="form-control" list="listaTiposRequerimiento" placeholder="Escriba para buscar...">
+                            <datalist id="listaTiposRequerimiento"></datalist>
                         </div>
                     </div>
                     
@@ -543,9 +620,8 @@
                         </div>
                         <div class="form-group">
                             <label>Responsable del Diligenciamiento</label>
-                            <select id="responsable_id" class="form-control">
-                                <option value="">Seleccionar...</option>
-                            </select>
+                            <input type="text" id="responsable_id" class="form-control" list="listaPersonal" placeholder="Buscar por legajo o nombre...">
+                            <datalist id="listaPersonal"></datalist>
                         </div>
                     </div>
                     
@@ -564,7 +640,6 @@
                         <textarea id="observaciones" class="form-control" rows="2"></textarea>
                     </div>
                     
-                    <!-- Documentos Adjuntos -->
                     <div class="conditional-fields">
                         <h4><i class="fas fa-paperclip"></i> Documentos Adjuntos</h4>
                         <div id="documentosList" class="documentos-container"></div>
@@ -589,7 +664,6 @@
                         </div>
                     </div>
                     
-                    <!-- Sección de Elevación -->
                     <div class="conditional-fields" style="border-left-color: #8b5cf6;">
                         <h4><i class="fas fa-arrow-up"></i> Elevación del Expediente</h4>
                         <p class="text-secondary">Complete esta sección cuando el expediente sea elevado a instancia superior.</p>
@@ -636,7 +710,6 @@
                         </button>
                     </div>
                     
-                    <!-- Historial de Elevaciones -->
                     <div class="conditional-fields" id="historialElevaciones" style="display:none;">
                         <h4><i class="fas fa-history"></i> Historial de Elevaciones</h4>
                         <div id="historialList" class="timeline"></div>
@@ -650,7 +723,6 @@
         </div>
     </div>
     
-    <!-- Modal Ver Documento -->
     <div id="documentoModal" class="modal">
         <div class="modal-content" style="max-width:600px;">
             <div class="modal-header">
@@ -675,7 +747,6 @@
         let subordinadosData = [];
         let personalData = [];
         
-        // ==================== CONFIGURACIÓN DE COLUMNAS ====================
         let activeColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado'];
         
         const columnLabels = {
@@ -695,6 +766,21 @@
         
         const allColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado', 'oficina', 'dependencia', 'tipo_requerimiento', 'nro_informe_tecnico'];
         
+        let subordinadosDisponibles = [];
+        let subordinadoSeleccionadoGlobal = null;
+        let callbacksFiltroSubordinado = [];
+
+        function esAdministrador() {
+            const user = localStorage.getItem('current_user');
+            if (!user) return false;
+            try {
+                const userData = JSON.parse(user);
+                return (userData.rol_id === 1 || userData.rol === 'Administrador Central' || userData.puede_ver_todas === true);
+            } catch(e) {
+                return false;
+            }
+        }
+
         function getToken() { return localStorage.getItem('jwt_token'); }
         
         function showToast(msg, type) {
@@ -711,13 +797,180 @@
             return div.innerHTML;
         }
         
-        // ==================== RENDER TABLA PERSONALIZABLE ====================
+        function registrarCallbackFiltroSubordinado(callback) {
+            if (typeof callback === 'function') {
+                callbacksFiltroSubordinado.push(callback);
+            }
+        }
+
+        function notificarCambioFiltroSubordinado() {
+            callbacksFiltroSubordinado.forEach(callback => {
+                try {
+                    callback(subordinadoSeleccionadoGlobal);
+                } catch(e) {
+                    console.error('Error en callback:', e);
+                }
+            });
+        }
+
+        async function cargarSubordinadosGlobal() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=oficinas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                subordinadosDisponibles = Array.isArray(data) ? data : (data.data || []);
+                actualizarSelectoresSubordinado();
+                
+                const listaSubordinados = document.getElementById('listaSubordinados');
+                const listaSubordinadosFiltro = document.getElementById('listaSubordinadosFiltro');
+                if (listaSubordinados) {
+                    listaSubordinados.innerHTML = subordinadosDisponibles.map(s => `<option value="${escapeHtml(s.valor)}">`).join('');
+                }
+                if (listaSubordinadosFiltro) {
+                    listaSubordinadosFiltro.innerHTML = subordinadosDisponibles.map(s => `<option value="${escapeHtml(s.valor)}">`).join('');
+                }
+                return subordinadosDisponibles;
+            } catch(e) {
+                console.error('Error cargando subordinados:', e);
+                return [];
+            }
+        }
+
+        function actualizarSelectoresSubordinado() {
+            document.querySelectorAll('.subordinado-selector select').forEach(select => {
+                const valorActual = select.value;
+                select.innerHTML = '<option value="">Todos los subordinados</option>' + 
+                    subordinadosDisponibles.map(s => `<option value="${escapeHtml(s.valor)}">${escapeHtml(s.valor)}</option>`).join('');
+                if (valorActual && subordinadosDisponibles.some(s => s.valor === valorActual)) {
+                    select.value = valorActual;
+                } else if (subordinadoSeleccionadoGlobal) {
+                    select.value = subordinadoSeleccionadoGlobal;
+                }
+            });
+        }
+
+        function setFiltroSubordinado(valor) {
+            subordinadoSeleccionadoGlobal = valor || null;
+            if (subordinadoSeleccionadoGlobal) {
+                localStorage.setItem('filtro_subordinado_global', subordinadoSeleccionadoGlobal);
+            } else {
+                localStorage.removeItem('filtro_subordinado_global');
+            }
+            actualizarSelectoresSubordinado();
+            actualizarIndicadoresFiltro();
+            notificarCambioFiltroSubordinado();
+        }
+
+        function getFiltroSubordinado() {
+            return subordinadoSeleccionadoGlobal;
+        }
+
+        function actualizarIndicadoresFiltro() {
+            const indicadores = document.querySelectorAll('.filtro-activo-indicador');
+            if (subordinadoSeleccionadoGlobal) {
+                indicadores.forEach(ind => {
+                    ind.style.display = 'inline-flex';
+                    const nombreSpan = ind.querySelector('.filtro-nombre');
+                    if (nombreSpan) nombreSpan.textContent = subordinadoSeleccionadoGlobal;
+                });
+            } else {
+                indicadores.forEach(ind => {
+                    ind.style.display = 'none';
+                });
+            }
+        }
+
+        function limpiarFiltroSubordinado() {
+            setFiltroSubordinado(null);
+            loadExpedientes();
+        }
+
+        function onSelectorSubordinadoChange(valor) {
+            setFiltroSubordinado(valor);
+            loadExpedientes();
+        }
+
+        function cargarFiltroGuardado() {
+            const saved = localStorage.getItem('filtro_subordinado_global');
+            if (saved) {
+                subordinadoSeleccionadoGlobal = saved;
+            }
+            actualizarIndicadoresFiltro();
+        }
+
+        async function initExpedientesHeader() {
+            await cargarSubordinadosGlobal();
+            cargarFiltroGuardado();
+            
+            const container = document.querySelector('.container');
+            const esAdmin = esAdministrador();
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const subordinadoNombre = user.subordinado_nombre || user.subordinado_valor || '';
+            const tieneSubordinado = user.subordinado_id && user.subordinado_id > 0;
+            
+            let selectorHtml = '';
+            if (esAdmin) {
+                selectorHtml = `
+                    <div class="subordinado-selector">
+                        <i class="fas fa-building"></i>
+                        <select id="selectorSubordinadoExpedientes" onchange="onSelectorSubordinadoChange(this.value)">
+                            <option value="">Todos los subordinados</option>
+                        </select>
+                    </div>
+                    <div class="filtro-activo-indicador" style="display: none;">
+                        <i class="fas fa-filter"></i>
+                        Filtrando por: <span class="filtro-nombre"></span>
+                        <i class="fas fa-times-circle limpiar-filtro" onclick="limpiarFiltroSubordinado()" title="Limpiar filtro"></i>
+                    </div>
+                `;
+            } else if (tieneSubordinado && subordinadoNombre) {
+                selectorHtml = `
+                    <div class="subordinado-actual">
+                        <i class="fas fa-building"></i>
+                        <span class="subordinado-nombre">${escapeHtml(subordinadoNombre)}</span>
+                    </div>
+                `;
+            }
+            
+            const headerHtml = `
+                <div class="card-header-con-filtro">
+                    <div class="card-header-left">
+                        <h1><i class="fas fa-folder-open"></i> Gestión de Expedientes</h1>
+                        ${selectorHtml}
+                    </div>
+                    <div>
+                        <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar Columnas</button>
+                        <button id="btnNuevoExpediente" class="btn btn-primary" onclick="openExpedienteModal()"><i class="fas fa-plus"></i> Nuevo Expediente</button>
+                    </div>
+                </div>
+            `;
+            
+            const oldHeader = document.querySelector('.card-header-con-filtro');
+            if (oldHeader) oldHeader.remove();
+            container.insertAdjacentHTML('afterbegin', headerHtml);
+            
+            if (esAdmin) {
+                actualizarSelectoresSubordinado();
+                actualizarIndicadoresFiltro();
+                document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => {
+                    openConfigModal();
+                    loadColumnConfig();
+                });
+            }
+            
+            registrarCallbackFiltroSubordinado(async () => {
+                await loadExpedientes();
+            });
+        }
+        
         function renderTable() {
             const thead = document.getElementById('tableHeader');
             const tbody = document.getElementById('expedientesTableBody');
             if (!thead || !tbody) return;
             
-            thead.innerHTML = '<tr>' + activeColumns.map(col => `
+            thead.innerHTML = '<td>' + activeColumns.map(col => `
                 <th class="draggable" data-col="${col}" draggable="true">
                     <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> 
                     ${columnLabels[col] || col}
@@ -768,8 +1021,8 @@
                     ${estado !== 'Elevado' ? `<button class="btn-accion btn-elevar" onclick="abrirElevacion(${exp.id})" title="Elevar Expediente">
                         <i class="fas fa-arrow-up"></i> Elevar
                     </button>` : ''}
-                </td>`;
-                row += '</tr>';
+                <\/td>`;
+                row += '<\/tr>';
                 return row;
             }).join('');
         }
@@ -893,7 +1146,6 @@
             } catch(e) { showToast('Error al guardar', 'error'); }
         }
         
-        // ==================== CARGAR DATOS ====================
         async function cargarCatalogos() {
             try {
                 const token = getToken();
@@ -945,65 +1197,53 @@
         
         function actualizarSelects() {
             const filtroTipo = document.getElementById('filtro_tipo');
-            if (filtroTipo && catalogosData.tiposOficio) {
-                filtroTipo.innerHTML = '<option value="">Todos</option>' + 
+            const listaTiposOficioFiltro = document.getElementById('listaTiposOficioFiltro');
+            const listaTiposOficio = document.getElementById('listaTiposOficio');
+            
+            if (catalogosData.tiposOficio.length) {
+                const options = catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">`).join('');
+                if (listaTiposOficioFiltro) listaTiposOficioFiltro.innerHTML = options;
+                if (listaTiposOficio) listaTiposOficio.innerHTML = options;
+                if (filtroTipo) filtroTipo.innerHTML = '<option value="">Todos</option>' + 
                     catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">${escapeHtml(c.valor)}</option>`).join('');
             }
             
-            const selectTipoOficio = document.getElementById('tipo_oficio');
-            if (selectTipoOficio && catalogosData.tiposOficio) {
-                selectTipoOficio.innerHTML = '<option value="">Seleccionar...</option>' + 
-                    catalogosData.tiposOficio.map(c => `<option value="${escapeHtml(c.valor)}">${escapeHtml(c.valor)}</option>`).join('');
+            const listaTiposRequerimiento = document.getElementById('listaTiposRequerimiento');
+            if (listaTiposRequerimiento && catalogosData.tiposRequerimiento.length) {
+                listaTiposRequerimiento.innerHTML = catalogosData.tiposRequerimiento.map(c => `<option value="${escapeHtml(c.valor)}">`).join('');
             }
             
-            const selectTipoRequerimiento = document.getElementById('tipo_requerimiento');
-            if (selectTipoRequerimiento && catalogosData.tiposRequerimiento) {
-                selectTipoRequerimiento.innerHTML = '<option value="">Seleccionar...</option>' + 
-                    catalogosData.tiposRequerimiento.map(c => `<option value="${escapeHtml(c.valor)}">${escapeHtml(c.valor)}</option>`).join('');
-            }
-            
-            const filtroJuzgado = document.getElementById('filtro_juzgado');
-            if (filtroJuzgado && catalogosData.juzgados) {
-                filtroJuzgado.innerHTML = '<option value="">Todos</option>' + 
-                    catalogosData.juzgados.map(j => `<option value="${escapeHtml(j.nombre)}">${escapeHtml(j.nombre)}</option>`).join('');
-            }
-            
-            const selectJuzgado = document.getElementById('juzgado_origen');
-            if (selectJuzgado && catalogosData.juzgados) {
-                selectJuzgado.innerHTML = '<option value="">Seleccionar...</option>' + 
-                    catalogosData.juzgados.map(j => `<option value="${escapeHtml(j.nombre)}">${escapeHtml(j.nombre)}</option>`).join('');
+            const listaJuzgadosFiltro = document.getElementById('listaJuzgadosFiltro');
+            const listaJuzgados = document.getElementById('listaJuzgados');
+            if (catalogosData.juzgados.length) {
+                const options = catalogosData.juzgados.map(j => `<option value="${escapeHtml(j.nombre)}">`).join('');
+                if (listaJuzgadosFiltro) listaJuzgadosFiltro.innerHTML = options;
+                if (listaJuzgados) listaJuzgados.innerHTML = options;
+                if (document.getElementById('filtro_juzgado')) {
+                    document.getElementById('filtro_juzgado').innerHTML = '<option value="">Todos</option>' + 
+                        catalogosData.juzgados.map(j => `<option value="${escapeHtml(j.nombre)}">${escapeHtml(j.nombre)}</option>`).join('');
+                }
             }
             
             const selectDependencia = document.getElementById('dependencia_id');
             const filtroDependencia = document.getElementById('filtro_dependencia');
-            if (selectDependencia && dependenciasData) {
+            if (selectDependencia && dependenciasData.length) {
                 selectDependencia.innerHTML = '<option value="">Seleccionar...</option>' + 
                     dependenciasData.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
             }
-            if (filtroDependencia && dependenciasData) {
+            if (filtroDependencia && dependenciasData.length) {
                 filtroDependencia.innerHTML = '<option value="">Todas</option>' + 
                     dependenciasData.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
             }
             
-            const selectSubordinado = document.getElementById('oficina');
-            const filtroSubordinado = document.getElementById('filtro_oficina');
-            if (selectSubordinado && subordinadosData) {
-                selectSubordinado.innerHTML = '<option value="">Seleccionar...</option>' + 
-                    subordinadosData.map(s => `<option value="${escapeHtml(s.valor)}">${escapeHtml(s.valor)}</option>`).join('');
-            }
-            if (filtroSubordinado && subordinadosData) {
-                filtroSubordinado.innerHTML = '<option value="">Todos</option>' + 
-                    subordinadosData.map(s => `<option value="${escapeHtml(s.valor)}">${escapeHtml(s.valor)}</option>`).join('');
-            }
-            
-            const selectResponsable = document.getElementById('responsable_id');
-            if (selectResponsable && personalData) {
-                selectResponsable.innerHTML = '<option value="">Seleccionar...</option>' + 
-                    personalData.map(p => `<option value="${p.id}">${escapeHtml(p.legajo)} - ${escapeHtml(p.apellido)}, ${escapeHtml(p.nombre)}</option>`).join('');
+            const listaPersonal = document.getElementById('listaPersonal');
+            if (listaPersonal && personalData.length) {
+                listaPersonal.innerHTML = personalData.map(p => 
+                    `<option value="${p.id}|${p.legajo} - ${p.apellido}, ${p.nombre}">`
+                ).join('');
             }
         }
         
-        // ==================== EXPEDIENTES ====================
         async function loadExpedientes() {
             const tbody = document.getElementById('expedientesTableBody');
             if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Cargando expedientes...<\/td><\/tr>';
@@ -1015,7 +1255,13 @@
                     return;
                 }
                 
-                const response = await fetch(`${API_URL}?endpoint=expedientes`, { 
+                let url = `${API_URL}?endpoint=expedientes`;
+                const filtroSub = getFiltroSubordinado();
+                if (filtroSub) {
+                    url += `&subordinado=${encodeURIComponent(filtroSub)}`;
+                }
+                
+                const response = await fetch(url, { 
                     headers: { 'Authorization': `Bearer ${token}` } 
                 });
                 
@@ -1030,7 +1276,7 @@
                 showToast(`✅ ${expedientesData.length} expedientes cargados`, 'success');
             } catch(e) {
                 console.error('Error cargando expedientes:', e);
-                if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Error cargando datos: ' + e.message + '<\/td><\/tr>';
+                if (tbody) tbody.innerHTML = '<td><td colspan="10" class="text-center">Error cargando datos: ' + e.message + '<\/td><\/tr>';
                 showToast('Error cargando expedientes', 'error');
             }
         }
@@ -1084,7 +1330,6 @@
             loadExpedientes();
         }
         
-        // ==================== DOCUMENTOS ====================
         async function cargarDocumentos(expedienteId) {
             if (!expedienteId) return;
             try {
@@ -1188,7 +1433,6 @@
         
         function cerrarDocumentoModal() { document.getElementById('documentoModal').style.display = 'none'; }
         
-        // ==================== ELEVACIONES ====================
         async function cargarElevacion(expedienteId) {
             try {
                 const token = getToken();
@@ -1296,10 +1540,31 @@
             } catch(e) { showToast('Error', 'error'); }
         }
         
-        // ==================== CRUD EXPEDIENTES ====================
         function openExpedienteModal(data = null) {
             const modal = document.getElementById('expedienteModal');
             const anioActual = new Date().getFullYear().toString();
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const esAdmin = esAdministrador();
+            const userSubordinadoValor = user.subordinado_valor || '';
+            
+            const oficinaInput = document.getElementById('oficina');
+            
+            if (!esAdmin && userSubordinadoValor) {
+                oficinaInput.value = userSubordinadoValor;
+                oficinaInput.readOnly = true;
+                oficinaInput.disabled = false;
+                oficinaInput.style.backgroundColor = 'var(--bg-surface)';
+                oficinaInput.style.opacity = '0.7';
+                oficinaInput.style.cursor = 'not-allowed';
+            } else if (esAdmin) {
+                oficinaInput.readOnly = false;
+                oficinaInput.disabled = false;
+                oficinaInput.style.backgroundColor = '';
+                oficinaInput.style.opacity = '';
+                oficinaInput.style.cursor = 'text';
+                oficinaInput.placeholder = 'Buscar...';
+                oficinaInput.setAttribute('list', 'listaSubordinados');
+            }
             
             if (data) {
                 document.getElementById('expedienteId').value = data.id;
@@ -1311,10 +1576,23 @@
                 document.getElementById('tipo_oficio').value = data.tipo_oficio || '';
                 document.getElementById('juzgado_origen').value = data.juzgado_nombre || data.juzgado_origen || '';
                 document.getElementById('dependencia_id').value = data.dependencia_id || '';
-                document.getElementById('oficina').value = data.oficina || '';
                 document.getElementById('tipo_requerimiento').value = data.tipo_requerimiento || '';
                 document.getElementById('estado').value = data.estado || 'Pendiente';
-                document.getElementById('responsable_id').value = data.responsable_id || '';
+                
+                if (esAdmin) {
+                    oficinaInput.value = data.oficina || '';
+                }
+                
+                if (data.responsable_id) {
+                    const personal = personalData.find(p => p.id == data.responsable_id);
+                    if (personal) {
+                        document.getElementById('responsable_id').value = `${personal.legajo} - ${personal.apellido}, ${personal.nombre}`;
+                    } else {
+                        document.getElementById('responsable_id').value = '';
+                    }
+                } else {
+                    document.getElementById('responsable_id').value = '';
+                }
                 document.getElementById('nro_informe_tecnico').value = data.nro_informe_tecnico || '';
                 document.getElementById('resumen').value = data.resumen || '';
                 document.getElementById('observaciones').value = data.observaciones || '';
@@ -1334,12 +1612,38 @@
                 renderDocumentosList();
                 document.getElementById('reciboExistente').style.display = 'none';
                 document.getElementById('historialElevaciones').style.display = 'none';
+                
+                if (!esAdmin && userSubordinadoValor) {
+                    oficinaInput.value = userSubordinadoValor;
+                } else if (esAdmin) {
+                    oficinaInput.value = '';
+                }
             }
             modal.style.display = 'flex';
         }
         
         async function saveExpediente() {
             const id = document.getElementById('expedienteId').value;
+            const esAdmin = esAdministrador();
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const userSubordinadoValor = user.subordinado_valor || '';
+            
+            let responsable_id = null;
+            const responsableText = document.getElementById('responsable_id').value;
+            if (responsableText) {
+                const match = responsableText.match(/^(\d+)/);
+                if (match) {
+                    const legajo = match[1];
+                    const found = personalData.find(p => p.legajo == legajo);
+                    if (found) responsable_id = found.id;
+                }
+            }
+            
+            let oficinaValue = document.getElementById('oficina').value;
+            
+            if (!esAdmin && userSubordinadoValor) {
+                oficinaValue = userSubordinadoValor;
+            }
             
             const data = {
                 nro_expediente: document.getElementById('nro_expediente').value,
@@ -1350,19 +1654,20 @@
                 tipo_oficio: document.getElementById('tipo_oficio').value,
                 juzgado_origen: document.getElementById('juzgado_origen').value,
                 dependencia_id: document.getElementById('dependencia_id').value || null,
-                oficina: document.getElementById('oficina').value,
-                tipo_requerimiento: document.getElementById('tipo_requerimiento').value,
+                oficina: oficinaValue,
+                tipo_requerimiento: document.getElementById('tipo_requerimiento').value || null,
                 estado: document.getElementById('estado').value,
-                responsable_id: document.getElementById('responsable_id').value || null,
+                responsable_id: responsable_id,
                 nro_informe_tecnico: document.getElementById('nro_informe_tecnico').value,
                 resumen: document.getElementById('resumen').value,
                 observaciones: document.getElementById('observaciones').value
             };
             
-            if (!data.nro_expediente || !data.anio || !data.fecha || !data.tipo_oficio || !data.juzgado_origen) {
-                showToast('Complete campos requeridos (N° Expediente, Año, Fecha, Tipo de Oficio, Juzgado Origen)', 'warning');
-                return;
-            }
+            if (!data.nro_expediente) { showToast('El número de expediente es requerido', 'warning'); return; }
+            if (!data.anio) { showToast('El año es requerido', 'warning'); return; }
+            if (!data.fecha) { showToast('La fecha es requerida', 'warning'); return; }
+            if (!data.tipo_oficio) { showToast('El tipo de oficio es requerido', 'warning'); return; }
+            if (!data.juzgado_origen) { showToast('El juzgado origen es requerido', 'warning'); return; }
             
             try {
                 const token = getToken();
@@ -1425,7 +1730,6 @@
             document.getElementById('documentoModal').style.display = 'none';
         }
         
-        // ==================== TEMA ====================
         const THEME_KEY = 'sistema_policial_theme';
         
         function applyTheme(theme) {
@@ -1471,7 +1775,6 @@
             return true;
         }
         
-        // ==================== EVENTOS E INICIALIZACIÓN ====================
         document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
         document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
         document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
@@ -1479,7 +1782,6 @@
             if (e.target.classList?.contains('modal')) closeModal();
         });
         
-        document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => { openConfigModal(); loadColumnConfig(); });
         document.getElementById('btnCerrarConfig')?.addEventListener('click', () => { document.getElementById('configPanel').style.display = 'none'; });
         document.getElementById('btnGuardarConfig')?.addEventListener('click', saveColumnConfig);
         document.getElementById('btnResetColumns')?.addEventListener('click', resetColumns);
@@ -1487,12 +1789,12 @@
         document.addEventListener('DOMContentLoaded', async () => {
             if (checkAuth()) {
                 initTheme();
+                await initExpedientesHeader();
                 await cargarCatalogos();
                 await loadExpedientes();
             }
         });
         
-        // Exponer funciones globales
         window.openExpedienteModal = openExpedienteModal;
         window.saveExpediente = saveExpediente;
         window.editExpediente = editExpediente;
@@ -1507,6 +1809,8 @@
         window.abrirElevacion = abrirElevacion;
         window.aplicarFiltros = aplicarFiltros;
         window.limpiarFiltros = limpiarFiltros;
+        window.onSelectorSubordinadoChange = onSelectorSubordinadoChange;
+        window.limpiarFiltroSubordinado = limpiarFiltroSubordinado;
     </script>
     <script src="theme.js"></script>
 </body>

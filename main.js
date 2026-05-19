@@ -35,14 +35,19 @@ function getToken() {
     return localStorage.getItem('jwt_token');
 }
 
-// ==================== VERIFICAR PERMISOS ====================
+// ==================== FUNCIÓN PARA VERIFICAR SI ES ADMINISTRADOR ====================
 function esAdministrador() {
     const user = localStorage.getItem('current_user');
     if (!user) return false;
-    const userData = JSON.parse(user);
-    return (userData.rol_id === 1 || userData.rol === 'Administrador Central');
+    try {
+        const userData = JSON.parse(user);
+        return (userData.rol_id === 1 || userData.rol === 'Administrador Central' || userData.puede_ver_todas === true);
+    } catch(e) {
+        return false;
+    }
 }
 
+// ==================== VERIFICAR PERMISOS ====================
 function puedeGestionarUsuarios() {
     return esAdministrador();
 }
@@ -175,6 +180,7 @@ async function checkAuth() {
 function handleLogout() {
     localStorage.removeItem('jwt_token');
     localStorage.removeItem('current_user');
+    localStorage.removeItem('filtro_subordinado_global');
     currentUser = null;
     currentPermissions = {};
     window.location.href = 'index.html';
@@ -248,28 +254,22 @@ function initTheme() {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Sistema iniciado');
     
-    // Login form
     const loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.addEventListener('submit', handleLogin);
     
-    // Logout button
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
     
-    // Mobile menu
     const hamburger = document.querySelector('.hamburger');
     if (hamburger) hamburger.addEventListener('click', toggleMobileMenu);
     
-    // Close modals
     document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
     window.addEventListener('click', (e) => {
         if (e.target.classList?.contains('modal')) closeModal();
     });
     
-    // Theme
     initTheme();
     
-    // Verificar autenticación (excepto en login)
     if (!window.location.pathname.includes('index.html')) {
         await checkAuth();
     }

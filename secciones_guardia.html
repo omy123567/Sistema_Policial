@@ -51,6 +51,13 @@
             border-radius: 20px;
             font-size: 0.7rem;
         }
+        .subordinado-badge {
+            background: rgba(29,78,216,0.2);
+            color: var(--accent-primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
         .seccion-descripcion {
             color: var(--text-secondary);
             font-size: 0.8rem;
@@ -138,9 +145,24 @@
             padding: 1rem;
             border-radius: 12px;
         }
-        .add-section-form input, .add-section-form textarea {
-            flex: 1;
-            min-width: 200px;
+        .filtro-subordinado {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .filtro-subordinado label {
+            font-weight: 600;
+        }
+        .filtro-subordinado select {
+            width: auto;
+            min-width: 250px;
         }
         .btn-accion {
             padding: 0.25rem 0.5rem;
@@ -166,17 +188,130 @@
             background-color: #dc2626;
             color: white;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-body {
+            padding: 1rem;
+        }
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        .close-modal {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .text-center { text-align: center; }
+        .text-secondary { color: var(--text-secondary); }
+        .mt-2 { margin-top: 0.5rem; }
+        
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .user-dropdown .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .user-dropdown .user-info:hover {
+            background-color: var(--bg-surface);
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-width: 180px;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .dropdown-menu.show { display: block; }
+        .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; color: var(--text-primary); text-decoration: none; transition: all 0.2s; }
+        .dropdown-menu a:hover { background-color: var(--bg-surface); }
+        .dropdown-menu hr { margin: 0; border-color: var(--border); }
+        
+        .subordinado-actual {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(29, 78, 216, 0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid rgba(29, 78, 216, 0.3);
+        }
+        .subordinado-actual i {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+        .subordinado-actual .subordinado-nombre {
+            font-weight: 500;
+            color: var(--accent-primary);
+        }
+        
         @media (max-width: 768px) {
             .seccion-header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
             .seccion-header-left { flex-direction: column; align-items: stretch; }
             .add-personal-form { flex-direction: column; }
+            .filtro-subordinado { flex-direction: column; align-items: stretch; }
+            .filtro-subordinado select { width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <nav class="navbar">
-            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="logo"><i class="fas fa-shield-alt"></i><span id="sistemaNombre">Sistema Policial</span></div>
             <div class="hamburger"><span></span><span></span><span></span></div>
             <ul class="nav-menu">
                 <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -184,25 +319,52 @@
                 <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
                 <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
-                <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li id="menuUsuarios" style="display: none;"><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li id="menuConfiguracion" style="display: none;"><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
                 <li><a href="secciones_guardia.html" class="nav-link active"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
-                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
-            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+            <div class="user-dropdown">
+                <div class="user-info" onclick="toggleDropdown(event)">
+                    <span id="userInfo"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="perfil.html"><i class="fas fa-user-circle"></i> Mi Perfil</a>
+                    <hr>
+                    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                </div>
+            </div>
         </nav>
     </div>
     
     <div class="container">
         <div class="card-header">
             <h1><i class="fas fa-layer-group"></i> Secciones de Guardia</h1>
-            <button id="btnVolver" class="btn btn-secondary" onclick="window.location.href='personal.html'">
-                <i class="fas fa-arrow-left"></i> Volver a Personal
+            <div>
+                <button id="btnVolverPersonal" class="btn btn-secondary" onclick="window.location.href='personal.html'">
+                    <i class="fas fa-arrow-left"></i> Volver a Personal
+                </button>
+            </div>
+        </div>
+        
+        <div id="filtroSubordinadoContainer" class="filtro-subordinado" style="display: none;">
+            <label><i class="fas fa-building"></i> Filtrar por Subordinado:</label>
+            <select id="filtroSubordinadoSecciones" class="form-control">
+                <option value="">Todas las delegaciones</option>
+            </select>
+            <button id="btnAplicarFiltro" class="btn btn-primary btn-sm">
+                <i class="fas fa-search"></i> Filtrar
             </button>
         </div>
         
         <div class="add-section-form">
-            <input type="text" id="nuevaSeccionNombre" class="form-control" placeholder="Nombre de la sección (ej: 4° Grupo)">
+            <input type="text" id="nuevaSeccionNombre" class="form-control" placeholder="Nombre de la sección (ej: 1° Grupo, Administrativo, etc.)">
             <textarea id="nuevaSeccionDescripcion" class="form-control" placeholder="Descripción (opcional)" rows="1"></textarea>
+            <div id="adminSubordinadoSelect" style="display: none;">
+                <select id="nuevaSeccionSubordinado" class="form-control">
+                    <option value="">Seleccionar delegación...</option>
+                </select>
+            </div>
             <button class="btn btn-primary" onclick="agregarSeccion()"><i class="fas fa-plus"></i> Agregar Sección</button>
         </div>
         
@@ -211,17 +373,22 @@
         </div>
     </div>
     
-    <!-- Modal Editar Sección -->
     <div id="editSeccionModal" class="modal">
-        <div class="modal-content" style="max-width:400px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3>Editar Sección</h3>
                 <span class="close-modal" onclick="cerrarModalEditar()">&times;</span>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editSeccionId">
-                <div><label>Nombre</label><input type="text" id="editSeccionNombre" class="form-control"></div>
-                <div><label>Descripción</label><textarea id="editSeccionDescripcion" class="form-control" rows="2"></textarea></div>
+                <div class="form-group"><label>Nombre</label><input type="text" id="editSeccionNombre" class="form-control"></div>
+                <div class="form-group"><label>Descripción</label><textarea id="editSeccionDescripcion" class="form-control" rows="2"></textarea></div>
+                <div id="editAdminSubordinadoSelect" class="form-group" style="display: none;">
+                    <label>Delegación</label>
+                    <select id="editSeccionSubordinado" class="form-control">
+                        <option value="">Seleccionar delegación...</option>
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="cerrarModalEditar()">Cancelar</button>
@@ -236,7 +403,21 @@
         const API_URL = 'backend/api.php';
         let seccionesData = [];
         let personalData = [];
+        let subordinadosList = [];
         let expandedSections = {};
+        let esAdmin = false;
+        let filtroSubordinadoActual = '';
+
+        function esAdministrador() {
+            const user = localStorage.getItem('current_user');
+            if (!user) return false;
+            try {
+                const userData = JSON.parse(user);
+                return (userData.rol_id === 1 || userData.rol === 'Administrador Central' || userData.puede_ver_todas === true);
+            } catch(e) {
+                return false;
+            }
+        }
         
         function getToken() { return localStorage.getItem('jwt_token'); }
         
@@ -254,10 +435,70 @@
             return div.innerHTML;
         }
         
+        function toggleDropdown(event) { event?.stopPropagation(); document.getElementById('dropdownMenu').classList.toggle('show'); }
+        document.addEventListener('click', function(e) { if (!e.target.closest('.user-dropdown')) { document.getElementById('dropdownMenu').classList.remove('show'); } });
+        
+        function aplicarPermisosMenu() {
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            esAdmin = (user.rol_id === 1 || user.rol === 'Administrador Central' || user.puede_ver_todas);
+            document.getElementById('menuUsuarios').style.display = esAdmin ? 'block' : 'none';
+            document.getElementById('menuConfiguracion').style.display = esAdmin ? 'block' : 'none';
+            return esAdmin;
+        }
+        
+        async function cargarConfiguracionSistema() {
+            try {
+                const response = await fetch(`${API_URL}?endpoint=configuracion_sistema`);
+                const config = await response.json();
+                if (config && config.nombre_sistema) {
+                    document.getElementById('sistemaNombre').textContent = config.nombre_sistema;
+                    document.title = config.nombre_sistema + ' - Secciones Guardia';
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        async function cargarSubordinados() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=oficinas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                subordinadosList = Array.isArray(data) ? data : (data.data || []);
+                
+                const selectNueva = document.getElementById('nuevaSeccionSubordinado');
+                const selectEdit = document.getElementById('editSeccionSubordinado');
+                const selectFiltro = document.getElementById('filtroSubordinadoSecciones');
+                
+                if (selectNueva) {
+                    selectNueva.innerHTML = '<option value="">Seleccionar delegación...</option>' + 
+                        subordinadosList.map(s => `<option value="${s.id}">${escapeHtml(s.valor)}</option>`).join('');
+                }
+                if (selectEdit) {
+                    selectEdit.innerHTML = '<option value="">Seleccionar delegación...</option>' + 
+                        subordinadosList.map(s => `<option value="${s.id}">${escapeHtml(s.valor)}</option>`).join('');
+                }
+                if (selectFiltro) {
+                    selectFiltro.innerHTML = '<option value="">Todas las delegaciones</option>' + 
+                        subordinadosList.map(s => `<option value="${escapeHtml(s.valor)}">${escapeHtml(s.valor)}</option>`).join('');
+                }
+                return subordinadosList;
+            } catch(e) { console.error(e); return []; }
+        }
+        
         async function loadPersonal() {
             try {
                 const token = getToken();
-                const response = await fetch(`${API_URL}?endpoint=personal`, {
+                const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+                let url = `${API_URL}?endpoint=personal`;
+                
+                if (!esAdmin && user.subordinado_valor) {
+                    url += `&subordinado=${encodeURIComponent(user.subordinado_valor)}`;
+                } else if (filtroSubordinadoActual) {
+                    url += `&subordinado=${encodeURIComponent(filtroSubordinadoActual)}`;
+                }
+                
+                const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
@@ -270,10 +511,15 @@
         async function loadSecciones() {
             const container = document.getElementById('seccionesContainer');
             container.innerHTML = '<div class="text-center">Cargando...</div>';
-            
             try {
                 const token = getToken();
-                const response = await fetch(`${API_URL}?endpoint=secciones_guardia`, {
+                let url = `${API_URL}?endpoint=secciones_guardia`;
+                
+                if (esAdmin && filtroSubordinadoActual) {
+                    url += `&subordinado=${encodeURIComponent(filtroSubordinadoActual)}`;
+                }
+                
+                const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
@@ -290,13 +536,15 @@
         function renderSecciones() {
             const container = document.getElementById('seccionesContainer');
             if (!seccionesData || seccionesData.length === 0) {
-                container.innerHTML = '<div class="text-center">No hay secciones de guardia creadas</div>';
+                container.innerHTML = '<div class="text-center">No hay secciones de guardia creadas para esta delegación</div>';
                 return;
             }
             
             container.innerHTML = seccionesData.map(seccion => {
                 const personalEnSeccion = personalData.filter(p => p.seccion_guardia_id == seccion.id);
                 const isExpanded = expandedSections[seccion.id] !== false;
+                const subordinadoNombre = seccion.subordinado_nombre || (seccion.subordinado_id ? 'Delegación asignada' : 'Sin delegación asignada');
+                const esAdminView = esAdmin && seccion.subordinado_nombre;
                 
                 return `
                     <div class="seccion-card" data-seccion-id="${seccion.id}">
@@ -305,10 +553,11 @@
                                 <i class="fas fa-chevron-${isExpanded ? 'down' : 'right'}"></i>
                                 <span class="seccion-nombre"><strong>${escapeHtml(seccion.nombre)}</strong></span>
                                 <span class="seccion-badge">${personalEnSeccion.length} agentes</span>
+                                ${esAdminView ? `<span class="subordinado-badge"><i class="fas fa-building"></i> ${escapeHtml(seccion.subordinado_nombre)}</span>` : ''}
                                 ${seccion.descripcion ? `<span class="seccion-descripcion">${escapeHtml(seccion.descripcion)}</span>` : ''}
                             </div>
                             <div class="seccion-actions" onclick="event.stopPropagation()">
-                                <button class="btn-accion btn-editar" onclick="editarSeccion(${seccion.id}, '${escapeHtml(seccion.nombre)}', '${escapeHtml(seccion.descripcion || '')}')">
+                                <button class="btn-accion btn-editar" onclick="editarSeccion(${seccion.id}, '${escapeHtml(seccion.nombre)}', '${escapeHtml(seccion.descripcion || '')}', ${seccion.subordinado_id || 'null'})">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="btn-accion btn-eliminar" onclick="eliminarSeccion(${seccion.id})">
@@ -341,7 +590,6 @@
             if (!personalEnSeccion || personalEnSeccion.length === 0) {
                 return '<div class="empty-personal">No hay personal asignado a esta sección</div>';
             }
-            
             return personalEnSeccion.map(p => `
                 <div class="personal-item" data-personal-id="${p.id}" data-seccion-id="${seccionId}">
                     <div class="personal-info">
@@ -362,7 +610,6 @@
             const content = document.getElementById(`seccionContent${seccionId}`);
             const header = content.previousElementSibling;
             const icon = header.querySelector('.fa-chevron-right, .fa-chevron-down');
-            
             if (content.classList.contains('open')) {
                 content.classList.remove('open');
                 icon.className = 'fas fa-chevron-right';
@@ -377,12 +624,10 @@
         async function asignarPersonal(seccionId) {
             const select = document.getElementById(`selectPersonal${seccionId}`);
             const personalId = select.value;
-            
             if (!personalId) {
                 showToast('Seleccione un agente', 'warning');
                 return;
             }
-            
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=personal&id=${personalId}`, {
@@ -406,7 +651,6 @@
         
         async function quitarPersonal(personalId, seccionId) {
             if (!confirm('¿Quitar este agente de la sección?')) return;
-            
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=personal&id=${personalId}`, {
@@ -431,6 +675,14 @@
         async function agregarSeccion() {
             const nombre = document.getElementById('nuevaSeccionNombre').value.trim();
             const descripcion = document.getElementById('nuevaSeccionDescripcion').value.trim();
+            let subordinado_id = null;
+            
+            if (esAdmin) {
+                subordinado_id = document.getElementById('nuevaSeccionSubordinado').value || null;
+            } else {
+                const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+                subordinado_id = user.subordinado_id || null;
+            }
             
             if (!nombre) {
                 showToast('Ingrese un nombre para la sección', 'warning');
@@ -439,16 +691,21 @@
             
             try {
                 const token = getToken();
+                const data = { nombre, descripcion, orden: 0 };
+                if (subordinado_id) {
+                    data.subordinado_id = subordinado_id;
+                }
                 const response = await fetch(`${API_URL}?endpoint=secciones_guardia`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ nombre, descripcion })
+                    body: JSON.stringify(data)
                 });
                 const result = await response.json();
                 if (result.success) {
                     showToast('Sección agregada correctamente', 'success');
                     document.getElementById('nuevaSeccionNombre').value = '';
                     document.getElementById('nuevaSeccionDescripcion').value = '';
+                    if (esAdmin) document.getElementById('nuevaSeccionSubordinado').value = '';
                     await loadPersonal();
                     await loadSecciones();
                 } else {
@@ -460,10 +717,13 @@
             }
         }
         
-        function editarSeccion(id, nombre, descripcion) {
+        function editarSeccion(id, nombre, descripcion, subordinado_id) {
             document.getElementById('editSeccionId').value = id;
             document.getElementById('editSeccionNombre').value = nombre;
             document.getElementById('editSeccionDescripcion').value = descripcion;
+            if (esAdmin && document.getElementById('editSeccionSubordinado')) {
+                document.getElementById('editSeccionSubordinado').value = subordinado_id || '';
+            }
             document.getElementById('editSeccionModal').style.display = 'flex';
         }
         
@@ -471,18 +731,27 @@
             const id = document.getElementById('editSeccionId').value;
             const nombre = document.getElementById('editSeccionNombre').value.trim();
             const descripcion = document.getElementById('editSeccionDescripcion').value.trim();
-            
+            let subordinado_id = null;
+            if (esAdmin) {
+                subordinado_id = document.getElementById('editSeccionSubordinado').value || null;
+            } else {
+                const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+                subordinado_id = user.subordinado_id || null;
+            }
             if (!nombre) {
                 showToast('El nombre no puede estar vacío', 'warning');
                 return;
             }
-            
             try {
                 const token = getToken();
+                const data = { nombre, descripcion, orden: 0 };
+                if (subordinado_id) {
+                    data.subordinado_id = subordinado_id;
+                }
                 const response = await fetch(`${API_URL}?endpoint=secciones_guardia&id=${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ nombre, descripcion })
+                    body: JSON.stringify(data)
                 });
                 const result = await response.json();
                 if (result.success) {
@@ -505,7 +774,6 @@
                 mensaje = `Esta sección tiene ${personalAsignado} agentes asignados. ¿Eliminar de todas formas? Se les quitará la asignación.`;
             }
             if (!confirm(mensaje)) return;
-            
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=secciones_guardia&id=${id}`, {
@@ -530,20 +798,60 @@
             document.getElementById('editSeccionModal').style.display = 'none';
         }
         
+        function aplicarFiltroSubordinado() {
+            const select = document.getElementById('filtroSubordinadoSecciones');
+            filtroSubordinadoActual = select.value || '';
+            loadSecciones();
+            loadPersonal();
+        }
+        
+        function initAdminUI() {
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const tieneSubordinado = user.subordinado_id && user.subordinado_id > 0;
+            const subordinadoNombre = user.subordinado_nombre || user.subordinado_valor || '';
+            const esAdminGlobal = esAdministrador();
+            
+            if (esAdminGlobal) {
+                document.getElementById('filtroSubordinadoContainer').style.display = 'flex';
+                document.getElementById('adminSubordinadoSelect').style.display = 'block';
+                document.getElementById('editAdminSubordinadoSelect').style.display = 'block';
+            } else if (tieneSubordinado && subordinadoNombre) {
+                const cardHeader = document.querySelector('.card-header');
+                if (cardHeader) {
+                    const subBadge = document.createElement('div');
+                    subBadge.className = 'subordinado-actual';
+                    subBadge.style.marginLeft = '1rem';
+                    subBadge.innerHTML = `<i class="fas fa-building"></i><span class="subordinado-nombre">${escapeHtml(subordinadoNombre)}</span>`;
+                    cardHeader.appendChild(subBadge);
+                }
+            }
+        }
+        
         function checkAuth() {
             const user = localStorage.getItem('current_user');
             if (!user) { window.location.href = 'index.html'; return false; }
             const userData = JSON.parse(user);
-            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            const userInfoEl = document.querySelector('#userInfo');
+            if (userInfoEl) userInfoEl.innerHTML = `${escapeHtml(userData.nombre)} <span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
             return true;
         }
         
-        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
-        document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
-        window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) cerrarModalEditar(); });
+        function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function toggleMobileMenu() { document.querySelector('.nav-menu')?.classList.toggle('active'); }
+        
+        document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+        document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu);
+        document.getElementById('btnAplicarFiltro')?.addEventListener('click', aplicarFiltroSubordinado);
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) cerrarModalEditar();
+        });
         
         document.addEventListener('DOMContentLoaded', async () => { 
             if (checkAuth()) { 
+                aplicarPermisosMenu();
+                cargarConfiguracionSistema();
+                initAdminUI();
+                await cargarSubordinados();
                 await loadPersonal(); 
                 await loadSecciones(); 
             } 
@@ -557,8 +865,10 @@
         window.asignarPersonal = asignarPersonal;
         window.quitarPersonal = quitarPersonal;
         window.cerrarModalEditar = cerrarModalEditar;
+        window.toggleDropdown = toggleDropdown;
+        window.aplicarFiltroSubordinado = aplicarFiltroSubordinado;
     </script>
-
-       <script src="theme.js"></script>
+    <script src="theme.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

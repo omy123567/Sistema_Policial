@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Licencias - Sistema de Gestión Policial</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,39 +11,172 @@
         @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
         .filtros-container { background-color: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
         .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .config-columnas { background: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .btn-config { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
+        th.draggable { cursor: move; user-select: none; }
+        th .drag-handle { display: inline-block; margin-right: 5px; opacity: 0.5; cursor: move; }
+        .column-order-list { background: var(--bg-surface); border-radius: 8px; padding: 0.5rem; max-height: 300px; overflow-y: auto; }
+        .column-order-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; margin: 0.25rem 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: move; }
         .btn-accion { padding: 0.25rem 0.5rem; margin: 0 0.25rem; border-radius: 6px; font-size: 0.7rem; cursor: pointer; border: none; }
         .btn-editar { background-color: rgba(29,78,216,0.2); color:#1d4ed8; }
         .btn-editar:hover { background-color:#1d4ed8; color:white; }
         .btn-eliminar { background-color: rgba(220,38,38,0.2); color:#dc2626; }
         .btn-eliminar:hover { background-color:#dc2626; color:white; }
-        .badge-estado { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 8px; font-size: 0.7rem; font-weight: bold; }
-        .badge-aprobada { background-color: rgba(22,163,74,0.2); color:#16a34a; }
-        .badge-pendiente { background-color: rgba(217,119,6,0.2); color:#d97706; }
-        .badge-rechazada { background-color: rgba(220,38,38,0.2); color:#dc2626; }
-        .badge-finalizada { background-color: rgba(107,114,128,0.2); color:#9ca3af; }
-        .badge-curso { background-color: rgba(29,78,216,0.2); color:#1d4ed8; }
-        .config-columnas { background: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--border); }
-        .config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 1rem; }
-        .config-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 8px; cursor: pointer; }
-        .config-item:hover { background: var(--bg-card); }
-        .btn-config { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
-        th.draggable { cursor: move; user-select: none; }
-        th .drag-handle { display: inline-block; margin-right: 5px; opacity: 0.5; cursor: move; }
-        th:hover .drag-handle { opacity: 1; }
-        th.drag-over { background-color: var(--accent-primary); color: white; }
-        .column-order-list { background: var(--bg-surface); border-radius: 8px; padding: 0.5rem; max-height: 300px; overflow-y: auto; }
-        .column-order-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; margin: 0.25rem 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: move; }
-        .column-order-item:hover { background: var(--bg-surface); border-color: var(--accent-primary); }
-        .column-order-item .drag-icon { color: var(--text-secondary); cursor: grab; }
-        .column-order-item .col-name { flex: 1; }
-        input[list] { width: 100%; padding: 0.5rem 0.75rem; background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); }
-        @media (max-width:768px){ .filtros-grid { grid-template-columns:1fr; } }
+        .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .badge-aprobada { background: rgba(22,163,74,0.2); color: #16a34a; }
+        .badge-pendiente { background: rgba(217,119,6,0.2); color: #d97706; }
+        .badge-rechazada { background: rgba(220,38,38,0.2); color: #dc2626; }
+        .badge-finalizada { background: rgba(107,114,128,0.2); color: #9ca3af; }
+        .badge-curso { background: rgba(29,78,216,0.2); color: #1d4ed8; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-content { background: var(--bg-card); border-radius: 16px; max-width: 700px; width: 95%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--bg-surface); }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; background: var(--bg-surface); }
+        .close-modal { cursor: pointer; font-size: 1.5rem; color: var(--text-secondary); }
+        .close-modal:hover { color: #dc2626; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.25rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary); }
+        .form-control { width: 100%; padding: 0.6rem 0.75rem; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-size: 0.9rem; }
+        input.form-control { cursor: text; }
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg-surface); font-weight: 600; }
+        .text-center { text-align: center; }
+        .text-secondary { color: var(--text-secondary); }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 3000; }
+        .toast { background: var(--bg-card); border-left: 4px solid; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast-success { border-left-color: #16a34a; }
+        .toast-error { border-left-color: #dc2626; }
+        .toast-warning { border-left-color: #d97706; }
+        .toast-info { border-left-color: #1d4ed8; }
+        
+        .card-header-con-filtro {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .card-header-left h1 {
+            margin: 0;
+        }
+        .subordinado-selector {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-surface);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        .subordinado-selector:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-card);
+        }
+        .subordinado-selector i {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+        .subordinado-selector select {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .subordinado-selector select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .filtro-activo-indicador {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(29, 78, 216, 0.15);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+        }
+        .filtro-activo-indicador i {
+            font-size: 0.7rem;
+        }
+        .filtro-activo-indicador .limpiar-filtro {
+            cursor: pointer;
+            margin-left: 0.5rem;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        .filtro-activo-indicador .limpiar-filtro:hover {
+            color: #dc2626;
+        }
+        .subordinado-actual {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(29, 78, 216, 0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid rgba(29, 78, 216, 0.3);
+        }
+        .subordinado-actual i {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+        .subordinado-actual .subordinado-nombre {
+            font-weight: 500;
+            color: var(--accent-primary);
+        }
+        input[readonly] {
+            cursor: not-allowed;
+            background-color: var(--bg-surface);
+            opacity: 0.8;
+        }
+        
+        .user-dropdown { position: relative; display: inline-block; }
+        .user-dropdown .user-info { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem 0.75rem; border-radius: 8px; transition: all 0.2s; }
+        .user-dropdown .user-info:hover { background-color: var(--bg-surface); }
+        .dropdown-menu { position: absolute; top: 100%; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; min-width: 180px; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .dropdown-menu.show { display: block; }
+        .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; color: var(--text-primary); text-decoration: none; transition: all 0.2s; }
+        .dropdown-menu a:hover { background-color: var(--bg-surface); }
+        .dropdown-menu hr { margin: 0; border-color: var(--border); }
+        
+        @media (max-width:768px){ 
+            .filtros-grid { grid-template-columns:1fr; } 
+            .modal-content { width:98%; } 
+            .card-header-con-filtro {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .card-header-left {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .subordinado-selector {
+                justify-content: space-between;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <nav class="navbar">
-            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="logo"><i class="fas fa-shield-alt"></i><span id="sistemaNombre">Sistema Policial</span></div>
             <div class="hamburger"><span></span><span></span><span></span></div>
             <ul class="nav-menu">
                 <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -51,22 +184,26 @@
                 <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
                 <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link active"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
-                <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
-                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+                <li id="menuUsuarios" style="display: none;"><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li id="menuConfiguracion" style="display: none;"><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+                <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
             </ul>
-            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+            <div class="user-dropdown">
+                <div class="user-info" onclick="toggleDropdown(event)">
+                    <span id="userInfo"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="perfil.html"><i class="fas fa-user-circle"></i> Mi Perfil</a>
+                    <hr>
+                    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                </div>
+            </div>
         </nav>
     </div>
     
     <div class="container">
-        <div class="card-header">
-            <h1><i class="fas fa-calendar-alt"></i> Gestión de Licencias</h1>
-            <div>
-                <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar</button>
-                <button id="btnNuevaLicencia" class="btn btn-primary" onclick="openLicenciaModal()"><i class="fas fa-plus"></i> Nueva</button>
-                <button class="btn btn-secondary" onclick="exportarCSV()"><i class="fas fa-file-csv"></i> CSV</button>
-            </div>
-        </div>
+        <div id="licenciasHeader"></div>
         
         <div id="configPanel" class="config-columnas" style="display: none;">
             <h3>Personalizar Columnas</h3>
@@ -84,9 +221,10 @@
             <div class="filtros-grid">
                 <div><label>Fecha Desde</label><input type="date" id="filtro_fecha_desde" class="form-control"></div>
                 <div><label>Fecha Hasta</label><input type="date" id="filtro_fecha_hasta" class="form-control"></div>
-                <div><label>Tipo</label><select id="filtro_tipo" class="form-control"><option value="">Todos</option></select></div>
+                <div><label>Tipo</label><input type="text" id="filtro_tipo" class="form-control" list="listaTiposLicenciaFiltro" placeholder="Escriba para buscar..."><datalist id="listaTiposLicenciaFiltro"></datalist></div>
                 <div><label>Estado</label><select id="filtro_estado" class="form-control"><option value="">Todos</option><option>Pendiente</option><option>Aprobada</option><option>Rechazada</option><option>En Curso</option><option>Finalizada</option></select></div>
                 <div><label>Agente</label><input type="text" id="filtro_agente" class="form-control" placeholder="Nombre"></div>
+                <div><label>Subordinado</label><input type="text" id="filtro_subordinado" class="form-control" list="listaSubordinadosFiltro" placeholder="Escriba para buscar..."><datalist id="listaSubordinadosFiltro"></datalist></div>
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem;">
                 <button class="btn btn-primary" onclick="aplicarFiltros()">Buscar</button>
@@ -97,59 +235,67 @@
         <div class="table-container">
             <table id="licenciasTable">
                 <thead id="tableHeader"></thead>
-                <tbody id="licenciasTableBody"><tr><td colspan="10" class="text-center">Cargando...<\/td></tr></tbody>
+                <tbody id="licenciasTableBody"><tr><td colspan="10" class="text-center">Cargando...<\/td><\/tr></tbody>
             </table>
         </div>
     </div>
     
-    <div id="licenciaModal" class="modal"><div class="modal-content" style="max-width:600px;">
-        <div class="modal-header"><h3 id="modalTitle">Nueva Licencia</h3><span class="close-modal">&times;</span></div>
-        <div class="modal-body">
-            <form id="licenciaForm">
-                <input type="hidden" id="licenciaId">
-                <div><label>Agente *</label>
-                    <select id="licencia_agente_id" class="form-control" required>
-                        <option value="">Seleccionar agente...</option>
-                    </select>
-                </div>
-                <div><label>Tipo *</label>
-                    <input type="text" id="licencia_tipo" class="form-control" list="tiposLicenciaList" placeholder="Buscar..." autocomplete="off" required>
-                    <datalist id="tiposLicenciaList"></datalist>
-                </div>
-                <div><label>Estado</label>
-                    <select id="licencia_estado" class="form-control">
-                        <option>Pendiente</option><option>Aprobada</option><option>Rechazada</option><option>En Curso</option><option>Finalizada</option>
-                    </select>
-                </div>
-                <div class="form-row">
-                    <div><label>Fecha Inicio *</label><input type="date" id="licencia_fecha_inicio" class="form-control" required></div>
-                    <div><label>Días Hábiles</label><input type="number" id="licencia_dias_habiles" class="form-control" value="0" min="0"></div>
-                </div>
-                <div class="form-row">
-                    <div><label>Días Viaje</label><input type="number" id="licencia_dias_viaje" class="form-control" value="0" min="0"></div>
-                    <div><label><input type="checkbox" id="licencia_contar_fines_semana"> Contar fines de semana</label></div>
-                </div>
-                <div><label>Fecha Fin</label><input type="date" id="licencia_fecha_fin" class="form-control" readonly></div>
-                <div><label>Observaciones</label><textarea id="licencia_observaciones" class="form-control" rows="3"></textarea></div>
-            </form>
+    <div id="licenciaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="modalTitle">Nueva Licencia</h3><span class="close-modal" onclick="closeModal()">&times;</span></div>
+            <div class="modal-body">
+                <form id="licenciaForm">
+                    <input type="hidden" id="licenciaId">
+                    <div class="form-group"><label>Agente *</label><input type="text" id="licencia_agente" class="form-control" list="listaAgentes" placeholder="Escriba para buscar por legajo o nombre..." autocomplete="off" required><datalist id="listaAgentes"></datalist><input type="hidden" id="licencia_agente_id"></div>
+                    <div class="form-group"><label>Tipo *</label><input type="text" id="licencia_tipo" class="form-control" list="listaTiposLicencia" placeholder="Escriba para buscar..." autocomplete="off" required><datalist id="listaTiposLicencia"></datalist></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Unidad Regional</label><select id="licencia_dependencia" class="form-control"><option value="">Seleccionar...</option></select></div>
+                        <div class="form-group"><label>Subordinado</label><input type="text" id="licencia_subordinado" class="form-control" placeholder="Delegación asignada" readonly></div>
+                    </div>
+                    <div class="form-group"><label>Estado</label><select id="licencia_estado" class="form-control"><option>Pendiente</option><option>Aprobada</option><option>Rechazada</option><option>En Curso</option><option>Finalizada</option></select></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Fecha Inicio *</label><input type="date" id="licencia_fecha_inicio" class="form-control" required></div>
+                        <div class="form-group"><label>Días Hábiles</label><input type="number" id="licencia_dias_habiles" class="form-control" value="0" min="0"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Días Viaje</label><input type="number" id="licencia_dias_viaje" class="form-control" value="0" min="0"></div>
+                        <div class="form-group"><label><input type="checkbox" id="licencia_contar_fines_semana"> Contar fines de semana</label></div>
+                    </div>
+                    <div class="form-group"><label>Fecha Fin</label><input type="date" id="licencia_fecha_fin" class="form-control" readonly></div>
+                    <div class="form-group"><label>Observaciones</label><textarea id="licencia_observaciones" class="form-control" rows="3"></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveLicencia()">Guardar</button></div>
         </div>
-        <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveLicencia()">Guardar</button></div>
-    </div></div>
+    </div>
     
     <div id="toast-container" class="toast-container"></div>
     
     <script>
         const API_URL = 'backend/api.php';
         let licenciasData = [];
+        let personalData = [];
+        let tiposLicenciaData = [];
+        let dependenciasData = [];
         let activeColumns = ['legajo', 'apellido_nombre', 'tipo_licencia', 'estado', 'fecha_inicio', 'fecha_fin', 'dias_habiles'];
-        
-        const columnLabels = {
-            'legajo': 'Legajo', 'apellido_nombre': 'Agente', 'tipo_licencia': 'Tipo',
-            'estado': 'Estado', 'fecha_inicio': 'Inicio', 'fecha_fin': 'Fin', 'dias_habiles': 'Días', 'observaciones': 'Observaciones'
-        };
-        
+        const columnLabels = { 'legajo': 'Legajo', 'apellido_nombre': 'Agente', 'tipo_licencia': 'Tipo', 'estado': 'Estado', 'fecha_inicio': 'Inicio', 'fecha_fin': 'Fin', 'dias_habiles': 'Días', 'observaciones': 'Observaciones' };
         const allColumns = ['legajo', 'apellido_nombre', 'tipo_licencia', 'estado', 'fecha_inicio', 'fecha_fin', 'dias_habiles', 'observaciones'];
         
+        let subordinadosDisponibles = [];
+        let subordinadoSeleccionadoGlobal = null;
+        let callbacksFiltroSubordinado = [];
+
+        function esAdministrador() {
+            const user = localStorage.getItem('current_user');
+            if (!user) return false;
+            try {
+                const userData = JSON.parse(user);
+                return (userData.rol_id === 1 || userData.rol === 'Administrador Central' || userData.puede_ver_todas === true);
+            } catch(e) {
+                return false;
+            }
+        }
+
         function getToken() { return localStorage.getItem('jwt_token'); }
         
         function showToast(msg, type) {
@@ -166,9 +312,222 @@
             return div.innerHTML;
         }
         
+        function toggleDropdown(event) { event?.stopPropagation(); document.getElementById('dropdownMenu').classList.toggle('show'); }
+        document.addEventListener('click', function(e) { if (!e.target.closest('.user-dropdown')) { document.getElementById('dropdownMenu').classList.remove('show'); } });
+        
+        function registrarCallbackFiltroSubordinado(callback) {
+            if (typeof callback === 'function') {
+                callbacksFiltroSubordinado.push(callback);
+            }
+        }
+
+        function notificarCambioFiltroSubordinado() {
+            callbacksFiltroSubordinado.forEach(callback => {
+                try {
+                    callback(subordinadoSeleccionadoGlobal);
+                } catch(e) {
+                    console.error('Error en callback:', e);
+                }
+            });
+        }
+
+        async function cargarSubordinadosGlobal() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=oficinas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                subordinadosDisponibles = Array.isArray(data) ? data : (data.data || []);
+                actualizarSelectoresSubordinado();
+                
+                const listaSubordinadosFiltro = document.getElementById('listaSubordinadosFiltro');
+                if (listaSubordinadosFiltro) {
+                    listaSubordinadosFiltro.innerHTML = subordinadosDisponibles.map(s => `<option value="${escapeHtml(s.valor)}">`).join('');
+                }
+                return subordinadosDisponibles;
+            } catch(e) {
+                console.error('Error cargando subordinados:', e);
+                return [];
+            }
+        }
+
+        function actualizarSelectoresSubordinado() {
+            document.querySelectorAll('.subordinado-selector select').forEach(select => {
+                const valorActual = select.value;
+                select.innerHTML = '<option value="">Todos los subordinados</option>' + 
+                    subordinadosDisponibles.map(s => `<option value="${escapeHtml(s.valor)}">${escapeHtml(s.valor)}</option>`).join('');
+                if (valorActual && subordinadosDisponibles.some(s => s.valor === valorActual)) {
+                    select.value = valorActual;
+                } else if (subordinadoSeleccionadoGlobal) {
+                    select.value = subordinadoSeleccionadoGlobal;
+                }
+            });
+        }
+
+        function setFiltroSubordinado(valor) {
+            subordinadoSeleccionadoGlobal = valor || null;
+            if (subordinadoSeleccionadoGlobal) {
+                localStorage.setItem('filtro_subordinado_global', subordinadoSeleccionadoGlobal);
+            } else {
+                localStorage.removeItem('filtro_subordinado_global');
+            }
+            actualizarSelectoresSubordinado();
+            actualizarIndicadoresFiltro();
+            notificarCambioFiltroSubordinado();
+        }
+
+        function getFiltroSubordinado() {
+            return subordinadoSeleccionadoGlobal;
+        }
+
+        function actualizarIndicadoresFiltro() {
+            const indicadores = document.querySelectorAll('.filtro-activo-indicador');
+            if (subordinadoSeleccionadoGlobal) {
+                indicadores.forEach(ind => {
+                    ind.style.display = 'inline-flex';
+                    const nombreSpan = ind.querySelector('.filtro-nombre');
+                    if (nombreSpan) nombreSpan.textContent = subordinadoSeleccionadoGlobal;
+                });
+            } else {
+                indicadores.forEach(ind => {
+                    ind.style.display = 'none';
+                });
+            }
+        }
+
+        function limpiarFiltroSubordinado() {
+            setFiltroSubordinado(null);
+            loadLicencias();
+        }
+
+        function onSelectorSubordinadoChange(valor) {
+            setFiltroSubordinado(valor);
+            loadLicencias();
+        }
+
+        function cargarFiltroGuardado() {
+            const saved = localStorage.getItem('filtro_subordinado_global');
+            if (saved) {
+                subordinadoSeleccionadoGlobal = saved;
+            }
+            actualizarIndicadoresFiltro();
+        }
+
+        async function initLicenciasHeader() {
+            await cargarSubordinadosGlobal();
+            cargarFiltroGuardado();
+            
+            const container = document.querySelector('.container');
+            const esAdmin = esAdministrador();
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const subordinadoNombre = user.subordinado_nombre || user.subordinado_valor || '';
+            const tieneSubordinado = user.subordinado_id && user.subordinado_id > 0;
+            
+            let selectorHtml = '';
+            if (esAdmin) {
+                selectorHtml = `
+                    <div class="subordinado-selector">
+                        <i class="fas fa-building"></i>
+                        <select id="selectorSubordinadoLicencias" onchange="onSelectorSubordinadoChange(this.value)">
+                            <option value="">Todos los subordinados</option>
+                        </select>
+                    </div>
+                    <div class="filtro-activo-indicador" style="display: none;">
+                        <i class="fas fa-filter"></i>
+                        Filtrando por: <span class="filtro-nombre"></span>
+                        <i class="fas fa-times-circle limpiar-filtro" onclick="limpiarFiltroSubordinado()" title="Limpiar filtro"></i>
+                    </div>
+                `;
+            } else if (tieneSubordinado && subordinadoNombre) {
+                selectorHtml = `
+                    <div class="subordinado-actual">
+                        <i class="fas fa-building"></i>
+                        <span class="subordinado-nombre">${escapeHtml(subordinadoNombre)}</span>
+                    </div>
+                `;
+            }
+            
+            const headerHtml = `
+                <div class="card-header-con-filtro">
+                    <div class="card-header-left">
+                        <h1><i class="fas fa-calendar-alt"></i> Gestión de Licencias</h1>
+                        ${selectorHtml}
+                    </div>
+                    <div>
+                        <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar</button>
+                        <button id="btnNuevaLicencia" class="btn btn-primary" onclick="openLicenciaModal()"><i class="fas fa-plus"></i> Nueva</button>
+                        <button class="btn btn-secondary" onclick="exportarCSV()"><i class="fas fa-file-csv"></i> CSV</button>
+                    </div>
+                </div>
+            `;
+            
+            const oldHeader = document.querySelector('.card-header-con-filtro');
+            if (oldHeader) oldHeader.remove();
+            container.insertAdjacentHTML('afterbegin', headerHtml);
+            
+            if (esAdmin) {
+                actualizarSelectoresSubordinado();
+                actualizarIndicadoresFiltro();
+                document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => {
+                    openConfigModal();
+                    loadColumnConfig();
+                });
+            }
+            
+            registrarCallbackFiltroSubordinado(async () => {
+                await loadLicencias();
+            });
+        }
+        
+        function aplicarPermisosMenu() {
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const esAdmin = (user.rol_id === 1 || user.rol === 'Administrador Central' || user.puede_ver_todas);
+            document.getElementById('menuUsuarios').style.display = esAdmin ? 'block' : 'none';
+            document.getElementById('menuConfiguracion').style.display = esAdmin ? 'block' : 'none';
+        }
+        
+        async function cargarConfiguracionSistema() {
+            try {
+                const response = await fetch(`${API_URL}?endpoint=configuracion_sistema`);
+                const config = await response.json();
+                if (config && config.nombre_sistema) {
+                    document.getElementById('sistemaNombre').textContent = config.nombre_sistema;
+                    document.title = config.nombre_sistema + ' - Licencias';
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        async function cargarDependenciasSelect() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_URL}?endpoint=dependencias`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                dependenciasData = Array.isArray(data) ? data : (data.data || []);
+                const select = document.getElementById('licencia_dependencia');
+                if (select && dependenciasData.length) {
+                    select.innerHTML = '<option value="">Seleccionar...</option>' + 
+                        dependenciasData.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        function getAgenteIdByText(texto) {
+            if (!texto) return null;
+            const match = personalData.find(p => `${p.legajo} - ${p.apellido}, ${p.nombre}` === texto);
+            return match ? match.id : null;
+        }
+        
+        function getAgenteTextById(id) {
+            const p = personalData.find(p => p.id == id);
+            return p ? `${p.legajo} - ${p.apellido}, ${p.nombre}` : '';
+        }
+        
         function getEstadoClass(estado) {
             const clases = { 'Aprobada': 'badge-aprobada', 'Pendiente': 'badge-pendiente', 'Rechazada': 'badge-rechazada', 'Finalizada': 'badge-finalizada', 'En Curso': 'badge-curso' };
-            return `<span class="badge-estado ${clases[estado] || 'badge-pendiente'}">${estado || 'Pendiente'}</span>`;
+            return `<span class="badge ${clases[estado] || 'badge-pendiente'}">${estado || 'Pendiente'}</span>`;
         }
         
         function calcularFechaFin() {
@@ -184,31 +543,37 @@
             document.getElementById('licencia_fecha_fin').value = fecha.toISOString().split('T')[0];
         }
         
+        function actualizarDatalists() {
+            const listaTiposLicencia = document.getElementById('listaTiposLicencia');
+            if (listaTiposLicencia && tiposLicenciaData) {
+                listaTiposLicencia.innerHTML = tiposLicenciaData.map(t => `<option value="${escapeHtml(t.valor)}">`).join('');
+            }
+            const listaTiposLicenciaFiltro = document.getElementById('listaTiposLicenciaFiltro');
+            if (listaTiposLicenciaFiltro && tiposLicenciaData) {
+                listaTiposLicenciaFiltro.innerHTML = tiposLicenciaData.map(t => `<option value="${escapeHtml(t.valor)}">`).join('');
+            }
+            const listaAgentes = document.getElementById('listaAgentes');
+            if (listaAgentes && personalData) {
+                listaAgentes.innerHTML = personalData.map(p => `<option value="${p.legajo} - ${p.apellido}, ${p.nombre}" data-id="${p.id}">`).join('');
+            }
+        }
+        
         function renderTable() {
             const thead = document.getElementById('tableHeader');
             const tbody = document.getElementById('licenciasTableBody');
             if (!thead || !tbody) return;
-            
-            thead.innerHTML = '<tr>' + activeColumns.map(col => `<th class="draggable" data-col="${col}" draggable="true"><span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> ${columnLabels[col] || col}</th>`).join('') + '<th>Acciones</th><\/thead>';
+            thead.innerHTML = '<tr>' + activeColumns.map(col => `<th class="draggable" data-col="${col}" draggable="true"><span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> ${columnLabels[col] || col}</th>`).join('') + '<th>Acciones</th></tr>';
             initHeaderDragDrop();
-            
-            if (!licenciasData || licenciasData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay registros<\/tr>';
-                return;
-            }
-            
+            if (!licenciasData || licenciasData.length === 0) { tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay registros<\/td><\/tr>'; return; }
             tbody.innerHTML = licenciasData.map(item => {
                 let row = '<tr>';
                 for (const col of activeColumns) {
-                    if (col === 'apellido_nombre') row += `<td>${escapeHtml(item.apellido ? `${item.apellido}, ${item.nombre}` : '-')}<\/td>`;
-                    else if (col === 'estado') row += `<td>${getEstadoClass(item.estado)}<\/td>`;
-                    else if (col === 'legajo') row += `<td>${escapeHtml(item.legajo || '-')}<\/td>`;
-                    else row += `<td>${escapeHtml(item[col] || '-')}<\/td>`;
+                    if (col === 'apellido_nombre') row += '<td>' + escapeHtml(item.apellido ? `${item.apellido}, ${item.nombre}` : '-') + '<\/td>';
+                    else if (col === 'estado') row += '<td>' + getEstadoClass(item.estado) + '<\/td>';
+                    else if (col === 'legajo') row += '<td>' + escapeHtml(item.legajo || '-') + '<\/td>';
+                    else row += '<td>' + escapeHtml(item[col] || '-') + '<\/td>';
                 }
-                row += `<td>
-                    <button class="btn-accion btn-editar" onclick="editLicencia(${item.id})"><i class="fas fa-edit"></i> Editar</button>
-                    <button class="btn-accion btn-eliminar" onclick="deleteLicencia(${item.id})"><i class="fas fa-trash"></i> Eliminar</button>
-                <\/td><\/tr>`;
+                row += `<td class="acciones-cell"><button class="btn-accion btn-editar" onclick="editLicencia(${item.id})"><i class="fas fa-edit"></i> Editar</button><button class="btn-accion btn-eliminar" onclick="deleteLicencia(${item.id})"><i class="fas fa-trash"></i> Eliminar</button><\/td><\/tr>`;
                 return row;
             }).join('');
         }
@@ -221,132 +586,11 @@
                 header.addEventListener('dragend', (e) => { if (dragSrc) dragSrc.style.opacity = ''; dragSrc = null; headers.forEach(h => h.classList.remove('drag-over')); });
                 header.addEventListener('dragover', (e) => { e.preventDefault(); header.classList.add('drag-over'); });
                 header.addEventListener('dragleave', (e) => { header.classList.remove('drag-over'); });
-                header.addEventListener('drop', (e) => {
-                    e.preventDefault(); header.classList.remove('drag-over');
-                    const fromCol = e.dataTransfer.getData('text/plain');
-                    const toCol = header.getAttribute('data-col');
-                    if (fromCol !== toCol) {
-                        const fromIndex = activeColumns.indexOf(fromCol);
-                        const toIndex = activeColumns.indexOf(toCol);
-                        if (fromIndex !== -1 && toIndex !== -1) {
-                            const moved = activeColumns.splice(fromIndex, 1)[0];
-                            activeColumns.splice(toIndex, 0, moved);
-                            renderTable(); saveColumnOrder();
-                        }
-                    }
-                });
+                header.addEventListener('drop', (e) => { e.preventDefault(); header.classList.remove('drag-over'); const fromCol = e.dataTransfer.getData('text/plain'); const toCol = header.getAttribute('data-col'); if (fromCol !== toCol) { const fromIndex = activeColumns.indexOf(fromCol); const toIndex = activeColumns.indexOf(toCol); if (fromIndex !== -1 && toIndex !== -1) { const moved = activeColumns.splice(fromIndex, 1)[0]; activeColumns.splice(toIndex, 0, moved); renderTable(); saveColumnOrder(); } } });
             });
         }
         
-        async function saveColumnOrder() {
-            try { const token = getToken(); await fetch(`${API_URL}?endpoint=table_config&tabla=licencias`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ columnas: activeColumns }) }); } catch(e) { console.error(e); }
-        }
-        
-        async function loadCatalogos() {
-            try {
-                const token = getToken();
-                if (!token) return;
-                const tiposResp = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipos_licencia`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const tipos = await tiposResp.json();
-                const tiposList = document.getElementById('tiposLicenciaList');
-                if (tiposList && Array.isArray(tipos)) tiposList.innerHTML = tipos.map(t => `<option value="${escapeHtml(t.valor)}">`).join('');
-                const filtroTipo = document.getElementById('filtro_tipo');
-                if (filtroTipo && Array.isArray(tipos)) filtroTipo.innerHTML = '<option value="">Todos</option>' + tipos.map(t => `<option value="${escapeHtml(t.valor)}">${escapeHtml(t.valor)}</option>`).join('');
-            } catch(e) { console.error(e); }
-        }
-        
-        async function loadPersonalSelect() {
-            try {
-                const token = getToken();
-                if (!token) return;
-                const response = await fetch(`${API_URL}?endpoint=personal`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const personal = await response.json();
-                const select = document.getElementById('licencia_agente_id');
-                if (select && Array.isArray(personal)) { select.innerHTML = '<option value="">Seleccionar agente...</option>' + personal.map(p => `<option value="${p.id}">${escapeHtml(p.legajo)} - ${escapeHtml(p.apellido)}, ${escapeHtml(p.nombre)}</option>`).join(''); }
-            } catch(e) { console.error(e); }
-        }
-        
-        async function loadLicencias() {
-            const tbody = document.getElementById('licenciasTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Cargando...<\/td><\/tr>';
-            try {
-                const token = getToken();
-                if (!token) { window.location.href = 'index.html'; return; }
-                const response = await fetch(`${API_URL}?endpoint=licencias`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await response.json();
-                console.log('Licencias cargadas:', data);
-                if (Array.isArray(data)) { licenciasData = data; renderTable(); showToast(`✅ ${data.length} licencias cargadas`, 'success'); }
-                else { licenciasData = []; renderTable(); showToast('No hay datos', 'warning'); }
-            } catch(e) { renderTable(); showToast('Error cargando', 'error'); }
-        }
-        
-        function openLicenciaModal(data = null) {
-            const modal = document.getElementById('licenciaModal');
-            if (data) {
-                document.getElementById('licenciaId').value = data.id;
-                document.getElementById('licencia_agente_id').value = data.agente_id || '';
-                document.getElementById('licencia_tipo').value = data.tipo_licencia || '';
-                document.getElementById('licencia_estado').value = data.estado || 'Pendiente';
-                document.getElementById('licencia_fecha_inicio').value = data.fecha_inicio;
-                document.getElementById('licencia_dias_habiles').value = data.dias_habiles;
-                document.getElementById('licencia_dias_viaje').value = data.dias_viaje;
-                document.getElementById('licencia_contar_fines_semana').checked = data.contar_fines_semana == 1;
-                document.getElementById('licencia_fecha_fin').value = data.fecha_fin;
-                document.getElementById('licencia_observaciones').value = data.observaciones || '';
-                document.getElementById('modalTitle').textContent = 'Editar Licencia';
-            } else {
-                document.getElementById('licenciaForm').reset();
-                document.getElementById('licenciaId').value = '';
-                document.getElementById('licencia_fecha_inicio').value = new Date().toISOString().split('T')[0];
-                document.getElementById('licencia_estado').value = 'Pendiente';
-                document.getElementById('modalTitle').textContent = 'Nueva Licencia';
-                calcularFechaFin();
-            }
-            modal.style.display = 'flex';
-        }
-        
-        async function saveLicencia() {
-            const id = document.getElementById('licenciaId').value;
-            const data = {
-                agente_id: document.getElementById('licencia_agente_id').value,
-                tipo_licencia: document.getElementById('licencia_tipo').value,
-                estado: document.getElementById('licencia_estado').value,
-                fecha_inicio: document.getElementById('licencia_fecha_inicio').value,
-                dias_habiles: parseInt(document.getElementById('licencia_dias_habiles').value) || 0,
-                dias_viaje: parseInt(document.getElementById('licencia_dias_viaje').value) || 0,
-                contar_fines_semana: document.getElementById('licencia_contar_fines_semana').checked ? 1 : 0,
-                fecha_fin: document.getElementById('licencia_fecha_fin').value,
-                observaciones: document.getElementById('licencia_observaciones').value
-            };
-            if (!data.agente_id || !data.tipo_licencia || !data.fecha_inicio) { showToast('Complete campos requeridos', 'warning'); return; }
-            try {
-                const token = getToken();
-                const url = id ? `${API_URL}?endpoint=licencias&id=${id}` : `${API_URL}?endpoint=licencias`;
-                const method = id ? 'PUT' : 'POST';
-                const response = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(data) });
-                const result = await response.json();
-                if (result.success) { showToast(`Licencia ${id ? 'actualizada' : 'creada'} correctamente`, 'success'); closeModal(); loadLicencias(); }
-                else showToast('Error al guardar', 'error');
-            } catch(e) { showToast('Error de conexión', 'error'); }
-        }
-        
-        async function editLicencia(id) {
-            try {
-                const token = getToken();
-                const response = await fetch(`${API_URL}?endpoint=licencias&id=${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await response.json();
-                if (data && data.id) openLicenciaModal(data);
-                else showToast('No se encontraron datos', 'error');
-            } catch(e) { showToast('Error cargando datos', 'error'); }
-        }
-        
-        async function deleteLicencia(id) {
-            if (confirm('¿Eliminar esta licencia?')) {
-                try { const token = getToken(); await fetch(`${API_URL}?endpoint=licencias&id=${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } }); showToast('Eliminada', 'success'); loadLicencias(); }
-                catch(e) { showToast('Error', 'error'); }
-            }
-        }
-        
+        async function saveColumnOrder() { try { const token = getToken(); await fetch(`${API_URL}?endpoint=table_config&tabla=licencias`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ columnas: activeColumns }) }); } catch(e) { console.error(e); } }
         function openConfigModal() { document.getElementById('configPanel').style.display = 'block'; renderOrderList(); }
         
         function renderOrderList() {
@@ -365,52 +609,204 @@
                 item.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', col); item.classList.add('dragging'); });
                 item.addEventListener('dragend', (e) => { item.classList.remove('dragging'); });
                 item.addEventListener('dragover', (e) => { e.preventDefault(); });
-                item.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    const fromCol = e.dataTransfer.getData('text/plain');
-                    const toCol = col;
-                    if (fromCol !== toCol) {
-                        const fromIndex = orderedColumns.indexOf(fromCol);
-                        const toIndex = orderedColumns.indexOf(toCol);
-                        if (fromIndex !== -1 && toIndex !== -1) {
-                            const moved = orderedColumns.splice(fromIndex, 1)[0];
-                            orderedColumns.splice(toIndex, 0, moved);
-                            activeColumns = orderedColumns.filter(c => activeColumns.includes(c));
-                            renderOrderList();
-                        }
-                    }
-                });
+                item.addEventListener('drop', (e) => { e.preventDefault(); const fromCol = e.dataTransfer.getData('text/plain'); const toCol = col; if (fromCol !== toCol) { const fromIndex = orderedColumns.indexOf(fromCol); const toIndex = orderedColumns.indexOf(toCol); if (fromIndex !== -1 && toIndex !== -1) { const moved = orderedColumns.splice(fromIndex, 1)[0]; orderedColumns.splice(toIndex, 0, moved); activeColumns = orderedColumns.filter(c => activeColumns.includes(c)); renderOrderList(); } } });
                 const checkbox = item.querySelector('.col-toggle');
-                checkbox.addEventListener('change', (e) => {
-                    if (e.target.checked) { if (!activeColumns.includes(col)) activeColumns.push(col); }
-                    else { const idx = activeColumns.indexOf(col); if (idx !== -1) activeColumns.splice(idx, 1); }
-                    renderOrderList();
-                });
+                checkbox.addEventListener('change', (e) => { if (e.target.checked) { if (!activeColumns.includes(col)) activeColumns.push(col); } else { const idx = activeColumns.indexOf(col); if (idx !== -1) activeColumns.splice(idx, 1); } renderOrderList(); });
                 container.appendChild(item);
             });
         }
         
-        async function loadColumnConfig() {
+        async function loadColumnConfig() { try { const token = getToken(); const response = await fetch(`${API_URL}?endpoint=table_config&tabla=licencias`, { headers: { 'Authorization': `Bearer ${token}` } }); const config = await response.json(); if (config && Array.isArray(config) && config.length > 0) { activeColumns = config; } renderOrderList(); } catch(e) { console.error(e); } }
+        function resetColumns() { activeColumns = ['legajo', 'apellido_nombre', 'tipo_licencia', 'estado', 'fecha_inicio', 'fecha_fin', 'dias_habiles']; renderOrderList(); renderTable(); saveColumnConfig(); }
+        async function saveColumnConfig() { try { const token = getToken(); await fetch(`${API_URL}?endpoint=table_config&tabla=licencias`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ columnas: activeColumns }) }); showToast('Configuración guardada', 'success'); document.getElementById('configPanel').style.display = 'none'; renderTable(); } catch(e) { showToast('Error', 'error'); } }
+        
+        async function loadCatalogos() {
             try {
                 const token = getToken();
-                const response = await fetch(`${API_URL}?endpoint=table_config&tabla=licencias`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const config = await response.json();
-                if (config && Array.isArray(config) && config.length > 0) activeColumns = config;
-                renderOrderList();
+                if (!token) return;
+                const tiposResp = await fetch(`${API_URL}?endpoint=catalogos&tipo=tipos_licencia`, { headers: { 'Authorization': `Bearer ${token}` } });
+                let tipos = await tiposResp.json();
+                tiposLicenciaData = Array.isArray(tipos) ? tipos : (tipos.data || []);
+                actualizarDatalists();
             } catch(e) { console.error(e); }
         }
         
-        async function saveColumnConfig() {
+        async function loadPersonalList() {
             try {
                 const token = getToken();
-                await fetch(`${API_URL}?endpoint=table_config&tabla=licencias`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ columnas: activeColumns }) });
-                showToast('Configuración guardada', 'success');
-                document.getElementById('configPanel').style.display = 'none';
-                renderTable();
-            } catch(e) { showToast('Error', 'error'); }
+                const esAdmin = esAdministrador();
+                const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+                const userSubordinadoValor = user.subordinado_valor || '';
+                
+                let url = `${API_URL}?endpoint=personal`;
+                
+                if (!esAdmin && userSubordinadoValor) {
+                    url += `&subordinado=${encodeURIComponent(userSubordinadoValor)}`;
+                } else {
+                    const filtroSub = getFiltroSubordinado();
+                    if (filtroSub) {
+                        url += `&subordinado=${encodeURIComponent(filtroSub)}`;
+                    }
+                }
+                
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                let personal = await response.json();
+                personal = Array.isArray(personal) ? personal : (personal.data || []);
+                personalData = personal.filter(p => p.legajo && p.legajo.trim() !== '');
+                actualizarDatalists();
+            } catch(e) { console.error(e); }
         }
         
-        function resetColumns() { activeColumns = ['legajo', 'apellido_nombre', 'tipo_licencia', 'estado', 'fecha_inicio', 'fecha_fin', 'dias_habiles']; renderOrderList(); renderTable(); }
+        async function loadLicencias() {
+            const tbody = document.getElementById('licenciasTableBody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Cargando...<\/td><\/tr>';
+            try {
+                const token = getToken();
+                if (!token) { window.location.href = 'index.html'; return; }
+                
+                let url = `${API_URL}?endpoint=licencias`;
+                const filtroSub = getFiltroSubordinado();
+                if (filtroSub) {
+                    url += `&subordinado=${encodeURIComponent(filtroSub)}`;
+                }
+                
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                let data = await response.json();
+                data = Array.isArray(data) ? data : (data.data || []);
+                licenciasData = data;
+                await loadColumnConfig();
+                renderTable();
+                showToast(`✅ ${data.length} licencias cargadas`, 'success');
+            } catch(e) { renderTable(); showToast('Error cargando licencias', 'error'); }
+        }
+        
+        function openLicenciaModal(data = null) {
+            const modal = document.getElementById('licenciaModal');
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const esAdmin = esAdministrador();
+            const userSubordinadoValor = user.subordinado_valor || '';
+            const userSubordinadoNombre = user.subordinado_nombre || userSubordinadoValor || '';
+            
+            const subordinadoInput = document.getElementById('licencia_subordinado');
+            
+            if (!esAdmin && userSubordinadoValor) {
+                subordinadoInput.value = userSubordinadoNombre;
+                subordinadoInput.readOnly = true;
+                subordinadoInput.disabled = false;
+                subordinadoInput.style.backgroundColor = 'var(--bg-surface)';
+                subordinadoInput.style.opacity = '0.7';
+                subordinadoInput.style.cursor = 'not-allowed';
+            } else if (esAdmin) {
+                subordinadoInput.readOnly = false;
+                subordinadoInput.disabled = false;
+                subordinadoInput.style.backgroundColor = '';
+                subordinadoInput.style.opacity = '';
+                subordinadoInput.style.cursor = 'text';
+                subordinadoInput.placeholder = 'Buscar...';
+                subordinadoInput.setAttribute('list', 'listaSubordinados');
+            }
+            
+            if (data) {
+                document.getElementById('licenciaId').value = data.id;
+                document.getElementById('licencia_agente').value = getAgenteTextById(data.agente_id);
+                document.getElementById('licencia_agente_id').value = data.agente_id || '';
+                document.getElementById('licencia_tipo').value = data.tipo_licencia || '';
+                document.getElementById('licencia_dependencia').value = data.dependencia_id || '';
+                if (esAdmin) {
+                    subordinadoInput.value = data.oficina || '';
+                }
+                document.getElementById('licencia_estado').value = data.estado || 'Pendiente';
+                document.getElementById('licencia_fecha_inicio').value = data.fecha_inicio;
+                document.getElementById('licencia_dias_habiles').value = data.dias_habiles;
+                document.getElementById('licencia_dias_viaje').value = data.dias_viaje;
+                document.getElementById('licencia_contar_fines_semana').checked = data.contar_fines_semana == 1;
+                document.getElementById('licencia_fecha_fin').value = data.fecha_fin;
+                document.getElementById('licencia_observaciones').value = data.observaciones || '';
+                document.getElementById('modalTitle').textContent = 'Editar Licencia';
+            } else {
+                document.getElementById('licenciaForm').reset();
+                document.getElementById('licenciaId').value = '';
+                document.getElementById('licencia_fecha_inicio').value = new Date().toISOString().split('T')[0];
+                document.getElementById('licencia_estado').value = 'Pendiente';
+                document.getElementById('licencia_dependencia').value = '';
+                document.getElementById('modalTitle').textContent = 'Nueva Licencia';
+                calcularFechaFin();
+                
+                if (!esAdmin && userSubordinadoValor) {
+                    subordinadoInput.value = userSubordinadoNombre;
+                } else if (esAdmin) {
+                    subordinadoInput.value = '';
+                }
+            }
+            modal.style.display = 'flex';
+        }
+        
+        async function saveLicencia() {
+            const id = document.getElementById('licenciaId').value;
+            const esAdmin = esAdministrador();
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const userSubordinadoValor = user.subordinado_valor || '';
+            
+            const agenteText = document.getElementById('licencia_agente').value;
+            let agenteId = document.getElementById('licencia_agente_id').value;
+            
+            if (!agenteId && agenteText) {
+                const match = agenteText.match(/^(\d+)/);
+                if (match) {
+                    const legajo = match[1];
+                    const found = personalData.find(p => p.legajo == legajo);
+                    if (found) agenteId = found.id;
+                }
+            }
+            
+            let oficinaValue = document.getElementById('licencia_subordinado').value;
+            if (!esAdmin && userSubordinadoValor) {
+                oficinaValue = userSubordinadoValor;
+            }
+            
+            const data = {
+                agente_id: agenteId,
+                tipo_licencia: document.getElementById('licencia_tipo').value,
+                estado: document.getElementById('licencia_estado').value,
+                fecha_inicio: document.getElementById('licencia_fecha_inicio').value,
+                dias_habiles: parseInt(document.getElementById('licencia_dias_habiles').value) || 0,
+                dias_viaje: parseInt(document.getElementById('licencia_dias_viaje').value) || 0,
+                contar_fines_semana: document.getElementById('licencia_contar_fines_semana').checked ? 1 : 0,
+                fecha_fin: document.getElementById('licencia_fecha_fin').value,
+                observaciones: document.getElementById('licencia_observaciones').value,
+                dependencia_id: document.getElementById('licencia_dependencia').value || null,
+                oficina: oficinaValue
+            };
+            
+            if (!data.agente_id) { showToast('Seleccione un agente', 'warning'); return; }
+            if (!data.tipo_licencia) { showToast('Seleccione un tipo de licencia', 'warning'); return; }
+            if (!data.fecha_inicio) { showToast('La fecha de inicio es requerida', 'warning'); return; }
+            
+            try {
+                const token = getToken();
+                const url = id ? `${API_URL}?endpoint=licencias&id=${id}` : `${API_URL}?endpoint=licencias`;
+                const method = id ? 'PUT' : 'POST';
+                const response = await fetch(url, { 
+                    method: method, 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
+                    body: JSON.stringify(data) 
+                });
+                const result = await response.json();
+                if (result.success) { 
+                    showToast(`Licencia ${id ? 'actualizada' : 'creada'} correctamente`, 'success'); 
+                    closeModal(); 
+                    loadLicencias(); 
+                } else {
+                    showToast('Error al guardar: ' + (result.error || 'Desconocido'), 'error');
+                }
+            } catch(e) { 
+                console.error(e);
+                showToast('Error de conexión', 'error'); 
+            }
+        }
+        
+        async function editLicencia(id) { try { const token = getToken(); const response = await fetch(`${API_URL}?endpoint=licencias&id=${id}`, { headers: { 'Authorization': `Bearer ${token}` } }); const data = await response.json(); if (data && data.id) openLicenciaModal(data); else showToast('No se encontraron datos', 'error'); } catch(e) { showToast('Error cargando datos', 'error'); } }
+        async function deleteLicencia(id) { if (confirm('¿Eliminar esta licencia?')) { try { const token = getToken(); await fetch(`${API_URL}?endpoint=licencias&id=${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } }); showToast('Eliminada', 'success'); loadLicencias(); } catch(e) { showToast('Error', 'error'); } } }
         
         function aplicarFiltros() {
             let filtrados = [...licenciasData];
@@ -419,14 +815,18 @@
             const tipo = document.getElementById('filtro_tipo')?.value; if (tipo && tipo !== '') filtrados = filtrados.filter(l => l.tipo_licencia === tipo);
             const estado = document.getElementById('filtro_estado')?.value; if (estado && estado !== '') filtrados = filtrados.filter(l => l.estado === estado);
             const agente = document.getElementById('filtro_agente')?.value.toLowerCase(); if (agente) filtrados = filtrados.filter(l => (l.apellido || '').toLowerCase().includes(agente) || (l.nombre || '').toLowerCase().includes(agente));
-            licenciasData = filtrados; renderTable();
-            showToast(`Encontradas ${filtrados.length} licencias`, 'info');
+            const subordinado = document.getElementById('filtro_subordinado')?.value;
+            if (subordinado && subordinado !== '') {
+                filtrados = filtrados.filter(l => l.oficina === subordinado);
+            }
+            licenciasData = filtrados; renderTable(); showToast(`Encontradas ${filtrados.length} licencias`, 'info');
         }
         
         function limpiarFiltros() {
             document.getElementById('filtro_fecha_desde').value = ''; document.getElementById('filtro_fecha_hasta').value = '';
             document.getElementById('filtro_tipo').value = ''; document.getElementById('filtro_estado').value = '';
-            document.getElementById('filtro_agente').value = ''; loadLicencias();
+            document.getElementById('filtro_agente').value = ''; document.getElementById('filtro_subordinado').value = '';
+            loadLicencias();
         }
         
         function exportarCSV() {
@@ -445,31 +845,47 @@
             const user = localStorage.getItem('current_user');
             if (!user) { window.location.href = 'index.html'; return false; }
             const userData = JSON.parse(user);
-            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            const userInfoEl = document.querySelector('#userInfo');
+            if (userInfoEl) userInfoEl.innerHTML = `${escapeHtml(userData.nombre)} <span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
             return true;
         }
         
-        document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => { openConfigModal(); loadColumnConfig(); });
+        function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function toggleMobileMenu() { document.querySelector('.nav-menu')?.classList.toggle('active'); }
+        
         document.getElementById('btnCerrarConfig')?.addEventListener('click', () => { document.getElementById('configPanel').style.display = 'none'; });
         document.getElementById('btnGuardarConfig')?.addEventListener('click', saveColumnConfig);
         document.getElementById('btnResetColumns')?.addEventListener('click', resetColumns);
-        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
-        document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
+        document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+        document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu);
         document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
-        
+        window.addEventListener('click', (e) => { if (e.target.classList?.contains('modal')) closeModal(); });
         document.getElementById('licencia_fecha_inicio')?.addEventListener('change', calcularFechaFin);
         document.getElementById('licencia_dias_habiles')?.addEventListener('input', calcularFechaFin);
         document.getElementById('licencia_dias_viaje')?.addEventListener('input', calcularFechaFin);
         document.getElementById('licencia_contar_fines_semana')?.addEventListener('change', calcularFechaFin);
         
-        document.addEventListener('DOMContentLoaded', () => { if (checkAuth()) { loadCatalogos(); loadPersonalSelect(); loadLicencias(); } });
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (checkAuth()) {
+                aplicarPermisosMenu();
+                cargarConfiguracionSistema();
+                await initLicenciasHeader();
+                await loadCatalogos();
+                await cargarDependenciasSelect();
+                await loadPersonalList();
+                await loadLicencias();
+            }
+        });
         
         window.openLicenciaModal = openLicenciaModal; window.saveLicencia = saveLicencia;
         window.editLicencia = editLicencia; window.deleteLicencia = deleteLicencia;
         window.closeModal = closeModal; window.aplicarFiltros = aplicarFiltros;
         window.limpiarFiltros = limpiarFiltros; window.exportarCSV = exportarCSV;
-        window.calcularFechaFin = calcularFechaFin;
+        window.calcularFechaFin = calcularFechaFin; window.toggleDropdown = toggleDropdown;
+        window.onSelectorSubordinadoChange = onSelectorSubordinadoChange;
+        window.limpiarFiltroSubordinado = limpiarFiltroSubordinado;
     </script>
-        <script src="theme.js"></script>
+    <script src="theme.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

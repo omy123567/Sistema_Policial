@@ -65,6 +65,7 @@
             margin-bottom: 1.5rem;
             border-bottom: 1px solid var(--border);
             padding-bottom: 0.5rem;
+            flex-wrap: wrap;
         }
         .tab-btn {
             padding: 0.5rem 1rem;
@@ -116,6 +117,72 @@
         .password-requirements li.valid {
             color: var(--accent-success);
         }
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .user-dropdown .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .user-dropdown .user-info:hover {
+            background-color: var(--bg-surface);
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-width: 180px;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .dropdown-menu a:hover {
+            background-color: var(--bg-surface);
+        }
+        .dropdown-menu hr {
+            margin: 0;
+            border-color: var(--border);
+        }
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            color: var(--text-primary);
+        }
+        .theme-toggle-btn:hover {
+            background-color: var(--bg-card);
+            transform: scale(1.1);
+        }
         @media (max-width: 768px) {
             .perfil-container {
                 grid-template-columns: 1fr;
@@ -133,7 +200,7 @@
 <body>
     <div class="header">
         <nav class="navbar">
-            <div class="logo"><i class="fas fa-shield-alt"></i><span>Sistema Policial</span></div>
+            <div class="logo"><i class="fas fa-shield-alt"></i><span id="sistemaNombre">Sistema Policial</span></div>
             <div class="hamburger"><span></span><span></span><span></span></div>
             <ul class="nav-menu">
                 <li><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -141,12 +208,20 @@
                 <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
                 <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
-                <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
-                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+                <li id="menuUsuarios" style="display: none;"><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li id="menuConfiguracion" style="display: none;"><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
+                <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
             </ul>
-            <div class="user-info">
-                <span id="userInfo"></span>
-                <button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            <div class="user-dropdown">
+                <div class="user-info" onclick="toggleDropdown(event)">
+                    <span id="userInfo"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="perfil.html" class="active"><i class="fas fa-user-circle"></i> Mi Perfil</a>
+                    <hr>
+                    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                </div>
             </div>
         </nav>
     </div>
@@ -212,10 +287,17 @@
         const API_URL = 'backend/api.php';
         
         function showToast(message, type) {
-            const container = document.getElementById('toast-container');
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                const newContainer = document.createElement('div');
+                newContainer.id = 'toast-container';
+                newContainer.className = 'toast-container';
+                document.body.appendChild(newContainer);
+                container = newContainer;
+            }
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            toast.innerHTML = `<div>${message}</div>`;
+            toast.innerHTML = `<div>${message}</div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;margin-left:10px;">&times;</button>`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
@@ -229,6 +311,38 @@
         
         function getToken() { return localStorage.getItem('jwt_token'); }
         
+        function toggleDropdown(event) { 
+            if (event) event.stopPropagation();
+            document.getElementById('dropdownMenu').classList.toggle('show'); 
+        }
+        
+        document.addEventListener('click', function(e) { 
+            if (!e.target.closest('.user-dropdown')) { 
+                document.getElementById('dropdownMenu').classList.remove('show'); 
+            } 
+        });
+        
+        function aplicarPermisosMenu() {
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const esAdmin = (user.rol_id === 1 || user.rol === 'Administrador Central' || user.puede_ver_todas);
+            const menuUsuarios = document.getElementById('menuUsuarios');
+            const menuConfiguracion = document.getElementById('menuConfiguracion');
+            if (menuUsuarios) menuUsuarios.style.display = esAdmin ? 'block' : 'none';
+            if (menuConfiguracion) menuConfiguracion.style.display = esAdmin ? 'block' : 'none';
+        }
+        
+        async function cargarConfiguracionSistema() {
+            try {
+                const response = await fetch(`${API_URL}?endpoint=configuracion_sistema`);
+                const config = await response.json();
+                if (config && config.nombre_sistema) {
+                    const nombreElement = document.getElementById('sistemaNombre');
+                    if (nombreElement) nombreElement.textContent = config.nombre_sistema;
+                    document.title = config.nombre_sistema + ' - Mi Perfil';
+                }
+            } catch(e) { console.error(e); }
+        }
+        
         async function apiRequest(endpoint, method = 'GET', data = null) {
             const token = getToken();
             const headers = { 'Content-Type': 'application/json' };
@@ -238,9 +352,17 @@
             try {
                 const response = await fetch(`${API_URL}?endpoint=${endpoint}`, options);
                 const result = await response.json();
-                if (response.status === 401) { window.location.href = 'index.html'; throw new Error('Sesión expirada'); }
+                if (response.status === 401) { 
+                    localStorage.clear();
+                    window.location.href = 'index.html'; 
+                    throw new Error('Sesión expirada'); 
+                }
                 return result;
-            } catch (error) { console.error('API Error:', error); showToast('Error de conexión', 'error'); return null; }
+            } catch (error) { 
+                console.error('API Error:', error); 
+                showToast('Error de conexión: ' + error.message, 'error'); 
+                return null; 
+            }
         }
         
         async function cargarPerfil() {
@@ -255,7 +377,9 @@
                     document.getElementById('perfil_email').value = data.email;
                     document.getElementById('perfil_username').value = data.username;
                 }
-            } catch (error) { showToast('Error cargando perfil', 'error'); }
+            } catch (error) { 
+                showToast('Error cargando perfil: ' + error.message, 'error'); 
+            }
         }
         
         function validarPassword() {
@@ -342,5 +466,7 @@
         document.addEventListener('DOMContentLoaded', () => { if (checkAuth()) cargarPerfil(); document.getElementById('formDatosPersonales')?.addEventListener('submit', actualizarDatos); document.getElementById('formCambiarPassword')?.addEventListener('submit', cambiarPassword); document.getElementById('logoutBtn')?.addEventListener('click', handleLogout); document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu); });
         window.showTab = showTab; window.validarPassword = validarPassword;
     </script>
+      <script src="theme.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

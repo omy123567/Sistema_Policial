@@ -9,333 +9,184 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-        .filtros-container {
-            background-color: var(--bg-surface);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .filtros-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        .config-columnas {
-            background: var(--bg-surface);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-        }
-        .btn-config {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        th.draggable {
-            cursor: move;
-            user-select: none;
-        }
-        th .drag-handle {
-            display: inline-block;
-            margin-right: 5px;
-            opacity: 0.5;
-            cursor: move;
-        }
-        .column-order-list {
-            background: var(--bg-surface);
-            border-radius: 8px;
-            padding: 0.5rem;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .column-order-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            margin: 0.25rem 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: move;
-        }
-        .documentos-container {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.5rem;
-            background-color: var(--bg-surface);
-            margin-top: 0.5rem;
-        }
-        .documento-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-        .btn-doc {
-            padding: 0.2rem 0.4rem;
-            font-size: 0.7rem;
-            border-radius: 4px;
-            cursor: pointer;
-            border: none;
-        }
-        .export-categorias {
-            background: var(--bg-surface);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-        }
-        .export-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropbtn {
-            background: var(--accent-primary);
-            color: white;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: var(--bg-card);
-            min-width: 220px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3);
-            z-index: 1;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .dropdown-content a {
-            color: var(--text-primary);
-            padding: 10px 16px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-        .dropdown-content a:hover {
-            background-color: var(--accent-primary);
-            color: white;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        .btn-pdf {
-            background: rgba(220,38,38,0.2);
-            color: #dc2626;
-            border: 1px solid #dc2626;
-        }
-        .badge-arma-si, .badge-chofer-si {
-            background-color: rgba(22,163,74,0.2);
-            color: #16a34a;
-            padding: 0.2rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-        }
-        .badge-arma-no, .badge-chofer-no {
-            background-color: rgba(107,114,128,0.2);
-            color: #9ca3af;
-            padding: 0.2rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-        }
-        .badge-doc-count {
-            background-color: rgba(29,78,216,0.2);
-            color: #1d4ed8;
-            padding: 0.2rem 0.5rem;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-        .conditional-fields {
-            margin-top: 0.5rem;
-            padding: 0.75rem;
-            background: var(--bg-surface);
-            border-radius: 8px;
-            border-left: 3px solid var(--accent-primary);
-        }
-        .acciones-buttons {
-            display: flex;
-            gap: 0.3rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .btn-accion {
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .btn-editar {
-            background-color: rgba(29, 78, 216, 0.15);
-            color: #3b82f6;
-        }
-        .btn-editar:hover {
-            background-color: #1d4ed8;
-            color: white;
-        }
-        .btn-eliminar {
-            background-color: rgba(220, 38, 38, 0.15);
-            color: #ef4444;
-        }
-        .btn-eliminar:hover {
-            background-color: #dc2626;
-            color: white;
-        }
-        .equipamiento-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
-        }
-        .equipamiento-tab {
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            border-radius: 8px;
-        }
-        .equipamiento-tab.active {
-            background: var(--accent-primary);
-            color: white;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: 12px;
-            max-width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-        .modal-body {
-            padding: 1rem;
-        }
-        .modal-footer {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-        .close-modal {
-            cursor: pointer;
-            font-size: 1.5rem;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-weight: 500;
-        }
-        .form-control {
-            width: 100%;
-            padding: 0.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-        .table-container {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        th {
-            background: var(--bg-surface);
-            font-weight: 600;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .text-secondary {
-            color: var(--text-secondary);
-        }
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 3000;
-        }
-        .toast {
-            background: var(--bg-card);
-            border-left: 4px solid;
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.5rem;
-            min-width: 280px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+        .filtros-container { background-color: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+        .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .config-columnas { background: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .btn-config { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
+        th.draggable { cursor: move; user-select: none; }
+        th .drag-handle { display: inline-block; margin-right: 5px; opacity: 0.5; cursor: move; }
+        .column-order-list { background: var(--bg-surface); border-radius: 8px; padding: 0.5rem; max-height: 300px; overflow-y: auto; }
+        .column-order-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; margin: 0.25rem 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: move; }
+        .documentos-container { max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem; background-color: var(--bg-surface); margin-top: 0.5rem; }
+        .documento-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--border); }
+        .btn-doc { padding: 0.2rem 0.4rem; font-size: 0.7rem; border-radius: 4px; cursor: pointer; border: none; }
+        .export-categorias { background: var(--bg-surface); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+        .export-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+        .dropdown { position: relative; display: inline-block; }
+        .dropbtn { background: var(--accent-primary); color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .dropdown-content { display: none; position: absolute; background-color: var(--bg-card); min-width: 220px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1; border-radius: 8px; border: 1px solid var(--border); }
+        .dropdown-content a { color: var(--text-primary); padding: 10px 16px; text-decoration: none; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .dropdown-content a:hover { background-color: var(--accent-primary); color: white; }
+        .dropdown:hover .dropdown-content { display: block; }
+        .btn-pdf { background: rgba(220,38,38,0.2); color: #dc2626; border: 1px solid #dc2626; }
+        .badge-arma-si, .badge-chofer-si { background-color: rgba(22,163,74,0.2); color: #16a34a; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.7rem; }
+        .badge-arma-no, .badge-chofer-no { background-color: rgba(107,114,128,0.2); color: #9ca3af; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.7rem; }
+        .badge-doc-count { background-color: rgba(29,78,216,0.2); color: #1d4ed8; padding: 0.2rem 0.5rem; border-radius: 20px; cursor: pointer; }
+        .conditional-fields { margin-top: 0.5rem; padding: 0.75rem; background: var(--bg-surface); border-radius: 8px; border-left: 3px solid var(--accent-primary); }
+        .acciones-buttons { display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap; }
+        .btn-accion { padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.7rem; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-editar { background-color: rgba(29,78,216,0.15); color: #3b82f6; }
+        .btn-editar:hover { background-color: #1d4ed8; color: white; }
+        .btn-eliminar { background-color: rgba(220,38,38,0.15); color: #ef4444; }
+        .btn-eliminar:hover { background-color: #dc2626; color: white; }
+        .equipamiento-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        .equipamiento-tab { padding: 0.5rem 1rem; cursor: pointer; border-radius: 8px; }
+        .equipamiento-tab.active { background: var(--accent-primary); color: white; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: var(--bg-card); border-radius: 12px; max-width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border); }
+        .modal-body { padding: 1rem; }
+        .modal-footer { padding: 1rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.5rem; }
+        .close-modal { cursor: pointer; font-size: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.25rem; font-weight: 500; }
+        .form-control { width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); }
+        input.form-control { cursor: text; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg-surface); font-weight: 600; }
+        .text-center { text-align: center; }
+        .text-secondary { color: var(--text-secondary); }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 3000; }
+        .toast { background: var(--bg-card); border-left: 4px solid; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-success { border-left-color: #16a34a; }
         .toast-error { border-left-color: #dc2626; }
         .toast-warning { border-left-color: #d97706; }
         .toast-info { border-left-color: #1d4ed8; }
-        @media (max-width:768px){
-            .filtros-grid { grid-template-columns: 1fr; }
-            .export-header { flex-direction: column; align-items: stretch; }
-            .dropdown-content { position: static; width: 100%; }
+        
+        .user-dropdown { position: relative; display: inline-block; }
+        .user-dropdown .user-info { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem 0.75rem; border-radius: 8px; transition: all 0.2s; }
+        .user-dropdown .user-info:hover { background-color: var(--bg-surface); }
+        .dropdown-menu { position: absolute; top: 100%; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; min-width: 180px; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .dropdown-menu.show { display: block; }
+        .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; color: var(--text-primary); text-decoration: none; transition: all 0.2s; }
+        .dropdown-menu a:hover { background-color: var(--bg-surface); }
+        .dropdown-menu hr { margin: 0; border-color: var(--border); }
+        
+        .card-header-con-filtro {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .card-header-left h1 {
+            margin: 0;
+        }
+        .subordinado-selector {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-surface);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        .subordinado-selector:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-card);
+        }
+        .subordinado-selector i {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+        .subordinado-selector select {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .subordinado-selector select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .filtro-activo-indicador {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(29, 78, 216, 0.15);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+        }
+        .filtro-activo-indicador i {
+            font-size: 0.7rem;
+        }
+        .filtro-activo-indicador .limpiar-filtro {
+            cursor: pointer;
+            margin-left: 0.5rem;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        .filtro-activo-indicador .limpiar-filtro:hover {
+            color: #dc2626;
+        }
+        .subordinado-actual {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(29, 78, 216, 0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid rgba(29, 78, 216, 0.3);
+        }
+        .subordinado-actual i {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+        }
+        .subordinado-actual .subordinado-nombre {
+            font-weight: 500;
+            color: var(--accent-primary);
+        }
+        input[readonly] {
+            cursor: not-allowed;
+            background-color: var(--bg-surface);
+            opacity: 0.8;
+        }
+        
+        @media (max-width:768px){ 
+            .filtros-grid { grid-template-columns: 1fr; } 
+            .export-header { flex-direction: column; align-items: stretch; } 
+            .dropdown-content { position: static; width: 100%; } 
             .acciones-buttons { flex-direction: column; gap: 0.2rem; }
+            .card-header-con-filtro {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .card-header-left {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .subordinado-selector {
+                justify-content: space-between;
+            }
         }
     </style>
 </head>
@@ -350,23 +201,26 @@
                 <li><a href="recargos.html" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Recargos</a></li>
                 <li><a href="expedientes.html" class="nav-link"><i class="fas fa-folder-open"></i> Expedientes</a></li>
                 <li><a href="licencias.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Licencias</a></li>
-                <li><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li id="menuUsuarios" style="display: none;"><a href="usuarios.html" class="nav-link"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li id="menuConfiguracion" style="display: none;"><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
                 <li><a href="secciones_guardia.html" class="nav-link"><i class="fas fa-layer-group"></i> Secciones Guardia</a></li>
-                <li><a href="configuracion.html" class="nav-link"><i class="fas fa-cog"></i> Configuración</a></li>
             </ul>
-            <div class="user-info"><span id="userInfo"></span><button id="logoutBtn" class="btn btn-sm btn-danger"><i class="fas fa-sign-out-alt"></i> Salir</button></div>
+            <div class="user-dropdown">
+                <div class="user-info" onclick="toggleDropdown(event)">
+                    <span id="userInfo"></span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="perfil.html"><i class="fas fa-user-circle"></i> Mi Perfil</a>
+                    <hr>
+                    <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                </div>
+            </div>
         </nav>
     </div>
     
     <div class="container">
-        <div class="card-header">
-            <h1><i class="fas fa-users"></i> Gestión de Personal</h1>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button id="btnSeccionesGuardia" class="btn-config" onclick="window.location.href='secciones_guardia.html'"><i class="fas fa-layer-group"></i> Secciones</button>
-                <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar</button>
-                <button id="btnNuevoPersonal" class="btn btn-primary" onclick="openPersonalModal()"><i class="fas fa-plus"></i> Nuevo</button>
-            </div>
-        </div>
+        <div id="personalHeader"></div>
         
         <div class="export-categorias">
             <div class="export-header">
@@ -380,7 +234,7 @@
                             <a onclick="exportarPDFCategoria('mes_cumple')"><i class="fas fa-birthday-cake"></i> Por Mes de Cumpleaños</a>
                             <a onclick="exportarPDFCategoria('tiene_arma')"><i class="fas fa-gun"></i> Con/Sin Arma</a>
                             <a onclick="exportarPDFCategoria('es_chofer')"><i class="fas fa-truck"></i> Es Chofer</a>
-                            <a onclick="exportarPDFCategoria('dependencia')"><i class="fas fa-building"></i> Por Unidad Regional/Superior</a>
+                            <a onclick="exportarPDFCategoria('dependencia')"><i class="fas fa-building"></i> Por Unidad Regional</a>
                             <a onclick="exportarPDFCategoria('oficina')"><i class="fas fa-location-dot"></i> Por Subordinado</a>
                             <a onclick="exportarPDFCategoria('edad_rango')"><i class="fas fa-chart-line"></i> Por Rango de Edad</a>
                             <a onclick="exportarPDFCategoria('seccion_guardia')"><i class="fas fa-layer-group"></i> Por Sección Guardia</a>
@@ -410,10 +264,10 @@
                 <div><label>Apellido</label><input type="text" id="filtro_apellido" class="form-control"></div>
                 <div><label>Nombre</label><input type="text" id="filtro_nombre" class="form-control"></div>
                 <div><label>DNI</label><input type="text" id="filtro_dni" class="form-control"></div>
-                <div><label>Jerarquía</label><select id="filtro_jerarquia" class="form-control"><option value="">Todas</option></select></div>
+                <div><label>Jerarquía</label><input type="text" id="filtro_jerarquia" class="form-control" list="listaJerarquiasFiltro" placeholder="Escriba para buscar..."><datalist id="listaJerarquiasFiltro"></datalist></div>
                 <div><label>Sexo</label><select id="filtro_sexo" class="form-control"><option value="">Todos</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div>
-                <div><label>Unidad Regional/Superior</label><select id="filtro_dependencia" class="form-control"><option value="">Todas</option></select></div>
-                <div><label>Subordinado</label><select id="filtro_oficina" class="form-control"><option value="">Todos</option></select></div>
+                <div><label>Unidad Regional</label><select id="filtro_dependencia" class="form-control"><option value="">Todas</option></select></div>
+                <div><label>Subordinado</label><input type="text" id="filtro_oficina" class="form-control" list="listaSubordinadosFiltro" placeholder="Escriba para buscar..."><datalist id="listaSubordinadosFiltro"></datalist></div>
                 <div><label>Con Arma</label><select id="filtro_arma" class="form-control"><option value="">Todos</option><option value="1">Sí</option><option value="0">No</option></select></div>
                 <div><label>Es Chofer</label><select id="filtro_chofer" class="form-control"><option value="">Todos</option><option value="1">Sí</option><option value="0">No</option></select></div>
                 <div><label>Sección Guardia</label><select id="filtro_seccion" class="form-control"><option value="">Todas</option></select></div>
@@ -432,7 +286,6 @@
         </div>
     </div>
     
-    <!-- Modal Personal Principal -->
     <div id="personalModal" class="modal">
         <div class="modal-content" style="max-width:900px; max-height:90vh; overflow-y:auto;">
             <div class="modal-header">
@@ -442,10 +295,9 @@
             <div class="modal-body">
                 <form id="personalForm">
                     <input type="hidden" id="personalId">
-                    
                     <div class="form-row">
                         <div class="form-group"><label>Legajo *</label><input type="text" id="legajo" class="form-control" required></div>
-                        <div class="form-group"><label>Jerarquía</label><select id="jerarquia" class="form-control"><option value="">Seleccionar...</option></select></div>
+                        <div class="form-group"><label>Jerarquía</label><input type="text" id="jerarquia" class="form-control" list="listaJerarquias" placeholder="Escriba para buscar..."><datalist id="listaJerarquias"></datalist></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group"><label>Apellido *</label><input type="text" id="apellido" class="form-control" required></div>
@@ -464,8 +316,8 @@
                         <div class="form-group"><label>Dirección</label><input type="text" id="direccion" class="form-control"></div>
                     </div>
                     
-                    <div class="form-group"><label>Unidad Regional/Superior</label><select id="dependencia_id" class="form-control"><option value="">Seleccionar Unidad Regional/Superior...</option></select></div>
-                    <div class="form-group"><label>Subordinado</label><select id="oficina_id" class="form-control"><option value="">Seleccionar Subordinado...</option></select></div>
+                    <div class="form-group"><label>Unidad Regional</label><select id="dependencia_id" class="form-control"><option value="">Seleccionar...</option></select></div>
+                    <div class="form-group"><label>Subordinado</label><input type="text" id="oficina_id" class="form-control" placeholder="Delegación asignada" readonly></div>
                     <div class="form-group"><label>Sección Guardia</label><select id="seccion_guardia_id" class="form-control"><option value="">Seleccionar...</option></select></div>
                     
                     <div class="form-row">
@@ -483,7 +335,7 @@
                         <h4><i class="fas fa-id-card"></i> Licencia de Conducir</h4>
                         <div class="form-row">
                             <div class="form-group"><label>N° Licencia</label><input type="text" id="nro_licencia_conducir" class="form-control"></div>
-                            <div class="form-group"><label>Categoría</label><select id="licencia_categoria" class="form-control"><option value="">Seleccionar</option></select></div>
+                            <div class="form-group"><label>Categoría</label><input type="text" id="licencia_categoria" class="form-control" list="listaLicenciaCategorias" placeholder="Escriba para buscar..."><datalist id="listaLicenciaCategorias"></datalist></div>
                         </div>
                         <div class="form-row">
                             <div class="form-group"><label>Vencimiento Licencia</label><input type="date" id="fecha_vencimiento_licencia" class="form-control"></div>
@@ -494,7 +346,7 @@
                     <div class="conditional-fields">
                         <h4><i class="fas fa-hospital-user"></i> Obra Social</h4>
                         <div class="form-row">
-                            <div class="form-group"><label>Obra Social</label><select id="obra_social" class="form-control"><option value="">Seleccionar...</option></select></div>
+                            <div class="form-group"><label>Obra Social</label><input type="text" id="obra_social" class="form-control" list="listaObrasSociales" placeholder="Escriba para buscar..."><datalist id="listaObrasSociales"></datalist></div>
                             <div class="form-group"><label>N° Afiliado</label><input type="text" id="obra_social_numero" class="form-control"></div>
                         </div>
                     </div>
@@ -529,7 +381,6 @@
         </div>
     </div>
     
-    <!-- Modal Arma -->
     <div id="armaModal" class="modal">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header"><h3>Registrar Arma</h3><span class="close-modal" onclick="cerrarModalArma()">&times;</span></div>
@@ -547,7 +398,6 @@
         </div>
     </div>
 
-    <!-- Modal Chaleco -->
     <div id="chalecoModal" class="modal">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header"><h3>Registrar Chaleco Antibalas</h3><span class="close-modal" onclick="cerrarModalChaleco()">&times;</span></div>
@@ -565,7 +415,6 @@
         </div>
     </div>
     
-    <!-- Modal Visualizar Documento -->
     <div id="documentoModal" class="modal">
         <div class="modal-content" style="max-width:600px;">
             <div class="modal-header"><h3>Documento</h3><span class="close-modal" onclick="cerrarDocumentoModal()">&times;</span></div>
@@ -586,7 +435,7 @@
             'legajo': 'Legajo', 'jerarquia': 'Jerarquía', 'apellido_nombre': 'Apellido y Nombre',
             'dni': 'DNI', 'sexo': 'Sexo', 'fecha_nacimiento': 'Fecha Nacimiento', 'edad': 'Edad',
             'telefono': 'Teléfono', 'email': 'Email', 'tiene_arma': 'Tiene Arma', 'es_chofer': 'Es Chofer',
-            'oficina': 'Subordinado', 'dependencia': 'Unidad Regional/Superior', 'seccion_guardia': 'Sección Guardia',
+            'oficina': 'Subordinado', 'dependencia': 'Unidad Regional', 'seccion_guardia': 'Sección Guardia',
             'documentos': 'Documentos'
         };
         
@@ -595,7 +444,23 @@
         let armasActuales = [];
         let chalecosActuales = [];
         let documentosActuales = [];
+        let catalogosData = { jerarquias: [], licenciaCategorias: [], obrasSociales: [] };
         
+        let subordinadosDisponibles = [];
+        let subordinadoSeleccionadoGlobal = null;
+        let callbacksFiltroSubordinado = [];
+
+        function esAdministrador() {
+            const user = localStorage.getItem('current_user');
+            if (!user) return false;
+            try {
+                const userData = JSON.parse(user);
+                return (userData.rol_id === 1 || userData.rol === 'Administrador Central' || userData.puede_ver_todas === true);
+            } catch(e) {
+                return false;
+            }
+        }
+
         function getToken() { return localStorage.getItem('jwt_token'); }
         
         function showToast(msg, type) {
@@ -611,6 +476,13 @@
             div.textContent = text;
             return div.innerHTML;
         }
+        
+        function toggleDropdown(event) { event?.stopPropagation(); document.getElementById('dropdownMenu').classList.toggle('show'); }
+        document.addEventListener('click', function(e) { if (!e.target.closest('.user-dropdown')) { document.getElementById('dropdownMenu').classList.remove('show'); } });
+        
+        function aplicarPermisosMenu() { const user = JSON.parse(localStorage.getItem('current_user') || '{}'); const esAdmin = (user.rol_id === 1 || user.rol === 'Administrador Central' || user.puede_ver_todas); document.getElementById('menuUsuarios').style.display = esAdmin ? 'block' : 'none'; document.getElementById('menuConfiguracion').style.display = esAdmin ? 'block' : 'none'; }
+        
+        async function cargarConfiguracionSistema() { try { const response = await fetch(`${API_URL}?endpoint=configuracion_sistema`); const config = await response.json(); if (config && config.nombre_sistema) { document.getElementById('sistemaNombre').textContent = config.nombre_sistema; document.title = config.nombre_sistema + ' - Personal'; } } catch(e) { console.error(e); } }
         
         function calcularEdad(fecha) {
             if (!fecha) return '-';
@@ -638,19 +510,24 @@
             if (tieneArma) document.getElementById('sin_arma_motivo').value = '';
         }
         
-        // ==================== CARGAR CATÁLOGOS ====================
+        function actualizarDatalists() {
+            const listaJerarquias = document.getElementById('listaJerarquias');
+            if (listaJerarquias && catalogosData.jerarquias) { listaJerarquias.innerHTML = catalogosData.jerarquias.map(j => `<option value="${escapeHtml(j.valor)}">`).join(''); }
+            const listaJerarquiasFiltro = document.getElementById('listaJerarquiasFiltro');
+            if (listaJerarquiasFiltro && catalogosData.jerarquias) { listaJerarquiasFiltro.innerHTML = catalogosData.jerarquias.map(j => `<option value="${escapeHtml(j.valor)}">`).join(''); }
+            const listaLicenciaCategorias = document.getElementById('listaLicenciaCategorias');
+            if (listaLicenciaCategorias && catalogosData.licenciaCategorias) { listaLicenciaCategorias.innerHTML = catalogosData.licenciaCategorias.map(c => `<option value="${escapeHtml(c.valor)}">`).join(''); }
+            const listaObrasSociales = document.getElementById('listaObrasSociales');
+            if (listaObrasSociales && catalogosData.obrasSociales) { listaObrasSociales.innerHTML = catalogosData.obrasSociales.map(o => `<option value="${escapeHtml(o.valor)}">`).join(''); }
+        }
+        
         async function cargarJerarquias() {
             try {
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=jerarquias`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await response.json();
-                let items = Array.isArray(data) ? data : (data.data || []);
-                if (items.length) {
-                    const select = document.getElementById('jerarquia');
-                    const filtro = document.getElementById('filtro_jerarquia');
-                    if (select) select.innerHTML = '<option value="">Seleccionar...</option>' + items.map(j => `<option value="${escapeHtml(j.valor)}">${escapeHtml(j.valor)}</option>`).join('');
-                    if (filtro) filtro.innerHTML = '<option value="">Todas</option>' + items.map(j => `<option value="${escapeHtml(j.valor)}">${escapeHtml(j.valor)}</option>`).join('');
-                }
+                catalogosData.jerarquias = Array.isArray(data) ? data : (data.data || []);
+                actualizarDatalists();
             } catch(e) { console.error('Error cargando jerarquías:', e); }
         }
         
@@ -659,33 +536,178 @@
                 const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=obras_sociales`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await response.json();
-                let items = Array.isArray(data) ? data : (data.data || []);
-                if (items.length) {
-                    const select = document.getElementById('obra_social');
-                    if (select) select.innerHTML = '<option value="">Seleccionar...</option>' + items.map(o => `<option value="${escapeHtml(o.valor)}">${escapeHtml(o.valor)}</option>`).join('');
-                }
+                catalogosData.obrasSociales = Array.isArray(data) ? data : (data.data || []);
+                actualizarDatalists();
             } catch(e) { console.error('Error cargando obras sociales:', e); }
         }
         
-        async function cargarSubordinados() {
+        async function cargarCategoriasLicencia() {
             try {
                 const token = getToken();
-                if (!token) return;
+                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=licencia_categorias`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                catalogosData.licenciaCategorias = Array.isArray(data) ? data : (data.data || []);
+                actualizarDatalists();
+            } catch(e) { console.error(e); }
+        }
+        
+        async function cargarSubordinadosGlobal() {
+            try {
+                const token = getToken();
                 const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=oficinas`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const result = await response.json();
-                let subordinados = Array.isArray(result) ? result : (result.data || []);
-                const selectSubordinado = document.getElementById('oficina_id');
-                const filtroSubordinado = document.getElementById('filtro_oficina');
-                if (selectSubordinado) {
-                    selectSubordinado.innerHTML = '<option value="">Seleccionar Subordinado...</option>';
-                    subordinados.forEach(item => { selectSubordinado.add(new Option(item.valor, item.valor)); });
+                const data = await response.json();
+                subordinadosDisponibles = Array.isArray(data) ? data : (data.data || []);
+                return subordinadosDisponibles;
+            } catch(e) { console.error('Error cargando subordinados:', e); return []; }
+        }
+        
+        function actualizarSelectoresSubordinado() {
+            document.querySelectorAll('.subordinado-selector select').forEach(select => {
+                const valorActual = select.value;
+                select.innerHTML = '<option value="">Todos los subordinados</option>' + 
+                    subordinadosDisponibles.map(s => `<option value="${escapeHtml(s.valor)}">${escapeHtml(s.valor)}</option>`).join('');
+                if (valorActual && subordinadosDisponibles.some(s => s.valor === valorActual)) {
+                    select.value = valorActual;
+                } else if (subordinadoSeleccionadoGlobal) {
+                    select.value = subordinadoSeleccionadoGlobal;
                 }
-                if (filtroSubordinado) {
-                    filtroSubordinado.innerHTML = '<option value="">Todos</option>';
-                    subordinados.forEach(item => { filtroSubordinado.add(new Option(item.valor, item.valor)); });
+            });
+        }
+
+        function setFiltroSubordinado(valor) {
+            subordinadoSeleccionadoGlobal = valor || null;
+            if (subordinadoSeleccionadoGlobal) {
+                localStorage.setItem('filtro_subordinado_global', subordinadoSeleccionadoGlobal);
+            } else {
+                localStorage.removeItem('filtro_subordinado_global');
+            }
+            actualizarSelectoresSubordinado();
+            actualizarIndicadoresFiltro();
+            notificarCambioFiltroSubordinado();
+        }
+
+        function getFiltroSubordinado() {
+            return subordinadoSeleccionadoGlobal;
+        }
+
+        function actualizarIndicadoresFiltro() {
+            const indicadores = document.querySelectorAll('.filtro-activo-indicador');
+            if (subordinadoSeleccionadoGlobal) {
+                indicadores.forEach(ind => {
+                    ind.style.display = 'inline-flex';
+                    const nombreSpan = ind.querySelector('.filtro-nombre');
+                    if (nombreSpan) nombreSpan.textContent = subordinadoSeleccionadoGlobal;
+                });
+            } else {
+                indicadores.forEach(ind => {
+                    ind.style.display = 'none';
+                });
+            }
+        }
+
+        function limpiarFiltroSubordinado() {
+            setFiltroSubordinado(null);
+            loadPersonal();
+        }
+
+        function onSelectorSubordinadoChange(valor) {
+            setFiltroSubordinado(valor);
+            loadPersonal();
+        }
+
+        function cargarFiltroGuardado() {
+            const saved = localStorage.getItem('filtro_subordinado_global');
+            if (saved) {
+                subordinadoSeleccionadoGlobal = saved;
+            }
+            actualizarIndicadoresFiltro();
+        }
+        
+        function registrarCallbackFiltroSubordinado(callback) {
+            if (typeof callback === 'function') {
+                callbacksFiltroSubordinado.push(callback);
+            }
+        }
+        
+        function notificarCambioFiltroSubordinado() {
+            callbacksFiltroSubordinado.forEach(callback => {
+                try {
+                    callback(subordinadoSeleccionadoGlobal);
+                } catch(e) {
+                    console.error('Error en callback:', e);
                 }
-                console.log(`✅ Subordinados cargados: ${subordinados.length}`);
-            } catch(e) { console.error('Error cargando subordinados:', e); showToast('Error cargando lista de subordinados', 'error'); }
+            });
+        }
+
+        async function initPersonalHeader() {
+            await cargarSubordinadosGlobal();
+            cargarFiltroGuardado();
+            
+            const container = document.querySelector('.container');
+            const esAdmin = esAdministrador();
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const subordinadoNombre = user.subordinado_nombre || user.subordinado_valor || '';
+            const tieneSubordinado = user.subordinado_id && user.subordinado_id > 0;
+            
+            let selectorHtml = '';
+            if (esAdmin) {
+                selectorHtml = `
+                    <div class="subordinado-selector">
+                        <i class="fas fa-building"></i>
+                        <select id="selectorSubordinadoPersonal" onchange="onSelectorSubordinadoChange(this.value)">
+                            <option value="">Todos los subordinados</option>
+                        </select>
+                    </div>
+                    <div class="filtro-activo-indicador" style="display: none;">
+                        <i class="fas fa-filter"></i>
+                        Filtrando por: <span class="filtro-nombre"></span>
+                        <i class="fas fa-times-circle limpiar-filtro" onclick="limpiarFiltroSubordinado()" title="Limpiar filtro"></i>
+                    </div>
+                `;
+            } else if (tieneSubordinado && subordinadoNombre) {
+                selectorHtml = `
+                    <div class="subordinado-actual">
+                        <i class="fas fa-building"></i>
+                        <span class="subordinado-nombre">${escapeHtml(subordinadoNombre)}</span>
+                    </div>
+                `;
+            }
+            
+            const headerHtml = `
+                <div class="card-header-con-filtro">
+                    <div class="card-header-left">
+                        <h1><i class="fas fa-users"></i> Gestión de Personal</h1>
+                        ${selectorHtml}
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button id="btnSeccionesGuardia" class="btn-config" onclick="window.location.href='secciones_guardia.html'"><i class="fas fa-layer-group"></i> Secciones</button>
+                        <button id="btnConfigurarColumnas" class="btn-config"><i class="fas fa-columns"></i> Personalizar</button>
+                        <button id="btnNuevoPersonal" class="btn btn-primary" onclick="openPersonalModal()"><i class="fas fa-plus"></i> Nuevo</button>
+                    </div>
+                </div>
+            `;
+            
+            const oldHeader = document.querySelector('.card-header-con-filtro');
+            if (oldHeader) oldHeader.remove();
+            const exportDiv = document.querySelector('.export-categorias');
+            if (exportDiv) {
+                exportDiv.insertAdjacentHTML('beforebegin', headerHtml);
+            } else {
+                container.insertAdjacentHTML('afterbegin', headerHtml);
+            }
+            
+            if (esAdmin) {
+                actualizarSelectoresSubordinado();
+                actualizarIndicadoresFiltro();
+                document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => { 
+                    openConfigModal(); 
+                    loadColumnConfig(); 
+                });
+            }
+            
+            registrarCallbackFiltroSubordinado(async () => {
+                await loadPersonal();
+            });
         }
         
         async function cargarUnidadesRegionales() {
@@ -696,36 +718,32 @@
                 let unidades = Array.isArray(data) ? data : (data.data || []);
                 const select = document.getElementById('dependencia_id');
                 const filtro = document.getElementById('filtro_dependencia');
-                if (select) select.innerHTML = '<option value="">Seleccionar Unidad Regional/Superior...</option>' + unidades.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
+                if (select) select.innerHTML = '<option value="">Seleccionar...</option>' + unidades.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
                 if (filtro) filtro.innerHTML = '<option value="">Todas</option>' + unidades.map(d => `<option value="${d.id}">${escapeHtml(d.nombre)}</option>`).join('');
             } catch(e) { console.error('Error cargando unidades regionales:', e); }
-        }
-        
-        async function cargarCategoriasLicencia() {
-            try {
-                const token = getToken();
-                const response = await fetch(`${API_URL}?endpoint=catalogos&tipo=licencia_categorias`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await response.json();
-                let items = Array.isArray(data) ? data : (data.data || []);
-                const select = document.getElementById('licencia_categoria');
-                if (select) select.innerHTML = '<option value="">Seleccionar</option>' + items.map(c => `<option value="${escapeHtml(c.valor)}">${escapeHtml(c.valor)}</option>`).join('');
-            } catch(e) { console.error(e); }
         }
         
         async function cargarSeccionesGuardia() {
             try {
                 const token = getToken();
-                const response = await fetch(`${API_URL}?endpoint=secciones_guardia`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const response = await fetch(`${API_URL}?endpoint=secciones_guardia`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 const data = await response.json();
                 let secciones = Array.isArray(data) ? data : (data.data || []);
-                const select = document.getElementById('seccion_guardia_id');
-                const filtroSelect = document.getElementById('filtro_seccion');
-                if (select) select.innerHTML = '<option value="">Seleccionar...</option>' + secciones.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
-                if (filtroSelect) filtroSelect.innerHTML = '<option value="">Todas</option>' + secciones.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+                const selectSeccion = document.getElementById('seccion_guardia_id');
+                const filtroSeccion = document.getElementById('filtro_seccion');
+                if (selectSeccion) {
+                    selectSeccion.innerHTML = '<option value="">Seleccionar...</option>' + 
+                        secciones.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+                }
+                if (filtroSeccion) {
+                    filtroSeccion.innerHTML = '<option value="">Todas</option>' + 
+                        secciones.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+                }
             } catch(e) { console.error(e); }
         }
         
-        // ==================== DOCUMENTOS ====================
         async function cargarDocumentosPorAgente(personalId) {
             if (!personalId) return [];
             try {
@@ -831,7 +849,6 @@
             modal.style.display = 'flex';
         }
         
-        // ==================== EQUIPAMIENTO ====================
         async function cargarArmas(personalId) {
             if (!personalId) return;
             try {
@@ -1016,7 +1033,6 @@
             } catch(e) { showToast('Error', 'error'); }
         }
         
-        // ==================== PDF INDIVIDUAL ====================
         async function generarPDFIndividual(id) {
             showToast('Generando PDF individual...', 'info');
             try {
@@ -1045,7 +1061,7 @@
                 doc.text(`Teléfono: ${p.telefono || '-'}`, 14, y); y += 7;
                 doc.text(`Email: ${p.email || '-'}`, 14, y); y += 7;
                 doc.text(`Subordinado: ${p.oficina || '-'}`, 14, y); y += 7;
-                doc.text(`Unidad Regional/Superior: ${p.dependencia_nombre || '-'}`, 14, y); y += 7;
+                doc.text(`Unidad Regional: ${p.dependencia_nombre || '-'}`, 14, y); y += 7;
                 doc.text(`Sección Guardia: ${p.seccion_guardia_nombre || '-'}`, 14, y); y += 7;
                 doc.text(`Dirección: ${p.direccion || '-'}`, 14, y); y += 10;
                 doc.setFontSize(12); doc.setTextColor(29, 78, 216); doc.text('TENENCIA DE ARMA', 14, y); y += 7;
@@ -1085,7 +1101,6 @@
             } catch(e) { showToast('Error generando PDF: ' + e.message, 'error'); }
         }
         
-        // ==================== RENDER TABLA ====================
         function renderTable() {
             const thead = document.getElementById('tableHeader');
             const tbody = document.getElementById('personalTableBody');
@@ -1093,7 +1108,7 @@
             thead.innerHTML = '<tr>' + activeColumns.map(col => `<th class="draggable" data-col="${col}" draggable="true"><span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> ${allColumnsInfo[col] || col}</th>`).join('') + '<th>Acciones</th></tr>';
             initHeaderDragDrop();
             const datosValidos = personalData.filter(item => item.legajo && item.legajo.trim() !== '');
-            if (!datosValidos || datosValidos.length === 0) { tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay registros</td></tr>'; return; }
+            if (!datosValidos || datosValidos.length === 0) { tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay registros<\/tr>'; return; }
             tbody.innerHTML = datosValidos.map(item => {
                 const cantDocs = (documentosPorAgente[item.id] || []).length;
                 let row = '<tr>';
@@ -1129,9 +1144,7 @@
             });
         }
         
-        async function saveColumnOrder() {
-            try { const token = getToken(); await fetch(`${API_URL}?endpoint=table_config&tabla=personal`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ columnas: activeColumns }) }); } catch(e) { console.error(e); }
-        }
+        async function saveColumnOrder() { try { const token = getToken(); await fetch(`${API_URL}?endpoint=table_config&tabla=personal`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ columnas: activeColumns }) }); } catch(e) { console.error(e); } }
         
         function openConfigModal() { document.getElementById('configPanel').style.display = 'block'; renderOrderList(); }
         
@@ -1158,7 +1171,6 @@
             });
         }
         
-        // ==================== EXPORTACIONES ====================
         function exportarPDFCategoria(categoria) {
             if (!personalData.length) { showToast('No hay datos para exportar', 'warning'); return; }
             showToast(`Generando PDF por categoría...`, 'info');
@@ -1174,13 +1186,14 @@
                 else if (categoria === 'mes_cumple') { titulo = 'Personal por Mes de Cumpleaños'; const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; agrupados = datosValidos.reduce((acc, p) => { if (p.fecha_nacimiento) { const mes = new Date(p.fecha_nacimiento).getMonth(); const key = meses[mes]; if (!acc[key]) acc[key] = []; acc[key].push(p); } else { if (!acc['Sin fecha']) acc['Sin fecha'] = []; acc['Sin fecha'].push(p); } return acc; }, {}); }
                 else if (categoria === 'tiene_arma') { titulo = 'Personal por Tenencia de Arma'; agrupados = datosValidos.reduce((acc, p) => { const key = p.tiene_arma == 1 ? 'Con Arma' : 'Sin Arma'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); }
                 else if (categoria === 'es_chofer') { titulo = 'Personal por Chofer'; agrupados = datosValidos.reduce((acc, p) => { const key = p.es_chofer == 1 ? 'Es Chofer' : 'No Chofer'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); }
-                else if (categoria === 'dependencia') { titulo = 'Personal por Unidad Regional/Superior'; agrupados = datosValidos.reduce((acc, p) => { const key = p.dependencia_nombre || 'Sin dependencia'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); }
+                else if (categoria === 'dependencia') { titulo = 'Personal por Unidad Regional'; agrupados = datosValidos.reduce((acc, p) => { const key = p.dependencia_nombre || 'Sin dependencia'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); }
                 else if (categoria === 'oficina') { titulo = 'Personal por Subordinado'; agrupados = datosValidos.reduce((acc, p) => { const key = p.oficina || 'Sin oficina'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); }
                 else if (categoria === 'edad_rango') { titulo = 'Personal por Rango de Edad'; agrupados = datosValidos.reduce((acc, p) => { const edad = calcularEdad(p.fecha_nacimiento); const rango = getRangoEdad(edad); if (!acc[rango]) acc[rango] = []; acc[rango].push(p); return acc; }, {}); }
                 else if (categoria === 'seccion_guardia') { titulo = 'Personal por Sección de Guardia'; agrupados = datosValidos.reduce((acc, p) => { const key = p.seccion_guardia_nombre || 'Sin sección'; if (!acc[key]) acc[key] = []; acc[key].push(p); return acc; }, {}); }
                 else { return; }
                 doc.setFontSize(18); doc.setTextColor(29,78,216); doc.text(titulo, 14, y); y += 10;
                 doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text(`Generado: ${new Date().toLocaleString()}`, 14, y); y += 8;
+                if (getFiltroSubordinado()) { doc.text(`Filtro por Subordinado: ${getFiltroSubordinado()}`, 14, y); y += 8; }
                 doc.text(`Total de agentes: ${datosValidos.length}`, 14, y); y += 15;
                 for (const [catNombre, items] of Object.entries(agrupados)) {
                     if (y > 250) { doc.addPage(); y = 20; }
@@ -1204,11 +1217,12 @@
                 const doc = new jsPDF('landscape', 'mm', 'a4');
                 doc.setFontSize(18); doc.setTextColor(29,78,216); doc.text('REPORTE COMPLETO DE PERSONAL', 14,20);
                 doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text(`Generado: ${new Date().toLocaleString()}`, 14,30);
-                doc.text(`Total de agentes: ${personalData.length}`, 14,37);
+                if (getFiltroSubordinado()) { doc.text(`Filtro por Subordinado: ${getFiltroSubordinado()}`, 14,38); }
+                doc.text(`Total de agentes: ${personalData.length}`, 14,45);
                 const datosValidos = personalData.filter(p => p.legajo && p.legajo.trim() !== '');
-                const headers = [['Legajo','Apellido','Nombre','DNI','Jerarquía','Sexo','Edad','Teléfono','Email','Tiene Arma','Es Chofer','Subordinado','Unidad Regional/Superior','Sección Guardia']];
+                const headers = [['Legajo','Apellido','Nombre','DNI','Jerarquía','Sexo','Edad','Teléfono','Email','Tiene Arma','Es Chofer','Subordinado','Unidad Regional','Sección Guardia']];
                 const data = datosValidos.map(p => [p.legajo||'-', p.apellido||'-', p.nombre||'-', p.dni||'-', p.jerarquia||'-', p.sexo||'-', calcularEdad(p.fecha_nacimiento).toString(), p.telefono||'-', p.email||'-', p.tiene_arma==1?'Sí':'No', p.es_chofer==1?'Sí':'No', p.oficina||'-', p.dependencia_nombre||'-', p.seccion_guardia_nombre||'-']);
-                doc.autoTable({ head: headers, body: data, startY: 45, theme: 'grid', headStyles: { fillColor: [29,78,216], textColor: [255,255,255], fontSize: 8 }, bodyStyles: { fontSize: 7, textColor: [50,50,50] }, alternateRowStyles: { fillColor: [240,240,240] }, margin: { left: 8, right: 8 } });
+                doc.autoTable({ head: headers, body: data, startY: 52, theme: 'grid', headStyles: { fillColor: [29,78,216], textColor: [255,255,255], fontSize: 8 }, bodyStyles: { fontSize: 7, textColor: [50,50,50] }, alternateRowStyles: { fillColor: [240,240,240] }, margin: { left: 8, right: 8 } });
                 doc.save(`reporte_personal_completo_${new Date().toISOString().split('T')[0]}.pdf`);
                 showToast('PDF completo generado correctamente', 'success');
             } catch(e) { showToast('Error generando PDF: ' + e.message, 'error'); }
@@ -1223,6 +1237,7 @@
                 let y = 20;
                 doc.setFontSize(18); doc.setTextColor(29,78,216); doc.text('RESUMEN DE PERSONAL', 14, y); y += 10;
                 doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text(`Generado: ${new Date().toLocaleString()}`, 14, y); y += 8;
+                if (getFiltroSubordinado()) { doc.text(`Filtro por Subordinado: ${getFiltroSubordinado()}`, 14, y); y += 8; }
                 const datosValidos = personalData.filter(p => p.legajo && p.legajo.trim() !== '');
                 doc.text(`Total de agentes: ${datosValidos.length}`, 14, y); y += 15;
                 const porJerarquia = {}; datosValidos.forEach(p => { const k = p.jerarquia || 'Sin especificar'; porJerarquia[k] = (porJerarquia[k] || 0) + 1; });
@@ -1249,14 +1264,18 @@
             } catch(e) { showToast('Error generando PDF resumen: ' + e.message, 'error'); }
         }
         
-        // ==================== CRUD PERSONAL ====================
         async function loadPersonal() {
             const tbody = document.getElementById('personalTableBody');
             if (tbody) tbody.innerHTML = '';
             try {
                 const token = getToken();
                 if (!token) { window.location.href = 'index.html'; return; }
-                const response = await fetch(`${API_URL}?endpoint=personal`, { headers: { 'Authorization': `Bearer ${token}` } });
+                let url = `${API_URL}?endpoint=personal`;
+                const filtroSub = getFiltroSubordinado();
+                if (filtroSub) {
+                    url += `&subordinado=${encodeURIComponent(filtroSub)}`;
+                }
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await response.json();
                 if (Array.isArray(data)) {
                     personalData = data.filter(item => item.legajo && item.legajo.trim() !== '');
@@ -1315,15 +1334,50 @@
         function openPersonalModal(data = null) {
             const modal = document.getElementById('personalModal');
             if (!modal) return;
-            cargarJerarquias(); cargarObrasSociales(); cargarSubordinados(); cargarUnidadesRegionales(); cargarCategoriasLicencia(); cargarSeccionesGuardia();
+            
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const esAdmin = esAdministrador();
+            const userSubordinadoValor = user.subordinado_valor || '';
+            
+            const oficinaInput = document.getElementById('oficina_id');
+            
+            // Configurar campo subordinado según el tipo de usuario
+            if (!esAdmin && userSubordinadoValor) {
+                oficinaInput.value = userSubordinadoValor;
+                oficinaInput.readOnly = true;
+                oficinaInput.disabled = false;
+                oficinaInput.style.backgroundColor = 'var(--bg-surface)';
+                oficinaInput.style.opacity = '0.7';
+                oficinaInput.style.cursor = 'not-allowed';
+            } else if (esAdmin) {
+                oficinaInput.readOnly = false;
+                oficinaInput.disabled = false;
+                oficinaInput.style.backgroundColor = '';
+                oficinaInput.style.opacity = '';
+                oficinaInput.style.cursor = 'text';
+                oficinaInput.placeholder = 'Seleccionar subordinado...';
+            }
+            
+            cargarJerarquias(); 
+            cargarObrasSociales(); 
+            cargarSubordinadosGlobal(); 
+            cargarUnidadesRegionales(); 
+            cargarCategoriasLicencia(); 
+            cargarSeccionesGuardia();
+            
             if (data) {
                 document.getElementById('personalId').value = data.id;
-                document.getElementById('legajo').value = data.legajo || ''; document.getElementById('jerarquia').value = data.jerarquia || '';
-                document.getElementById('apellido').value = data.apellido || ''; document.getElementById('nombre').value = data.nombre || '';
-                document.getElementById('dni').value = data.dni || ''; document.getElementById('sexo').value = data.sexo || '';
-                document.getElementById('fecha_nacimiento').value = data.fecha_nacimiento || ''; document.getElementById('telefono').value = data.telefono || '';
-                document.getElementById('email').value = data.email || ''; document.getElementById('direccion').value = data.direccion || '';
-                document.getElementById('dependencia_id').value = data.dependencia_id || ''; document.getElementById('oficina_id').value = data.oficina || '';
+                document.getElementById('legajo').value = data.legajo || '';
+                document.getElementById('jerarquia').value = data.jerarquia || '';
+                document.getElementById('apellido').value = data.apellido || '';
+                document.getElementById('nombre').value = data.nombre || '';
+                document.getElementById('dni').value = data.dni || '';
+                document.getElementById('sexo').value = data.sexo || '';
+                document.getElementById('fecha_nacimiento').value = data.fecha_nacimiento || '';
+                document.getElementById('telefono').value = data.telefono || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('direccion').value = data.direccion || '';
+                document.getElementById('dependencia_id').value = data.dependencia_id || '';
                 document.getElementById('seccion_guardia_id').value = data.seccion_guardia_id || '';
                 document.getElementById('tiene_arma').value = data.tiene_arma == 1 ? '1' : '0';
                 document.getElementById('sin_arma_motivo').value = data.sin_arma_motivo || '';
@@ -1334,15 +1388,20 @@
                 document.getElementById('obra_social').value = data.obra_social || '';
                 document.getElementById('obra_social_numero').value = data.obra_social_numero || '';
                 document.getElementById('modalTitle').textContent = 'Editar Personal';
-                cargarDocumentos(data.id); cargarArmas(data.id).then(() => mostrarArmas()); cargarChalecos(data.id);
+                cargarDocumentos(data.id);
+                cargarArmas(data.id).then(() => mostrarArmas());
+                cargarChalecos(data.id);
             } else {
                 document.getElementById('personalForm').reset();
                 document.getElementById('personalId').value = '';
                 document.getElementById('tiene_arma').value = '0';
                 document.getElementById('es_chofer').value = '0';
                 document.getElementById('modalTitle').textContent = 'Nuevo Personal';
-                documentosActuales = []; armasActuales = []; chalecosActuales = [];
-                renderDocumentosList(); mostrarArmas();
+                documentosActuales = [];
+                armasActuales = [];
+                chalecosActuales = [];
+                renderDocumentosList();
+                mostrarArmas();
             }
             toggleArmamentoFields();
             modal.style.display = 'flex';
@@ -1350,29 +1409,67 @@
         
         async function savePersonal() {
             const id = document.getElementById('personalId').value;
+            const esAdmin = esAdministrador();
+            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+            const userSubordinadoValor = user.subordinado_valor || '';
+            
+            let oficinaValue = document.getElementById('oficina_id').value;
+            
+            // Si no es admin y tiene subordinado asignado, forzar ese valor
+            if (!esAdmin && userSubordinadoValor) {
+                oficinaValue = userSubordinadoValor;
+            }
+            
             const data = {
-                legajo: document.getElementById('legajo').value, jerarquia: document.getElementById('jerarquia').value,
-                apellido: document.getElementById('apellido').value, nombre: document.getElementById('nombre').value,
-                dni: document.getElementById('dni').value, sexo: document.getElementById('sexo').value,
-                fecha_nacimiento: document.getElementById('fecha_nacimiento').value, telefono: document.getElementById('telefono').value,
-                email: document.getElementById('email').value, oficina: document.getElementById('oficina_id').value,
-                dependencia_id: document.getElementById('dependencia_id').value, seccion_guardia_id: document.getElementById('seccion_guardia_id').value || null,
-                direccion: document.getElementById('direccion').value, tiene_arma: parseInt(document.getElementById('tiene_arma').value),
-                sin_arma_motivo: document.getElementById('sin_arma_motivo').value, nro_licencia_conducir: document.getElementById('nro_licencia_conducir').value,
-                licencia_categoria: document.getElementById('licencia_categoria').value, fecha_vencimiento_licencia: document.getElementById('fecha_vencimiento_licencia').value,
-                es_chofer: parseInt(document.getElementById('es_chofer').value), obra_social: document.getElementById('obra_social').value,
-                obra_social_numero: document.getElementById('obra_social_numero').value
+                legajo: document.getElementById('legajo').value.trim(),
+                jerarquia: document.getElementById('jerarquia').value || null,
+                apellido: document.getElementById('apellido').value.trim(),
+                nombre: document.getElementById('nombre').value.trim(),
+                dni: document.getElementById('dni').value.trim(),
+                sexo: document.getElementById('sexo').value || null,
+                oficina: oficinaValue,
+                dependencia_id: document.getElementById('dependencia_id').value || null,
+                seccion_guardia_id: document.getElementById('seccion_guardia_id').value || null,
+                fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
+                tiene_arma: parseInt(document.getElementById('tiene_arma').value) || 0,
+                sin_arma_motivo: document.getElementById('sin_arma_motivo').value || null,
+                nro_licencia_conducir: document.getElementById('nro_licencia_conducir').value || null,
+                licencia_categoria: document.getElementById('licencia_categoria').value || null,
+                fecha_vencimiento_licencia: document.getElementById('fecha_vencimiento_licencia').value || null,
+                es_chofer: parseInt(document.getElementById('es_chofer').value) || 0,
+                obra_social: document.getElementById('obra_social').value || null,
+                obra_social_numero: document.getElementById('obra_social_numero').value || null,
+                telefono: document.getElementById('telefono').value || null,
+                email: document.getElementById('email').value || null,
+                direccion: document.getElementById('direccion').value || null
             };
-            if (!data.legajo || !data.apellido || !data.nombre || !data.dni) { showToast('Complete campos requeridos', 'warning'); return; }
+            
+            if (!data.legajo) { showToast('El legajo es requerido', 'warning'); return; }
+            if (!data.apellido) { showToast('El apellido es requerido', 'warning'); return; }
+            if (!data.nombre) { showToast('El nombre es requerido', 'warning'); return; }
+            if (!data.dni) { showToast('El DNI es requerido', 'warning'); return; }
+            
             try {
                 const token = getToken();
                 const url = id ? `${API_URL}?endpoint=personal&id=${id}` : `${API_URL}?endpoint=personal`;
                 const method = id ? 'PUT' : 'POST';
-                const response = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(data) });
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
                 const result = await response.json();
-                if (result.success) { showToast(`Personal ${id ? 'actualizado' : 'creado'} correctamente`, 'success'); closeModal(); loadPersonal(); }
-                else { showToast('Error al guardar', 'error'); }
-            } catch(e) { showToast('Error de conexión', 'error'); }
+                if (result.success) {
+                    showToast(`Personal ${id ? 'actualizado' : 'creado'} correctamente`, 'success');
+                    closeModal();
+                    loadPersonal();
+                } else {
+                    showToast('Error al guardar: ' + (result.error || 'Desconocido'), 'error');
+                }
+            } catch(e) {
+                console.error('Error:', e);
+                showToast('Error de conexión: ' + e.message, 'error');
+            }
         }
         
         async function editPersonal(id) {
@@ -1401,33 +1498,72 @@
             const user = localStorage.getItem('current_user');
             if (!user) { window.location.href = 'index.html'; return false; }
             const userData = JSON.parse(user);
-            document.getElementById('userInfo').innerHTML = `<span>${escapeHtml(userData.nombre)}</span><span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            const userInfoEl = document.querySelector('#userInfo');
+            if (userInfoEl) {
+                userInfoEl.innerHTML = `${escapeHtml(userData.nombre)} <span class="badge badge-info">${escapeHtml(userData.rol)}</span>`;
+            }
             return true;
         }
         
-        document.getElementById('btnConfigurarColumnas')?.addEventListener('click', () => { openConfigModal(); loadColumnConfig(); });
+        function handleLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+        function toggleMobileMenu() { document.querySelector('.nav-menu')?.classList.toggle('active'); }
+        
         document.getElementById('btnCerrarConfig')?.addEventListener('click', () => { document.getElementById('configPanel').style.display = 'none'; });
         document.getElementById('btnGuardarConfig')?.addEventListener('click', saveColumnConfig);
         document.getElementById('btnResetColumns')?.addEventListener('click', resetColumns);
-        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.clear(); window.location.href = 'index.html'; });
-        document.querySelector('.hamburger')?.addEventListener('click', () => { document.querySelector('.nav-menu')?.classList.toggle('active'); });
+        document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+        document.querySelector('.hamburger')?.addEventListener('click', toggleMobileMenu);
         document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
         
-        document.addEventListener('DOMContentLoaded', () => { if (checkAuth()) { cargarJerarquias(); cargarObrasSociales(); cargarSubordinados(); cargarUnidadesRegionales(); cargarCategoriasLicencia(); cargarSeccionesGuardia(); loadPersonal(); } });
+        document.addEventListener('DOMContentLoaded', async () => { 
+            if (checkAuth()) { 
+                aplicarPermisosMenu();
+                cargarConfiguracionSistema();
+                await initPersonalHeader();
+                cargarJerarquias(); 
+                cargarObrasSociales(); 
+                cargarSubordinadosGlobal(); 
+                cargarUnidadesRegionales(); 
+                cargarCategoriasLicencia(); 
+                await cargarSeccionesGuardia();
+                await loadPersonal();
+            } 
+        });
         
-        window.openPersonalModal = openPersonalModal; window.savePersonal = savePersonal; window.editPersonal = editPersonal; window.deletePersonal = deletePersonal;
-        window.closeModal = closeModal; window.aplicarFiltros = aplicarFiltros; window.limpiarFiltros = limpiarFiltros;
-        window.exportarPDFCompleto = exportarPDFCompleto; window.exportarPDFResumen = exportarPDFResumen; window.exportarPDFCategoria = exportarPDFCategoria;
-        window.toggleArmamentoFields = toggleArmamentoFields; window.generarPDFIndividual = generarPDFIndividual;
-        window.subirDocumento = subirDocumento; window.verDocumento = verDocumento; window.cerrarDocumentoModal = cerrarDocumentoModal;
-        window.eliminarDocumento = eliminarDocumento; window.verDocumentosAgente = verDocumentosAgente;
-        window.mostrarArmas = mostrarArmas; window.mostrarChalecos = mostrarChalecos;
-        window.agregarArma = agregarArma; window.agregarChaleco = agregarChaleco;
-        window.editarArma = editarArma; window.editarChaleco = editarChaleco;
-        window.eliminarArma = eliminarArma; window.eliminarChaleco = eliminarChaleco;
-        window.guardarArma = guardarArma; window.guardarChaleco = guardarChaleco;
-        window.cerrarModalArma = cerrarModalArma; window.cerrarModalChaleco = cerrarModalChaleco;
+        window.openPersonalModal = openPersonalModal; 
+        window.savePersonal = savePersonal; 
+        window.editPersonal = editPersonal; 
+        window.deletePersonal = deletePersonal;
+        window.closeModal = closeModal; 
+        window.aplicarFiltros = aplicarFiltros; 
+        window.limpiarFiltros = limpiarFiltros;
+        window.exportarPDFCompleto = exportarPDFCompleto; 
+        window.exportarPDFResumen = exportarPDFResumen; 
+        window.exportarPDFCategoria = exportarPDFCategoria;
+        window.toggleArmamentoFields = toggleArmamentoFields; 
+        window.generarPDFIndividual = generarPDFIndividual;
+        window.subirDocumento = subirDocumento; 
+        window.verDocumento = verDocumento; 
+        window.cerrarDocumentoModal = cerrarDocumentoModal;
+        window.eliminarDocumento = eliminarDocumento; 
+        window.verDocumentosAgente = verDocumentosAgente;
+        window.mostrarArmas = mostrarArmas; 
+        window.mostrarChalecos = mostrarChalecos;
+        window.agregarArma = agregarArma; 
+        window.agregarChaleco = agregarChaleco;
+        window.editarArma = editarArma; 
+        window.editarChaleco = editarChaleco;
+        window.eliminarArma = eliminarArma; 
+        window.eliminarChaleco = eliminarChaleco;
+        window.guardarArma = guardarArma; 
+        window.guardarChaleco = guardarChaleco;
+        window.cerrarModalArma = cerrarModalArma; 
+        window.cerrarModalChaleco = cerrarModalChaleco;
+        window.toggleDropdown = toggleDropdown;
+        window.onSelectorSubordinadoChange = onSelectorSubordinadoChange;
+        window.limpiarFiltroSubordinado = limpiarFiltroSubordinado;
     </script>
     <script src="theme.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

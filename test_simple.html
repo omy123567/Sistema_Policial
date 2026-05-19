@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Simple</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #0d1117; color: #e6edf3; }
+        .success { color: #16a34a; }
+        .error { color: #dc2626; }
+        pre { background: #161b22; padding: 10px; border-radius: 8px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test de API</h1>
+    <div id="resultados"></div>
+    
+    <script>
+        async function testAPI() {
+            const resultados = document.getElementById('resultados');
+            resultados.innerHTML = '<p>Probando API...</p>';
+            
+            // 1. Probar login
+            try {
+                const loginRes = await fetch('backend/auth.php?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                const loginData = await loginRes.json();
+                
+                if (loginData.success) {
+                    localStorage.setItem('jwt_token', loginData.token);
+                    resultados.innerHTML += '<p class="success">✅ Login exitoso</p>';
+                    
+                    // 2. Probar obtener personal
+                    const personalRes = await fetch('backend/api.php?endpoint=personal', {
+                        headers: { 'Authorization': `Bearer ${loginData.token}` }
+                    });
+                    const personalData = await personalRes.json();
+                    resultados.innerHTML += `<p>✅ Personal: ${personalData.length} registros encontrados</p>`;
+                    resultados.innerHTML += `<pre>${JSON.stringify(personalData.slice(0, 3), null, 2)}</pre>`;
+                    
+                    // 3. Probar obtener catálogos
+                    const catalogosRes = await fetch('backend/api.php?endpoint=catalogos&tipo=tipos_recargo', {
+                        headers: { 'Authorization': `Bearer ${loginData.token}` }
+                    });
+                    const catalogosData = await catalogosRes.json();
+                    resultados.innerHTML += `<p>✅ Catálogos tipos_recargo: ${catalogosData.length} registros</p>`;
+                    
+                } else {
+                    resultados.innerHTML += `<p class="error">❌ Login fallido: ${loginData.error}</p>`;
+                }
+            } catch(e) {
+                resultados.innerHTML += `<p class="error">❌ Error: ${e.message}</p>`;
+            }
+        }
+        
+        testAPI();
+    </script>
+</body>
+</html>

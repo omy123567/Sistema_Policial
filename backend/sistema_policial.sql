@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-05-2026 a las 15:04:53
+-- Tiempo de generación: 19-05-2026 a las 15:01:52
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -66,6 +66,14 @@ CREATE TABLE `bitacora` (
   `user_agent` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `bitacora`
+--
+
+INSERT INTO `bitacora` (`id`, `usuario_id`, `accion`, `tabla_afectada`, `registro_id`, `detalles`, `ip_address`, `user_agent`, `created_at`) VALUES
+(1, 4, 'login', NULL, NULL, NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-11 15:12:40'),
+(2, 4, 'login', NULL, NULL, 'Inicio de sesión desde IP', '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', '2026-05-11 15:12:40');
 
 -- --------------------------------------------------------
 
@@ -152,7 +160,6 @@ INSERT INTO `catalogos` (`id`, `tipo`, `dependencia_id`, `valor`, `orden`, `acti
 (191, 'tipo_oficio', NULL, 'Nota V', 3, 1, '2026-05-06 11:33:29'),
 (192, 'tipo_oficio', NULL, 'Memorandum', 4, 1, '2026-05-06 11:33:35'),
 (193, 'tipos_recargo', NULL, 'Recargo Guardia', 4, 1, '2026-05-06 12:05:35'),
-(194, 'oficinas', 1, 'Delegacion Laguna Blanca', 1, 1, '2026-05-08 14:38:43'),
 (195, 'oficinas', 1, 'Delegacion Criminalística C-5', 2, 1, '2026-05-08 22:38:58'),
 (196, 'oficinas', 1, 'Delegacion Pirané', 3, 1, '2026-05-08 22:39:08'),
 (197, 'oficinas', 1, 'Direccion de Policia Cientifica', 4, 1, '2026-05-08 22:47:50'),
@@ -163,7 +170,8 @@ INSERT INTO `catalogos` (`id`, `tipo`, `dependencia_id`, `valor`, `orden`, `acti
 (204, 'oficinas', 1, 'Delegacion Ibarreta', 9, 1, '2026-05-08 22:49:19'),
 (205, 'oficinas', 1, 'Delegacion Nueva Formosa', 10, 1, '2026-05-08 22:49:25'),
 (206, 'oficinas', 1, 'Division Investigación Ciberdelitos', 11, 1, '2026-05-08 22:49:44'),
-(207, 'oficinas', 1, 'Division Informatica Forense', 12, 1, '2026-05-08 22:49:51');
+(207, 'oficinas', 1, 'Division Informatica Forense', 12, 1, '2026-05-08 22:49:51'),
+(209, 'oficinas', 1, 'Delegacion Laguna Blanca', 0, 1, '2026-05-11 23:48:03');
 
 -- --------------------------------------------------------
 
@@ -210,7 +218,7 @@ CREATE TABLE `dashboard_config` (
 --
 
 INSERT INTO `dashboard_config` (`id`, `usuario_id`, `widgets`, `created_at`, `updated_at`) VALUES
-(1, 1, '[\"stats\",\"jerarquias\",\"recargos\",\"expedientes\",\"licencias\",\"tipos_requerimiento\",\"juzgados\",\"cumpleanos\"]', '2026-04-21 22:28:02', '2026-04-23 14:04:46');
+(1, 1, '[\"stats\",\"jerarquias\",\"secciones_guardia\",\"recargos\",\"expedientes\",\"licencias\",\"tipos_requerimiento\",\"juzgados\",\"cumpleanos\"]', '2026-04-21 22:28:02', '2026-05-16 14:37:15');
 
 -- --------------------------------------------------------
 
@@ -328,7 +336,9 @@ CREATE TABLE `expedientes` (
 --
 
 INSERT INTO `expedientes` (`id`, `nro_expediente`, `anio`, `expediente_origen`, `anio_origen`, `fecha`, `fecha_vencimiento`, `tipo_oficio`, `juzgado_origen`, `responsable_id`, `dependencia_id`, `dependencia`, `oficina`, `tipo_requerimiento`, `resumen`, `observaciones`, `nro_informe_tecnico`, `estado`, `created_by`, `created_at`) VALUES
-(1, 'EXP-001', '2026', '2', '', '2026-05-11', NULL, 'Oficio Judicial', '8', NULL, 1, NULL, 'Delegacion Laguna Blanca', '', '', '', '', 'Pendiente', NULL, '2026-05-11 12:48:58');
+(2, 'EXP-003', '2026', '2', '2024', '2026-05-14', NULL, 'Oficio Vario', '14', NULL, 1, NULL, 'Delegacion Laguna Blanca', 'Resguardo de Evidencia', '', '', '', 'Pendiente', NULL, '2026-05-14 21:57:20'),
+(3, 'EXP-001', '2026', '2', '2024', '2026-05-16', NULL, 'Oficio Judicial', '7', 12, 1, NULL, 'Delegacion Criminalística C-5', 'Resguardo de Evidencia', '', '', '', 'Pendiente', NULL, '2026-05-16 13:58:52'),
+(4, '111', '2026', '2', '2024', '2026-05-16', NULL, 'Oficio Judicial', '11', NULL, 1, NULL, 'Delegacion Pirané', '', '', '', '', 'Pendiente', NULL, '2026-05-16 14:00:13');
 
 -- --------------------------------------------------------
 
@@ -668,6 +678,27 @@ CREATE TABLE `personal` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `personal`
+--
+
+INSERT INTO `personal` (`id`, `legajo`, `jerarquia`, `apellido`, `nombre`, `dni`, `sexo`, `oficina`, `dependencia_id`, `seccion_guardia_id`, `fecha_nacimiento`, `tiene_arma`, `arma_marca`, `arma_modelo`, `arma_serie`, `chaleco_numero`, `sin_arma_motivo`, `sin_arma_justificacion`, `nro_credencial`, `nro_licencia_conducir`, `licencia_categoria`, `es_chofer`, `fecha_vencimiento_licencia`, `obra_social`, `nro_afiliado`, `obra_social_numero`, `telefono`, `email`, `direccion`, `estado`, `created_at`, `updated_at`) VALUES
+(3, '007', 'Comisario General', 'Fernández', 'Laura', '40334455', 'Masculino', 'Delegacion Laguna Blanca', 1, 5, '0000-00-00', 0, NULL, NULL, NULL, NULL, '', NULL, NULL, '', '', 0, '0000-00-00', '', NULL, '', '', '', '', 'Activo', '2026-05-11 23:29:30', '2026-05-11 23:30:19'),
+(10, '11', 'Comisario Mayor', 'López', 'Diego', '40334457', 'Masculino', 'Delegacion Laguna Blanca', 1, NULL, '1992-05-16', 0, NULL, NULL, NULL, NULL, '', NULL, NULL, '', '', 0, '0000-00-00', '', NULL, '', '', '', '', 'Activo', '2026-05-14 12:39:40', '2026-05-14 12:39:40'),
+(11, '007', 'Comisario Mayor', 'lezcano', 'Carlos', '40112233', 'Femenino', 'Delegacion Laguna Blanca', 1, 2, '1998-05-15', 0, NULL, NULL, NULL, NULL, '', NULL, NULL, '', '', 0, '0000-00-00', '', NULL, '', '', '', '', 'Activo', '2026-05-14 13:19:44', '2026-05-15 22:28:01'),
+(12, '007', 'Oficial Inspector', 'Campuzano', 'Carlos', '37534733', 'Masculino', 'Direccion de Policia Cientifica', 1, 5, '0000-00-00', 0, NULL, NULL, NULL, NULL, '', NULL, NULL, '', '', 0, '0000-00-00', '', NULL, '', '', '', '', 'Activo', '2026-05-14 13:33:02', '2026-05-15 23:39:31'),
+(13, '003', 'Comisario Inspector', 'García', 'Diana', '37534733', '', 'Delegacion Criminalística C-5', 1, 5, '0000-00-00', 0, NULL, NULL, NULL, NULL, '', NULL, NULL, '', '', 0, '0000-00-00', '', NULL, '', '', '', '', 'Activo', '2026-05-14 13:34:27', '2026-05-14 14:27:36'),
+(14, '001', 'Agente', 'Perez', 'Juan', '12345678', NULL, 'Delegacion Laguna Blanca', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 14:01:22', '2026-05-14 14:01:22'),
+(15, '002', 'Oficial', 'Gomez', 'Maria', '87654321', NULL, 'Otra Delegacion', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 14:01:22', '2026-05-14 14:01:22'),
+(16, '001', 'Agente', 'Perez', 'Juan', '12345678', NULL, 'Delegacion Laguna Blanca', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 14:10:42', '2026-05-14 14:10:42'),
+(17, '002', 'Oficial', 'Gomez', 'Maria', '87654321', NULL, 'Otra Delegacion', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 14:10:42', '2026-05-14 14:10:42'),
+(18, '001', 'Agente', 'Perez', 'Juan', '12345678', NULL, 'Delegacion Laguna Blanca', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 14:13:01', '2026-05-14 14:13:01'),
+(19, '002', 'Oficial', 'Gomez', 'Maria', '87654321', NULL, 'Otra Delegacion', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 14:13:01', '2026-05-14 14:13:01'),
+(20, '003', 'Suboficial', 'Lopez', 'Carlos', '11223344', NULL, 'Delegacion Laguna Blanca', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 14:13:01', '2026-05-14 14:13:01'),
+(21, '006', 'Comisario Inspector', 'García', 'Juan', '39235410', 'Femenino', 'Delegacion Criminalística C-5', 1, 2, '0000-00-00', 0, NULL, NULL, NULL, NULL, '', NULL, NULL, '', '', 0, '0000-00-00', '', NULL, '', '', '', '', 'Activo', '2026-05-14 14:28:28', '2026-05-14 14:28:28'),
+(22, '001', 'Agente', 'Perez', 'Juan', '12345678', NULL, 'Delegacion Laguna Blanca', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 22:37:02', '2026-05-14 22:37:02'),
+(23, '002', 'Oficial', 'Gomez', 'Maria', '87654321', NULL, 'Otra Delegacion', 1, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Activo', '2026-05-14 22:37:02', '2026-05-14 22:37:02');
+
 -- --------------------------------------------------------
 
 --
@@ -705,6 +736,15 @@ CREATE TABLE `recargos` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `seccion_guardia_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `recargos`
+--
+
+INSERT INTO `recargos` (`id`, `fecha`, `hora`, `tipo_recargo`, `oficina`, `dependencia_id`, `personal_id`, `observaciones`, `estado`, `created_by`, `created_at`, `seccion_guardia_id`) VALUES
+(1, '2026-05-12', '22:06:00', 'Seguridad Ciudadana', 'Delegacion Laguna Blanca', 1, 3, '', 'Pendiente', NULL, '2026-05-12 00:06:40', 5),
+(2, '2026-05-14', '13:16:00', 'Operativo', 'Delegacion Criminalística C-5', 1, 13, '', 'Pendiente', NULL, '2026-05-14 14:16:52', 5),
+(3, '2026-05-16', '14:55:00', 'Seguridad Ciudadana', 'Delegacion Criminalística C-5', 1, 20, NULL, 'Pendiente', NULL, '2026-05-16 14:53:54', 5);
 
 -- --------------------------------------------------------
 
@@ -830,6 +870,7 @@ CREATE TABLE `secciones_guardia` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
   `descripcion` text DEFAULT NULL,
+  `subordinado_id` int(11) DEFAULT NULL,
   `orden` int(11) DEFAULT 0,
   `activo` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -839,11 +880,11 @@ CREATE TABLE `secciones_guardia` (
 -- Volcado de datos para la tabla `secciones_guardia`
 --
 
-INSERT INTO `secciones_guardia` (`id`, `nombre`, `descripcion`, `orden`, `activo`, `created_at`) VALUES
-(2, '2° Grupo', 'Segundo grupo de guardia', 2, 1, '2026-04-24 22:59:36'),
-(3, '3° Grupo', 'Tercer grupo de guardia', 3, 1, '2026-04-24 22:59:36'),
-(5, '1° Grupo', 'Primer grupo de guardia', 1, 1, '2026-04-24 23:37:58'),
-(8, 'Administrativo', 'Personal administrativo', 4, 1, '2026-04-24 23:37:58');
+INSERT INTO `secciones_guardia` (`id`, `nombre`, `descripcion`, `subordinado_id`, `orden`, `activo`, `created_at`) VALUES
+(2, '2° Grupo', 'Segundo grupo de guardia', NULL, 2, 1, '2026-04-24 22:59:36'),
+(3, '3° Grupo', 'Tercer grupo de guardia', NULL, 3, 1, '2026-04-24 22:59:36'),
+(5, '1° Grupo', 'Primer grupo de guardia', NULL, 1, 1, '2026-04-24 23:37:58'),
+(8, 'Administrativo', 'Personal administrativo', NULL, 4, 1, '2026-04-24 23:37:58');
 
 -- --------------------------------------------------------
 
@@ -865,7 +906,7 @@ CREATE TABLE `user_table_config` (
 --
 
 INSERT INTO `user_table_config` (`id`, `usuario_id`, `tabla`, `columnas`, `created_at`, `updated_at`) VALUES
-(2, 1, 'expedientes', '[\"nro_expediente\",\"expediente_origen\",\"fecha\",\"tipo_oficio\",\"juzgado_origen\",\"tipo_requerimiento\",\"estado\"]', '2026-04-23 22:03:14', '2026-04-23 22:19:54'),
+(2, 1, 'expedientes', '[\"fecha\",\"nro_expediente\",\"anio\",\"expediente_origen\",\"tipo_oficio\",\"oficina\",\"juzgado_origen\",\"tipo_requerimiento\",\"estado\",\"nro_informe_tecnico\"]', '2026-04-23 22:03:14', '2026-05-11 13:09:42'),
 (11, 1, 'recargos', '[\"fecha\",\"hora\",\"tipo_recargo\",\"oficina\",\"personal\",\"estado\",\"observaciones\"]', '2026-04-24 14:22:32', '2026-04-24 14:22:32'),
 (22, 1, 'personal', '[\"legajo\",\"jerarquia\",\"apellido_nombre\",\"dni\",\"sexo\",\"fecha_nacimiento\",\"edad\",\"tiene_arma\",\"dependencia\",\"oficina\"]', '2026-05-08 22:36:33', '2026-05-08 22:36:33');
 
@@ -885,7 +926,7 @@ CREATE TABLE `usuarios` (
   `dependencia_id` int(11) DEFAULT NULL,
   `subordinado_id` int(11) DEFAULT NULL,
   `puede_ver_todas` tinyint(1) DEFAULT 0,
-  `nivel_acceso` enum('solo_propio','delegacion','todas') DEFAULT 'solo_propio',
+  `nivel_acceso` enum('solo_propio','solo_subordinado','delegacion','todas') DEFAULT 'solo_propio',
   `estado` enum('Activo','Inactivo') DEFAULT 'Activo',
   `permisos` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`permisos`)),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -900,7 +941,8 @@ INSERT INTO `usuarios` (`id`, `nombre_completo`, `username`, `email`, `password`
 (1, 'Administrador Central', 'admin', 'admin@sistema.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 1, NULL, 1, 'todas', 'Activo', NULL, '2026-04-21 15:12:12', '2026-05-09 03:00:00'),
 (2, 'Supervisor La Plata', 'supervisor.lp', 'supervisor.lp@policia.gob.ar', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 1, NULL, 0, 'delegacion', 'Activo', NULL, '2026-04-21 15:12:12', '2026-05-09 03:00:00'),
 (3, 'Jefe Criminalística LP', 'jefe.crim.lp', 'jefe.crim.lp@policia.gob.ar', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, 1, NULL, 0, 'solo_propio', 'Activo', NULL, '2026-04-21 15:12:12', '2026-05-09 03:00:00'),
-(4, 'Lezcano Omar ', 'ojlezcano', 'omarlezcano93@gmail.com', '$2y$10$GkUyL7Sw3.VWVnAJsNF28.WH3ma9JmTIN8ssf/PAp9cKNQ8nuSI2u', 4, NULL, 194, 0, '', 'Activo', '{\"dashboard\":[\"ver\"],\"personal\":[\"ver\",\"crear\"],\"recargos\":[\"ver\"],\"expedientes\":[\"ver\"],\"licencias\":[\"ver\"],\"usuarios\":[\"ver\"]}', '2026-05-09 13:21:44', '2026-05-09 13:21:44');
+(4, 'Lezcano Omar ', 'ojlezcano', 'omarlezcano93@gmail.com', '$2y$10$GkUyL7Sw3.VWVnAJsNF28.WH3ma9JmTIN8ssf/PAp9cKNQ8nuSI2u', 4, 1, 209, 0, 'solo_subordinado', 'Activo', '[]', '2026-05-09 13:21:44', '2026-05-15 22:26:48'),
+(6, 'Lezcano Omar ', 'ojlezcano1', 'omarlezcano93@gmail.co', '$2y$10$OrEUy8H03Z01sMeaNbSFDeqMnGvlJgJjKPSzPPyP.x9Ww17uSyjMu', 4, 1, 195, 0, 'solo_subordinado', 'Activo', '[]', '2026-05-14 14:15:15', '2026-05-14 14:15:15');
 
 --
 -- Índices para tablas volcadas
@@ -1068,8 +1110,6 @@ ALTER TABLE `permisos`
 --
 ALTER TABLE `personal`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `legajo` (`legajo`),
-  ADD UNIQUE KEY `dni` (`dni`),
   ADD KEY `dependencia_id` (`dependencia_id`),
   ADD KEY `idx_legajo` (`legajo`),
   ADD KEY `idx_dni` (`dni`),
@@ -1120,7 +1160,8 @@ ALTER TABLE `roles_permisos`
 -- Indices de la tabla `secciones_guardia`
 --
 ALTER TABLE `secciones_guardia`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_subordinado` (`subordinado_id`);
 
 --
 -- Indices de la tabla `user_table_config`
@@ -1154,13 +1195,13 @@ ALTER TABLE `alertas_config`
 -- AUTO_INCREMENT de la tabla `bitacora`
 --
 ALTER TABLE `bitacora`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `catalogos`
 --
 ALTER TABLE `catalogos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=215;
 
 --
 -- AUTO_INCREMENT de la tabla `configuracion`
@@ -1172,7 +1213,7 @@ ALTER TABLE `configuracion`
 -- AUTO_INCREMENT de la tabla `dashboard_config`
 --
 ALTER TABLE `dashboard_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `dependencias`
@@ -1202,7 +1243,7 @@ ALTER TABLE `equipamiento_chalecos`
 -- AUTO_INCREMENT de la tabla `expedientes`
 --
 ALTER TABLE `expedientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `expediente_documentos`
@@ -1268,7 +1309,7 @@ ALTER TABLE `permisos`
 -- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `personal_documentos`
@@ -1280,7 +1321,7 @@ ALTER TABLE `personal_documentos`
 -- AUTO_INCREMENT de la tabla `recargos`
 --
 ALTER TABLE `recargos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `reportes_guardados`
@@ -1304,13 +1345,13 @@ ALTER TABLE `secciones_guardia`
 -- AUTO_INCREMENT de la tabla `user_table_config`
 --
 ALTER TABLE `user_table_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Restricciones para tablas volcadas
@@ -1408,6 +1449,12 @@ ALTER TABLE `reportes_guardados`
 ALTER TABLE `roles_permisos`
   ADD CONSTRAINT `roles_permisos_ibfk_1` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `roles_permisos_ibfk_2` FOREIGN KEY (`permiso_id`) REFERENCES `permisos` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `secciones_guardia`
+--
+ALTER TABLE `secciones_guardia`
+  ADD CONSTRAINT `fk_secciones_subordinado` FOREIGN KEY (`subordinado_id`) REFERENCES `catalogos` (`id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `usuarios`

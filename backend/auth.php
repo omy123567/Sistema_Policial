@@ -40,18 +40,18 @@ function handleLogin() {
         $stmt->execute([$username]);
         $user = $stmt->fetch();
         
-        // Usuarios predefinidos para pruebas
-        $predefinedUsers = [
-            'admin' => ['password' => 'admin123', 'rol' => 'Administrador Central', 'rol_id' => 1, 'id' => 1, 'dependencia_id' => 1, 'subordinado_id' => null, 'nivel_acceso' => 'todas'],
-            'supervisor.lp' => ['password' => 'admin123', 'rol' => 'Supervisor Delegación', 'rol_id' => 2, 'id' => 2, 'dependencia_id' => 1, 'subordinado_id' => null, 'nivel_acceso' => 'delegacion'],
-            'jefe.lb' => ['password' => 'admin123', 'rol' => 'Jefe Sección', 'rol_id' => 3, 'id' => 4, 'dependencia_id' => 1, 'subordinado_id' => 194, 'nivel_acceso' => 'solo_subordinado']
-        ];
-        
         $validPassword = false;
         
         if ($user && password_verify($password, $user['password'])) {
             $validPassword = true;
-        } elseif (isset($predefinedUsers[$username]) && $predefinedUsers[$username]['password'] === $password) {
+        }
+        
+        // Usuarios predefinidos para pruebas (solo para desarrollo)
+        $predefinedUsers = [
+            'admin' => ['password' => 'admin123', 'rol' => 'Administrador Central', 'rol_id' => 1, 'id' => 1, 'dependencia_id' => 1, 'subordinado_id' => null, 'nivel_acceso' => 'todas'],
+        ];
+        
+        if (!$validPassword && isset($predefinedUsers[$username]) && $predefinedUsers[$username]['password'] === $password) {
             $validPassword = true;
             if (!$user) {
                 $predef = $predefinedUsers[$username];
@@ -72,6 +72,19 @@ function handleLogin() {
         }
         
         if ($validPassword && $user) {
+            // Obtener el valor del subordinado desde catalogos (dinámico)
+            $subordinado_valor = null;
+            $subordinado_id = $user['subordinado_id'] ?? null;
+            
+            if ($subordinado_id) {
+                $stmt2 = $db->prepare("SELECT valor FROM catalogos WHERE id = ? AND tipo = 'oficinas' AND activo = 1");
+                $stmt2->execute([$subordinado_id]);
+                $sub = $stmt2->fetch();
+                if ($sub) {
+                    $subordinado_valor = $sub['valor'];
+                }
+            }
+            
             // Obtener permisos del rol
             $permisos = [];
             if (isset($user['rol_id'])) {
@@ -90,10 +103,6 @@ function handleLogin() {
                 }
             }
             
-            // Obtener dependencias y subordinados permitidos
-            $dependenciasPermitidas = getDependenciasPermitidas($db, $user);
-            $subordinadosPermitidos = getSubordinadosPermitidos($db, $user);
-            
             $payload = [
                 'user_id' => $user['id'],
                 'username' => $user['username'],
@@ -103,12 +112,11 @@ function handleLogin() {
                 'rol_nivel' => $user['rol_nivel'] ?? 0,
                 'dependencia_id' => $user['dependencia_id'] ?? null,
                 'dependencia_nombre' => $user['dependencia_nombre'] ?? null,
-                'subordinado_id' => $user['subordinado_id'] ?? null,
-                'subordinado_nombre' => $user['subordinado_nombre'] ?? null,
+                'subordinado_id' => $subordinado_id,
+                'subordinado_nombre' => $subordinado_valor,
+                'subordinado_valor' => $subordinado_valor,
                 'puede_ver_todas' => ($user['nivel_acceso'] ?? 'solo_propio') === 'todas',
                 'nivel_acceso' => $user['nivel_acceso'] ?? 'solo_propio',
-                'dependencias_permitidas' => $dependenciasPermitidas,
-                'subordinados_permitidos' => $subordinadosPermitidos,
                 'permisos' => $permisos,
                 'exp' => time() + JWT_EXPIRATION
             ];
@@ -126,12 +134,11 @@ function handleLogin() {
                     'rol_id' => $user['rol_id'],
                     'dependencia_id' => $user['dependencia_id'],
                     'dependencia_nombre' => $user['dependencia_nombre'],
-                    'subordinado_id' => $user['subordinado_id'],
-                    'subordinado_nombre' => $user['subordinado_nombre'],
+                    'subordinado_id' => $subordinado_id,
+                    'subordinado_nombre' => $subordinado_valor,
+                    'subordinado_valor' => $subordinado_valor,
                     'puede_ver_todas' => ($user['nivel_acceso'] ?? 'solo_propio') === 'todas',
                     'nivel_acceso' => $user['nivel_acceso'] ?? 'solo_propio',
-                    'dependencias_permitidas' => $dependenciasPermitidas,
-                    'subordinados_permitidos' => $subordinadosPermitidos,
                     'permisos' => $permisos
                 ]
             ]);
@@ -143,75 +150,6 @@ function handleLogin() {
     
     http_response_code(401);
     echo json_encode(['error' => 'Credenciales inválidas']);
-}
-
-// Función para obtener dependencias permitidas
-function getDependenciasPermitidas($db, $usuario) {
-    $puede_ver_todas = ($usuario['nivel_acceso'] ?? 'solo_propio') === 'todas';
-    $nivel_acceso = $usuario['nivel_acceso'] ?? 'solo_propio';
-    $dependencia_id = $usuario['dependencia_id'] ?? null;
-    
-    // Administrador puede ver todo
-    if ($puede_ver_todas || $nivel_acceso === 'todas') {
-        $stmt = $db->query("SELECT id FROM dependencias WHERE activo = 1");
-        return array_column($stmt->fetchAll(), 'id');
-    }
-    
-    // Nivel solo_propio: solo su dependencia
-    if ($nivel_acceso === 'solo_propio' || !$dependencia_id) {
-        return $dependencia_id ? [$dependencia_id] : [];
-    }
-    
-    // Nivel delegacion: su dependencia y todas las hijas
-    $ids = [$dependencia_id];
-    $stmt = $db->prepare("
-        WITH RECURSIVE dependencias_hijas AS (
-            SELECT id FROM dependencias WHERE id = ?
-            UNION ALL
-            SELECT d.id FROM dependencias d
-            INNER JOIN dependencias_hijas dh ON d.padre_id = dh.id
-        )
-        SELECT id FROM dependencias_hijas
-    ");
-    $stmt->execute([$dependencia_id]);
-    $hijas = $stmt->fetchAll();
-    
-    foreach ($hijas as $hija) {
-        if (!in_array($hija['id'], $ids)) {
-            $ids[] = $hija['id'];
-        }
-    }
-    
-    return $ids;
-}
-
-// Función para obtener subordinados permitidos
-function getSubordinadosPermitidos($db, $usuario) {
-    $nivel_acceso = $usuario['nivel_acceso'] ?? 'solo_propio';
-    $puede_ver_todas = ($usuario['nivel_acceso'] ?? 'solo_propio') === 'todas';
-    $subordinado_id = $usuario['subordinado_id'] ?? null;
-    
-    // Administrador o nivel 'todas' puede ver todos los subordinados
-    if ($puede_ver_todas || $nivel_acceso === 'todas') {
-        $stmt = $db->query("SELECT id FROM catalogos WHERE tipo = 'oficinas' AND activo = 1");
-        return array_column($stmt->fetchAll(), 'id');
-    }
-    
-    // Nivel 'solo_subordinado' - solo su subordinado específico
-    if ($nivel_acceso === 'solo_subordinado' && $subordinado_id) {
-        return [$subordinado_id];
-    }
-    
-    // Nivel 'solo_propio' o 'delegacion' - basado en dependencia
-    $dependenciasPermitidas = getDependenciasPermitidas($db, $usuario);
-    if (empty($dependenciasPermitidas)) {
-        return [];
-    }
-    
-    $placeholders = implode(',', array_fill(0, count($dependenciasPermitidas), '?'));
-    $stmt = $db->prepare("SELECT id FROM catalogos WHERE tipo = 'oficinas' AND dependencia_id IN ($placeholders) AND activo = 1");
-    $stmt->execute($dependenciasPermitidas);
-    return array_column($stmt->fetchAll(), 'id');
 }
 
 function handleVerify() {
