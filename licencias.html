@@ -67,9 +67,7 @@
             gap: 1rem;
             flex-wrap: wrap;
         }
-        .card-header-left h1 {
-            margin: 0;
-        }
+        .card-header-left h1 { margin: 0; }
         .subordinado-selector {
             display: inline-flex;
             align-items: center;
@@ -80,14 +78,8 @@
             border: 1px solid var(--border);
             transition: all 0.2s ease;
         }
-        .subordinado-selector:hover {
-            border-color: var(--accent-primary);
-            background: var(--bg-card);
-        }
-        .subordinado-selector i {
-            color: var(--accent-primary);
-            font-size: 0.9rem;
-        }
+        .subordinado-selector:hover { border-color: var(--accent-primary); background: var(--bg-card); }
+        .subordinado-selector i { color: var(--accent-primary); font-size: 0.9rem; }
         .subordinado-selector select {
             background: transparent;
             border: none;
@@ -98,10 +90,7 @@
             cursor: pointer;
             outline: none;
         }
-        .subordinado-selector select option {
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
+        .subordinado-selector select option { background: var(--bg-card); color: var(--text-primary); }
         .filtro-activo-indicador {
             display: inline-flex;
             align-items: center;
@@ -112,18 +101,14 @@
             font-size: 0.75rem;
             color: var(--accent-primary);
         }
-        .filtro-activo-indicador i {
-            font-size: 0.7rem;
-        }
+        .filtro-activo-indicador i { font-size: 0.7rem; }
         .filtro-activo-indicador .limpiar-filtro {
             cursor: pointer;
             margin-left: 0.5rem;
             color: var(--text-secondary);
             transition: color 0.2s;
         }
-        .filtro-activo-indicador .limpiar-filtro:hover {
-            color: #dc2626;
-        }
+        .filtro-activo-indicador .limpiar-filtro:hover { color: #dc2626; }
         .subordinado-actual {
             display: inline-flex;
             align-items: center;
@@ -133,43 +118,16 @@
             border-radius: 30px;
             border: 1px solid rgba(29, 78, 216, 0.3);
         }
-        .subordinado-actual i {
-            color: var(--accent-primary);
-            font-size: 0.9rem;
-        }
-        .subordinado-actual .subordinado-nombre {
-            font-weight: 500;
-            color: var(--accent-primary);
-        }
-        input[readonly] {
-            cursor: not-allowed;
-            background-color: var(--bg-surface);
-            opacity: 0.8;
-        }
-        
-        .user-dropdown { position: relative; display: inline-block; }
-        .user-dropdown .user-info { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem 0.75rem; border-radius: 8px; transition: all 0.2s; }
-        .user-dropdown .user-info:hover { background-color: var(--bg-surface); }
-        .dropdown-menu { position: absolute; top: 100%; right: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; min-width: 180px; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .dropdown-menu.show { display: block; }
-        .dropdown-menu a { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; color: var(--text-primary); text-decoration: none; transition: all 0.2s; }
-        .dropdown-menu a:hover { background-color: var(--bg-surface); }
-        .dropdown-menu hr { margin: 0; border-color: var(--border); }
+        .subordinado-actual i { color: var(--accent-primary); font-size: 0.9rem; }
+        .subordinado-actual .subordinado-nombre { font-weight: 500; color: var(--accent-primary); }
+        input[readonly] { cursor: not-allowed; background-color: var(--bg-surface); opacity: 0.8; }
         
         @media (max-width:768px){ 
             .filtros-grid { grid-template-columns:1fr; } 
             .modal-content { width:98%; } 
-            .card-header-con-filtro {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .card-header-left {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .subordinado-selector {
-                justify-content: space-between;
-            }
+            .card-header-con-filtro { flex-direction: column; align-items: stretch; }
+            .card-header-left { flex-direction: column; align-items: stretch; }
+            .subordinado-selector { justify-content: space-between; }
         }
     </style>
 </head>
@@ -224,7 +182,6 @@
                 <div><label>Tipo</label><input type="text" id="filtro_tipo" class="form-control" list="listaTiposLicenciaFiltro" placeholder="Escriba para buscar..."><datalist id="listaTiposLicenciaFiltro"></datalist></div>
                 <div><label>Estado</label><select id="filtro_estado" class="form-control"><option value="">Todos</option><option>Pendiente</option><option>Aprobada</option><option>Rechazada</option><option>En Curso</option><option>Finalizada</option></select></div>
                 <div><label>Agente</label><input type="text" id="filtro_agente" class="form-control" placeholder="Nombre"></div>
-                <div><label>Subordinado</label><input type="text" id="filtro_subordinado" class="form-control" list="listaSubordinadosFiltro" placeholder="Escriba para buscar..."><datalist id="listaSubordinadosFiltro"></datalist></div>
             </div>
             <div style="display:flex;gap:0.5rem;margin-top:1rem;">
                 <button class="btn btn-primary" onclick="aplicarFiltros()">Buscar</button>
@@ -250,7 +207,6 @@
                     <div class="form-group"><label>Tipo *</label><input type="text" id="licencia_tipo" class="form-control" list="listaTiposLicencia" placeholder="Escriba para buscar..." autocomplete="off" required><datalist id="listaTiposLicencia"></datalist></div>
                     <div class="form-row">
                         <div class="form-group"><label>Unidad Regional</label><select id="licencia_dependencia" class="form-control"><option value="">Seleccionar...</option></select></div>
-                        <div class="form-group"><label>Subordinado</label><input type="text" id="licencia_subordinado" class="form-control" placeholder="Delegación asignada" readonly></div>
                     </div>
                     <div class="form-group"><label>Estado</label><select id="licencia_estado" class="form-control"><option>Pendiente</option><option>Aprobada</option><option>Rechazada</option><option>En Curso</option><option>Finalizada</option></select></div>
                     <div class="form-row">
@@ -340,11 +296,6 @@
                 const data = await response.json();
                 subordinadosDisponibles = Array.isArray(data) ? data : (data.data || []);
                 actualizarSelectoresSubordinado();
-                
-                const listaSubordinadosFiltro = document.getElementById('listaSubordinadosFiltro');
-                if (listaSubordinadosFiltro) {
-                    listaSubordinadosFiltro.innerHTML = subordinadosDisponibles.map(s => `<option value="${escapeHtml(s.valor)}">`).join('');
-                }
                 return subordinadosDisponibles;
             } catch(e) {
                 console.error('Error cargando subordinados:', e);
@@ -684,27 +635,6 @@
             const modal = document.getElementById('licenciaModal');
             const user = JSON.parse(localStorage.getItem('current_user') || '{}');
             const esAdmin = esAdministrador();
-            const userSubordinadoValor = user.subordinado_valor || '';
-            const userSubordinadoNombre = user.subordinado_nombre || userSubordinadoValor || '';
-            
-            const subordinadoInput = document.getElementById('licencia_subordinado');
-            
-            if (!esAdmin && userSubordinadoValor) {
-                subordinadoInput.value = userSubordinadoNombre;
-                subordinadoInput.readOnly = true;
-                subordinadoInput.disabled = false;
-                subordinadoInput.style.backgroundColor = 'var(--bg-surface)';
-                subordinadoInput.style.opacity = '0.7';
-                subordinadoInput.style.cursor = 'not-allowed';
-            } else if (esAdmin) {
-                subordinadoInput.readOnly = false;
-                subordinadoInput.disabled = false;
-                subordinadoInput.style.backgroundColor = '';
-                subordinadoInput.style.opacity = '';
-                subordinadoInput.style.cursor = 'text';
-                subordinadoInput.placeholder = 'Buscar...';
-                subordinadoInput.setAttribute('list', 'listaSubordinados');
-            }
             
             if (data) {
                 document.getElementById('licenciaId').value = data.id;
@@ -712,9 +642,6 @@
                 document.getElementById('licencia_agente_id').value = data.agente_id || '';
                 document.getElementById('licencia_tipo').value = data.tipo_licencia || '';
                 document.getElementById('licencia_dependencia').value = data.dependencia_id || '';
-                if (esAdmin) {
-                    subordinadoInput.value = data.oficina || '';
-                }
                 document.getElementById('licencia_estado').value = data.estado || 'Pendiente';
                 document.getElementById('licencia_fecha_inicio').value = data.fecha_inicio;
                 document.getElementById('licencia_dias_habiles').value = data.dias_habiles;
@@ -731,21 +658,12 @@
                 document.getElementById('licencia_dependencia').value = '';
                 document.getElementById('modalTitle').textContent = 'Nueva Licencia';
                 calcularFechaFin();
-                
-                if (!esAdmin && userSubordinadoValor) {
-                    subordinadoInput.value = userSubordinadoNombre;
-                } else if (esAdmin) {
-                    subordinadoInput.value = '';
-                }
             }
             modal.style.display = 'flex';
         }
         
         async function saveLicencia() {
             const id = document.getElementById('licenciaId').value;
-            const esAdmin = esAdministrador();
-            const user = JSON.parse(localStorage.getItem('current_user') || '{}');
-            const userSubordinadoValor = user.subordinado_valor || '';
             
             const agenteText = document.getElementById('licencia_agente').value;
             let agenteId = document.getElementById('licencia_agente_id').value;
@@ -759,11 +677,6 @@
                 }
             }
             
-            let oficinaValue = document.getElementById('licencia_subordinado').value;
-            if (!esAdmin && userSubordinadoValor) {
-                oficinaValue = userSubordinadoValor;
-            }
-            
             const data = {
                 agente_id: agenteId,
                 tipo_licencia: document.getElementById('licencia_tipo').value,
@@ -774,8 +687,7 @@
                 contar_fines_semana: document.getElementById('licencia_contar_fines_semana').checked ? 1 : 0,
                 fecha_fin: document.getElementById('licencia_fecha_fin').value,
                 observaciones: document.getElementById('licencia_observaciones').value,
-                dependencia_id: document.getElementById('licencia_dependencia').value || null,
-                oficina: oficinaValue
+                dependencia_id: document.getElementById('licencia_dependencia').value || null
             };
             
             if (!data.agente_id) { showToast('Seleccione un agente', 'warning'); return; }
@@ -815,17 +727,13 @@
             const tipo = document.getElementById('filtro_tipo')?.value; if (tipo && tipo !== '') filtrados = filtrados.filter(l => l.tipo_licencia === tipo);
             const estado = document.getElementById('filtro_estado')?.value; if (estado && estado !== '') filtrados = filtrados.filter(l => l.estado === estado);
             const agente = document.getElementById('filtro_agente')?.value.toLowerCase(); if (agente) filtrados = filtrados.filter(l => (l.apellido || '').toLowerCase().includes(agente) || (l.nombre || '').toLowerCase().includes(agente));
-            const subordinado = document.getElementById('filtro_subordinado')?.value;
-            if (subordinado && subordinado !== '') {
-                filtrados = filtrados.filter(l => l.oficina === subordinado);
-            }
             licenciasData = filtrados; renderTable(); showToast(`Encontradas ${filtrados.length} licencias`, 'info');
         }
         
         function limpiarFiltros() {
             document.getElementById('filtro_fecha_desde').value = ''; document.getElementById('filtro_fecha_hasta').value = '';
             document.getElementById('filtro_tipo').value = ''; document.getElementById('filtro_estado').value = '';
-            document.getElementById('filtro_agente').value = ''; document.getElementById('filtro_subordinado').value = '';
+            document.getElementById('filtro_agente').value = '';
             loadLicencias();
         }
         

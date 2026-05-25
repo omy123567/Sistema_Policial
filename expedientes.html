@@ -182,6 +182,12 @@
         .acciones-cell {
             white-space: nowrap;
         }
+        .acciones-buttons {
+            display: flex;
+            gap: 0.3rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
         
         .modal {
             display: none;
@@ -428,6 +434,10 @@
             }
             .subordinado-selector {
                 justify-content: space-between;
+            }
+            .acciones-buttons {
+                flex-direction: column;
+                gap: 0.2rem;
             }
         }
     </style>
@@ -747,7 +757,7 @@
         let subordinadosData = [];
         let personalData = [];
         
-        let activeColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado'];
+        let activeColumns = ['fecha', 'nro_expediente', 'anio', 'expediente_origen', 'tipo_oficio', 'oficina', 'juzgado_origen', 'tipo_requerimiento', 'estado', 'nro_informe_tecnico'];
         
         const columnLabels = {
             'nro_expediente': 'N° Expediente',
@@ -970,7 +980,7 @@
             const tbody = document.getElementById('expedientesTableBody');
             if (!thead || !tbody) return;
             
-            thead.innerHTML = '<td>' + activeColumns.map(col => `
+            thead.innerHTML = '<tr>' + activeColumns.map(col => `
                 <th class="draggable" data-col="${col}" draggable="true">
                     <span class="drag-handle"><i class="fas fa-grip-vertical"></i></span> 
                     ${columnLabels[col] || col}
@@ -980,7 +990,7 @@
             initHeaderDragDrop();
             
             if (!expedientesData || expedientesData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay expedientes registrados<\/td><\/tr>';
+                tbody.innerHTML = '<tr><td colspan="' + (activeColumns.length + 1) + '" class="text-center">No hay expedientes registrados</td></tr>';
                 return;
             }
             
@@ -997,32 +1007,56 @@
                 
                 const responsable = exp.responsable_apellido ? `${exp.responsable_apellido}, ${exp.responsable_nombre}` : '-';
                 const anio = exp.anio || (exp.fecha ? exp.fecha.split('-')[0] : '-');
-                const expedienteOrigen = exp.expediente_origen ? `${exp.expediente_origen}${exp.anio_origen ? `/${exp.anio_origen}` : ''}` : '-';
+                
+                let expedienteOrigenMostrar = '-';
+                if (exp.expediente_origen) {
+                    expedienteOrigenMostrar = `${exp.expediente_origen}${exp.anio_origen ? `/${exp.anio_origen}` : ''}`;
+                }
+                
                 const juzgadoNombre = exp.juzgado_nombre || exp.juzgado_origen || '-';
                 const dependenciaNombre = exp.dependencia_nombre || '-';
                 const oficinaNombre = exp.oficina || '-';
                 
                 let row = '<tr>';
                 for (const col of activeColumns) {
-                    if (col === 'responsable') row += '<td>' + escapeHtml(responsable) + '</td>';
-                    else if (col === 'juzgado_origen') row += '<td>' + escapeHtml(juzgadoNombre) + '</td>';
-                    else if (col === 'dependencia') row += '<td>' + escapeHtml(dependenciaNombre) + '</td>';
-                    else if (col === 'oficina') row += '<td>' + escapeHtml(oficinaNombre) + '</td>';
-                    else if (col === 'estado') row += '<td><span class="badge ' + estadoClass + '">' + escapeHtml(estado) + '</span></td>';
-                    else row += '<td>' + escapeHtml(exp[col] || '-') + '</td>';
+                    if (col === 'responsable') {
+                        row += '<td>' + escapeHtml(responsable) + '</td>';
+                    } 
+                    else if (col === 'juzgado_origen') {
+                        row += '<td>' + escapeHtml(juzgadoNombre) + '</td>';
+                    } 
+                    else if (col === 'dependencia') {
+                        row += '<td>' + escapeHtml(dependenciaNombre) + '</td>';
+                    } 
+                    else if (col === 'oficina') {
+                        row += '<td>' + escapeHtml(oficinaNombre) + '</td>';
+                    } 
+                    else if (col === 'estado') {
+                        row += '<td><span class="badge ' + estadoClass + '">' + escapeHtml(estado) + '</span></td>';
+                    }
+                    else if (col === 'expediente_origen') {
+                        row += '<td>' + escapeHtml(expedienteOrigenMostrar) + '</td>';
+                    }
+                    else {
+                        row += '<td>' + escapeHtml(exp[col] || '-') + '</td>';
+                    }
                 }
+                
                 row += `<td class="acciones-cell">
-                    <button class="btn-accion btn-editar" onclick="editExpediente(${exp.id})" title="Editar">
-                        <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <button class="btn-accion btn-eliminar" onclick="deleteExpediente(${exp.id})" title="Eliminar">
-                        <i class="fas fa-trash"></i> Eliminar
-                    </button>
-                    ${estado !== 'Elevado' ? `<button class="btn-accion btn-elevar" onclick="abrirElevacion(${exp.id})" title="Elevar Expediente">
-                        <i class="fas fa-arrow-up"></i> Elevar
-                    </button>` : ''}
-                <\/td>`;
-                row += '<\/tr>';
+                    <div class="acciones-buttons">
+                        <button class="btn-accion btn-editar" onclick="editExpediente(${exp.id})" title="Editar">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn-accion btn-eliminar" onclick="deleteExpediente(${exp.id})" title="Eliminar">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                        ${estado !== 'Elevado' ? `<button class="btn-accion btn-elevar" onclick="abrirElevacion(${exp.id})" title="Elevar Expediente">
+                            <i class="fas fa-arrow-up"></i> Elevar
+                        </button>` : ''}
+                    </div>
+                </td>`;
+                
+                row += '</tr>';
                 return row;
             }).join('');
         }
@@ -1119,14 +1153,14 @@
                 if (config && Array.isArray(config) && config.length > 0) {
                     activeColumns = config;
                 } else {
-                    activeColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado'];
+                    activeColumns = ['fecha', 'nro_expediente', 'anio', 'expediente_origen', 'tipo_oficio', 'oficina', 'juzgado_origen', 'tipo_requerimiento', 'estado', 'nro_informe_tecnico'];
                 }
                 renderOrderList();
             } catch(e) { console.error(e); }
         }
         
         function resetColumns() {
-            activeColumns = ['nro_expediente', 'anio', 'expediente_origen', 'fecha', 'tipo_oficio', 'juzgado_origen', 'responsable', 'estado'];
+            activeColumns = ['fecha', 'nro_expediente', 'anio', 'expediente_origen', 'tipo_oficio', 'oficina', 'juzgado_origen', 'tipo_requerimiento', 'estado', 'nro_informe_tecnico'];
             renderOrderList();
             renderTable();
             saveColumnConfig();
@@ -1246,7 +1280,7 @@
         
         async function loadExpedientes() {
             const tbody = document.getElementById('expedientesTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Cargando expedientes...<\/td><\/tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Cargando expedientes...</td></tr>';
             
             try {
                 const token = getToken();
@@ -1276,7 +1310,7 @@
                 showToast(`✅ ${expedientesData.length} expedientes cargados`, 'success');
             } catch(e) {
                 console.error('Error cargando expedientes:', e);
-                if (tbody) tbody.innerHTML = '<td><td colspan="10" class="text-center">Error cargando datos: ' + e.message + '<\/td><\/tr>';
+                if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="text-center">Error cargando datos: ' + e.message + '</td></tr>';
                 showToast('Error cargando expedientes', 'error');
             }
         }

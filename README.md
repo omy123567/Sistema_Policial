@@ -1,6 +1,6 @@
 # Sistema de Gestión Policial
 
-[![Versión](https://img.shields.io/badge/versión-1.0.0-blue.svg)](https://github.com/)
+[![Versión](https://img.shields.io/badge/versión-2.0.0-blue.svg)](https://github.com/)
 [![PHP](https://img.shields.io/badge/PHP-7.4+-777BB4.svg)](https://php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL-5.7+-4479A1.svg)](https://mysql.com/)
 [![Licencia](https://img.shields.io/badge/licencia-Institucional-red.svg)]()
@@ -19,6 +19,7 @@ Sistema web completo para la gestión institucional de dependencias policiales y
 - [Roles y Permisos](#-roles-y-permisos)
 - [API Endpoints](#-api-endpoints)
 - [Usuarios de Prueba](#-usuarios-de-prueba)
+- [Credenciales de Acceso](#-credenciales-de-acceso)
 - [Solución de Problemas](#-solución-de-problemas)
 - [Personalización](#-personalización)
 - [Seguridad](#-seguridad)
@@ -51,6 +52,7 @@ Sistema web completo para la gestión institucional de dependencias policiales y
 - ✅ Documentos adjuntos (CV, certificados, fotos)
 - ✅ Calendario de cumpleaños
 - ✅ Importación masiva desde CSV
+- ✅ Secciones de guardia (1° Grupo, 2° Grupo, 3° Grupo, Administrativo)
 
 ### ⚖️ Recargos Disciplinarios
 - ✅ Registro de faltas y sanciones
@@ -64,7 +66,6 @@ Sistema web completo para la gestión institucional de dependencias policiales y
 - ✅ Sistema de elevaciones con imágenes
 - ✅ Adjuntos con drag & drop
 - ✅ Estados: Pendiente, En Trámite, Finalizado, Vencido
-- ✅ Cálculo automático de vencimiento (3 días hábiles)
 - ✅ Búsqueda avanzada por múltiples criterios
 
 ### 📅 Licencias
@@ -79,11 +80,11 @@ Sistema web completo para la gestión institucional de dependencias policiales y
 - ✅ Roles: Administrador, Supervisor, Jefe Sección, Operador
 - ✅ Permisos configurables por módulo y acción
 - ✅ Asignación de dependencia específica
-- ✅ Niveles de acceso: solo_propio, delegacion, todas
+- ✅ Niveles de acceso: solo_propio, solo_subordinado, delegacion, todas
 
 ### ⚙️ Configuración
 - ✅ Catálogos dinámicos (jerarquías, oficinas, juzgados, etc.)
-- ✅ Feriados nacionales
+- ✅ Feriados nacionales y provinciales
 - ✅ Estructura de dependencias jerárquica
 - ✅ Backup y restauración de base de datos
 - ✅ Personalización del dashboard
@@ -98,6 +99,7 @@ Sistema web completo para la gestión institucional de dependencias policiales y
 |----------|---------------|--------------|
 | PHP | 7.4 | 8.0+ |
 | MySQL | 5.7 | 8.0+ |
+| MariaDB | 10.4 | 10.6+ |
 | Apache | 2.4 | 2.4+ |
 | XAMPP/WAMP/LAMP | - | Última versión |
 
